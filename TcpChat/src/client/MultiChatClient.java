@@ -46,7 +46,7 @@ public class MultiChatClient implements Runnable {
         String host = "localhost";
 
         if (args.length < 2) {
-            System.out.println("Usage: java MultiThreadChatClient <host> <portNumber>\n"
+            System.out.println("Usage: java ChatClient <host> <portNumber>\n"
                     + "Now using host=" + host + ", portNumber=" + portNumber);
         } else {
             host = args[0];

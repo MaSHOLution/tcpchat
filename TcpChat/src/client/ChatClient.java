@@ -26,7 +26,7 @@ package client;
 import java.net.*;
 import java.io.*;
 
-public class MultiChatClient implements Runnable {
+public class ChatClient implements Runnable {
 
     // Sockets
     protected static Socket clientSocket = null;
@@ -50,7 +50,7 @@ public class MultiChatClient implements Runnable {
                     + "Now using host=" + host + ", portNumber=" + portNumber);
         } else {
             host = args[0];
-            portNumber = Integer.valueOf(args[1]).intValue();
+            portNumber = Integer.valueOf(args[1]);
         }
 
         /*
@@ -75,7 +75,7 @@ public class MultiChatClient implements Runnable {
             try {
 
                 /* Create a thread to read from the server. */
-                new Thread(new MultiChatClient()).start();
+                new Thread(new ChatClient()).start();
                 while (!closed) {
                     outStream.println(inputLine.readLine().trim());
                 }

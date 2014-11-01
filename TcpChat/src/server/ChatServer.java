@@ -47,10 +47,10 @@ public class ChatServer {
         // Default port
         int portNumber = 8000;
         if (args.length < 1) {
-            System.out.println("Usage: java MultiThreadChatServerSync <portNumber>\n"
+            System.out.println("Usage: java ChatServer <portNumber>\n"
                     + "Now using port number=" + portNumber);
         } else {
-            portNumber = Integer.valueOf(args[0]).intValue();
+            portNumber = Integer.valueOf(args[0]);
         }
 
         // Open a server socket on the portNumber (default 8000)
@@ -94,7 +94,6 @@ class ClientThread extends Thread {
     protected Socket clientSocket = null;
     protected final ClientThread[] threads;
     protected int maxClientsCount;
-    protected String name = null;
 
     /**
      * Constructor
@@ -215,12 +214,12 @@ class ClientThread extends Thread {
                     && threads[i] != this
                     && threads[i].clientName != null
                     && threads[i].clientName.equals(receiver)) {
-                threads[i].outStream.println("<" + name + "> " + message);
+                threads[i].outStream.println("<" + this.clientName + "> " + message);
                 /*
                  * Echo this message to let the client know the private
                  * message was sent.
                  */
-                this.outStream.println(">" + name + "> " + message);
+                this.outStream.println(">" + this.clientName + "> " + message);
                 break;
             }
         }

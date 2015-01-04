@@ -40,12 +40,12 @@ public class ChatClient implements Runnable {
 
     public static void main(String[] args) {
 
-        // The default port.
+        // The default port
         int portNumber = 8000;
         // The default host.
         String host = "localhost";
 
-        if (args.length < 2) {
+        if (args.length != 2) {
             System.out.println("Usage: java ChatClient <host> <portNumber>\n"
                     + "Now using host=" + host + ", portNumber=" + portNumber);
         } else {
@@ -64,7 +64,7 @@ public class ChatClient implements Runnable {
         } catch (UnknownHostException e) {
             System.err.println("Don't know about host " + host);
         } catch (IOException e) {
-            System.err.println("Couldn't get I/O for the connection to the host " + host);
+            System.err.println("Couldn't get connection to host \"" + host + "\"");
         }
 
         /*
@@ -74,14 +74,13 @@ public class ChatClient implements Runnable {
         if (clientSocket != null && outStream != null && inStream != null) {
             try {
 
-                /* Create a thread to read from the server. */
+                // Create a thread to read from the server
                 new Thread(new ChatClient()).start();
                 while (!closed) {
                     outStream.println(inputLine.readLine().trim());
                 }
-                /*
-                 * Close the output stream, close the input stream, close the socket.
-                 */
+
+                // Close the output stream, close the input stream, close the socket.
                 outStream.close();
                 inStream.close();
                 clientSocket.close();
@@ -96,6 +95,7 @@ public class ChatClient implements Runnable {
      * 
      * @see java.lang.Runnable#run()
      */
+    @Override
     public void run() {
         /*
          * Keep on reading from the socket till we receive "Bye" from the
@@ -105,11 +105,13 @@ public class ChatClient implements Runnable {
         try {
             while ((responseLine = inStream.readLine()) != null) {
                 System.out.println(responseLine);
-                if (responseLine.indexOf("*** Bye") != -1) {
+                if (responseLine.startsWith("*** Bye")) {
+                    System.out.println("You have successfully signed out.");
                     break;
                 }
             }
             closed = true;
+            System.out.println("Press \"Enter\" to quit!");
         } catch (IOException e) {
             System.err.println("IOException:  " + e);
         }

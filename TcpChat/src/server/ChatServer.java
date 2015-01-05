@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2014 Manuel Schmid.
+ * Copyright 2015 Manuel Schmid.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,7 +23,6 @@
  */
 package server;
 
-import java.io.DataInputStream;
 import java.io.PrintStream;
 import java.io.IOException;
 import java.net.Socket;

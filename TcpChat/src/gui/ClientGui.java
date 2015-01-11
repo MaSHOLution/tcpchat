@@ -23,14 +23,39 @@
  */
 package gui;
 
+import java.awt.Dimension;
+import java.awt.event.KeyEvent;
+import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintStream;
+import java.net.Socket;
+import java.net.UnknownHostException;
+
 /**
+ * This is the gui class for the client Run this file to initialize gui
  *
  * @author Manuel Schmid
  */
 public class ClientGui extends javax.swing.JFrame {
 
+    // Socket
+    protected Socket clientSocket = null;
+
+    // Streams
+    protected PrintStream outStream = null;
+    protected DataInputStream inStream = null;
+    protected BufferedReader inputLine = null;
+
+    protected enum connectButtonText {
+
+        Connect, 
+        Disconnect
+    }
+
     /**
-     * Creates new form NewJFrame
+     * Initializes the gui elements
      */
     public ClientGui() {
         initComponents();
@@ -64,18 +89,20 @@ public class ClientGui extends javax.swing.JFrame {
         setTitle("Chat-Client");
 
         bConnect.setText("Connect");
-
-        org.jdesktop.beansbinding.Binding binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, connectionPanel, org.jdesktop.beansbinding.ELProperty.create("${enabled}"), bConnect, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
-        bindingGroup.addBinding(binding);
-
         bConnect.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 bConnectActionPerformed(evt);
             }
         });
 
-        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, connectionPanel, org.jdesktop.beansbinding.ELProperty.create("${enabled}"), tbPort, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
+        org.jdesktop.beansbinding.Binding binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, connectionPanel, org.jdesktop.beansbinding.ELProperty.create("${enabled}"), tbPort, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
         bindingGroup.addBinding(binding);
+
+        tbPort.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                tbPortKeyPressed(evt);
+            }
+        });
 
         jLabel1.setText("Port");
 
@@ -91,6 +118,7 @@ public class ClientGui extends javax.swing.JFrame {
         bindingGroup.addBinding(binding);
 
         jLabel3.setText("Nickname");
+        jLabel3.setEnabled(false);
 
         binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, connectionPanel, org.jdesktop.beansbinding.ELProperty.create("${enabled}"), jLabel3, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
         bindingGroup.addBinding(binding);
@@ -160,6 +188,12 @@ public class ClientGui extends javax.swing.JFrame {
         binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, sendPanel, org.jdesktop.beansbinding.ELProperty.create("${enabled}"), tbMessage, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
         bindingGroup.addBinding(binding);
 
+        tbMessage.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                tbMessageKeyPressed(evt);
+            }
+        });
+
         javax.swing.GroupLayout sendPanelLayout = new javax.swing.GroupLayout(sendPanel);
         sendPanel.setLayout(sendPanelLayout);
         sendPanelLayout.setHorizontalGroup(
@@ -184,8 +218,8 @@ public class ClientGui extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(serverPanel)
-                    .addComponent(connectionPanel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(sendPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(sendPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(connectionPanel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -206,20 +240,142 @@ public class ClientGui extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void bConnectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bConnectActionPerformed
-        this.sendPanel.setEnabled(true);
-        this.connectionPanel.setEnabled(false);
-        System.out.println("test");
+        if (this.bConnect.getText().equals(connectButtonText.Connect.toString())) {
+            this.connect();
+        } else {
+            this.disconnect();
+        }
     }//GEN-LAST:event_bConnectActionPerformed
 
     private void bSendMessageActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bSendMessageActionPerformed
-        // TODO add your handling code here:
+        this.sendMessage();
     }//GEN-LAST:event_bSendMessageActionPerformed
+
+    private void tbMessageKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tbMessageKeyPressed
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            this.sendMessage();
+        }
+    }//GEN-LAST:event_tbMessageKeyPressed
+
+    private void tbPortKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tbPortKeyPressed
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            this.connect();
+        }
+    }//GEN-LAST:event_tbPortKeyPressed
+
+    /**
+     * Connects the client to the server
+     */
+    private boolean connect() {
+        // Initiating variables
+        String host = this.tbServer.getText();
+        int portNumber = Integer.parseInt(this.tbPort.getText());
+
+        /*
+         * Open a socket on a given host and port. Open input and output streams.
+         */
+        try {
+            // Set up socket and streams
+            clientSocket = new Socket(host, portNumber);
+            inputLine = new BufferedReader(new InputStreamReader(System.in));
+            outStream = new PrintStream(clientSocket.getOutputStream());
+            inStream = new DataInputStream(clientSocket.getInputStream());
+
+            // Initial clear of the chat text area
+            this.clearChatArea();
+
+            // Create a thread to read from the server
+            new Thread(new ClientGuiThread(this)).start();
+
+            this.switchGui(true);
+            return true;
+
+        } catch (UnknownHostException e) {
+            System.err.println("Don't know about host " + host);
+        } catch (IOException e) {
+            System.err.println("Could not connect to host \"" + host + "\"");
+        }
+        return false;
+    }
+
+    /**
+     * Disconnects the client to the server
+     */
+    private void disconnect() {
+        this.outStream.println("/quit");
+    }
+
+    /**
+     * Sends a message through the outStream to the server
+     */
+    private void sendMessage() {
+
+        // Check if line is empty
+        String message = this.tbMessage.getText();
+        if (!message.trim().equals("")) {
+            this.outStream.println(message);
+            this.tbMessage.setText("");
+        }
+    }
+
+    /**
+     * Output a message on the chat text area
+     *
+     * @param message
+     */
+    public synchronized void outputLineOnGui(String message) {
+        if (!message.trim().equals("")) {
+            this.taChat.append("\n" + message);
+            this.taChat.setCaretPosition(taChat.getDocument().getLength());
+        }
+    }
+
+    /**
+     * Clears the chat text area
+     */
+    private void clearChatArea() {
+        this.taChat.setText("");
+    }
+
+    /**
+     * Closes the connection to the server
+     */
+    protected synchronized void closeConnection() {
+        try {
+            // Close streams and socket
+            this.outStream.close();
+            this.inStream.close();
+            this.clientSocket.close();
+            
+            this.switchGui(false);
+        } catch (IOException e) {
+            System.err.println("IOException:  " + e);
+        }
+    }
+
+    /**
+     * Switches the gui between two states: 1. Only connect bar active 2. chat
+     * area and message sending active
+     *
+     * @param isEnabled
+     */
+    private void switchGui(boolean isEnabled) {
+
+        if (isEnabled) {
+            this.bConnect.setText(connectButtonText.Disconnect.toString());
+            this.pack();
+        } else {
+            this.bConnect.setText(connectButtonText.Connect.toString());
+        }
+        this.sendPanel.setEnabled(isEnabled);
+        this.connectionPanel.setEnabled(!isEnabled);
+    }
 
     /**
      * @param args the command line arguments
      */
     public static void main(String args[]) {
-        
+
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
@@ -243,10 +399,6 @@ public class ClientGui extends javax.swing.JFrame {
                 new ClientGui().setVisible(true);
             }
         });
-    }
-
-    public void changeText(String text) {
-        jLabel3.setText(text);
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

@@ -28,8 +28,8 @@
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="1" attributes="0">
                   <Component id="serverPanel" max="32767" attributes="0"/>
-                  <Component id="connectionPanel" alignment="0" max="32767" attributes="0"/>
                   <Component id="sendPanel" alignment="1" max="32767" attributes="0"/>
+                  <Component id="connectionPanel" alignment="0" max="32767" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
@@ -95,9 +95,6 @@
           <Properties>
             <Property name="text" type="java.lang.String" value="Connect"/>
           </Properties>
-          <BindingProperties>
-            <BindingProperty name="enabled" source="connectionPanel" sourcePath="${enabled}" target="bConnect" targetPath="enabled" updateStrategy="0" immediately="false"/>
-          </BindingProperties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="bConnectActionPerformed"/>
           </Events>
@@ -106,6 +103,9 @@
           <BindingProperties>
             <BindingProperty name="enabled" source="connectionPanel" sourcePath="${enabled}" target="tbPort" targetPath="enabled" updateStrategy="0" immediately="false"/>
           </BindingProperties>
+          <Events>
+            <EventHandler event="keyPressed" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="tbPortKeyPressed"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JLabel" name="jLabel1">
           <Properties>
@@ -131,6 +131,7 @@
         <Component class="javax.swing.JLabel" name="jLabel3">
           <Properties>
             <Property name="text" type="java.lang.String" value="Nickname"/>
+            <Property name="enabled" type="boolean" value="false"/>
           </Properties>
           <BindingProperties>
             <BindingProperty name="enabled" source="connectionPanel" sourcePath="${enabled}" target="jLabel3" targetPath="enabled" updateStrategy="0" immediately="false"/>
@@ -209,6 +210,9 @@
           <BindingProperties>
             <BindingProperty name="enabled" source="sendPanel" sourcePath="${enabled}" target="tbMessage" targetPath="enabled" updateStrategy="0" immediately="false"/>
           </BindingProperties>
+          <Events>
+            <EventHandler event="keyPressed" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="tbMessageKeyPressed"/>
+          </Events>
         </Component>
       </SubComponents>
     </Container>

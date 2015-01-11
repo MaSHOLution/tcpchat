@@ -4,6 +4,7 @@
 	- Private Nachrichten in Tabs anzeigen lassen
 	- Connect-Button:
 		- Fix für Connect-Problem mit Name "/quit"
+	- Nickname in tbNickname verwenden anstatt Nutzereingabe
 
 server.ChatServer
 	- Name "/quit" nicht erlauben
@@ -11,11 +12,10 @@ server.ChatServer
 	- Wegen jFrame Close-Event schließen ohne Rückgabe ermöglichen
 	- Sperre bei Spam
 	- Logging
+		- Logpath anpassen
 		- Nicht auf Konsole ausgeben lassen
-		- General
-		- Connection
-		- Exception
-
+	- Bei schließen alle Clients trennen 
+	
 Allgemein:
 	- Userliste
 	- Verschlüsselung der Daten

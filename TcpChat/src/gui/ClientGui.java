@@ -23,8 +23,6 @@
  */
 package gui;
 
-import java.awt.Dimension;
-import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
 import java.io.BufferedReader;
 import java.io.DataInputStream;
@@ -103,6 +101,8 @@ public class ClientGui extends javax.swing.JFrame {
             }
         });
 
+        tbPort.setText("8000");
+
         org.jdesktop.beansbinding.Binding binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, connectionPanel, org.jdesktop.beansbinding.ELProperty.create("${enabled}"), tbPort, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
         bindingGroup.addBinding(binding);
 
@@ -121,6 +121,8 @@ public class ClientGui extends javax.swing.JFrame {
 
         binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, connectionPanel, org.jdesktop.beansbinding.ELProperty.create("${enabled}"), jLabel2, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
         bindingGroup.addBinding(binding);
+
+        tbServer.setText("localhost");
 
         binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, connectionPanel, org.jdesktop.beansbinding.ELProperty.create("${enabled}"), tbServer, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
         bindingGroup.addBinding(binding);
@@ -207,8 +209,8 @@ public class ClientGui extends javax.swing.JFrame {
             sendPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, sendPanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(tbMessage, javax.swing.GroupLayout.PREFERRED_SIZE, 433, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(tbMessage)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(bSendMessage, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
         sendPanelLayout.setVerticalGroup(
@@ -277,14 +279,14 @@ public class ClientGui extends javax.swing.JFrame {
     private boolean connect() {
         // Initiating variables
         String host = this.tbServer.getText();
-        int portNumber = Integer.parseInt(this.tbPort.getText());
+        int port = Integer.parseInt(this.tbPort.getText());
 
         /*
          * Open a socket on a given host and port. Open input and output streams.
          */
         try {
             // Set up socket and streams
-            clientSocket = new Socket(host, portNumber);
+            clientSocket = new Socket(host, port);
             inputLine = new BufferedReader(new InputStreamReader(System.in));
             outStream = new PrintStream(clientSocket.getOutputStream());
             inStream = new DataInputStream(clientSocket.getInputStream());
@@ -299,9 +301,9 @@ public class ClientGui extends javax.swing.JFrame {
             return true;
 
         } catch (UnknownHostException e) {
-            System.err.println("Don't know about host " + host);
+            this.dialogHelper.showWarningDialog("Warning", "Don't know about host " + host);
         } catch (IOException e) {
-            System.err.println("Could not connect to host \"" + host + "\"");
+            this.dialogHelper.showWarningDialog("Connection failed", "Could not connect to host \"" + host + "\" on Port " + port);
         }
         return false;
     }

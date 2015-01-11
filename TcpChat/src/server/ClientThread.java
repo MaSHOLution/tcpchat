@@ -62,12 +62,7 @@ class ClientThread extends Thread {
 
             // Setting up name
             String name = this.setName();
-            for (int i = 0; i < this.maxClientsCount; i++) {
-                if (this.threads[i] != null && this.threads[i] == this) {
-                    this.clientName = "@" + name;
-                    break;
-                }
-            }
+            this.linkNameToThread(name);
 
             // Broadcasts welcome message to all clients
             broadcastExceptMe("*** A new user " + name + " entered the chat room !!! ***");
@@ -184,7 +179,21 @@ class ClientThread extends Thread {
     }
 
     /**
-     * Clean up
+     * Adds name to clientThread at index of this client
+     *
+     * @param name name of the client
+     */
+    protected void linkNameToThread(String name) {
+        for (int i = 0; i < this.maxClientsCount; i++) {
+            if (this.threads[i] != null && this.threads[i] == this) {
+                this.clientName = "@" + name;
+                break;
+            }
+        }
+    }
+
+    /**
+     * Disconnect the client, set slot in clientArray free for new client
      */
     protected synchronized void disconnect() {
         for (int i = 0; i < this.maxClientsCount; i++) {

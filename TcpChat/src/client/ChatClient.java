@@ -31,7 +31,6 @@ import java.io.PrintStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
-
 public class ChatClient implements Runnable {
 
     // Sockets

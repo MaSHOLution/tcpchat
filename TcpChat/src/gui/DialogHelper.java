@@ -84,9 +84,9 @@ public class DialogHelper {
                 JOptionPane.PLAIN_MESSAGE);
     }
 
-        /**
+    /**
      * Shows a custom dialog on a frame
-     * 
+     *
      * @param title title of the dialog
      * @param content content of the dialog
      * @param icon icon of the dialog

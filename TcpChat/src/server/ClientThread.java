@@ -66,7 +66,7 @@ class ClientThread extends Thread {
 
             // Broadcasts welcome message to all clients
             broadcastExceptMe("*** A new user " + name + " entered the chat room !!! ***");
-            this.outStream.println("Welcome " + name + " to our chat room.\nTo leave, enter \"/quit\" in a new line.");
+            this.sendMessage(this.outStream, "Welcome to our chat room.\nTo leave, enter \"/quit\" in a new line.");
 
             // Start conversation
             while (true) {
@@ -93,7 +93,7 @@ class ClientThread extends Thread {
                 }
             }
             broadcastExceptMe("*** " + name + " has left ***");
-            this.outStream.println("*** Bye " + name + " ***");
+            this.sendMessage(this.outStream, "*** Bye " + name + " ***");
 
             disconnect();
 
@@ -114,7 +114,7 @@ class ClientThread extends Thread {
         // TODO ENCODE
         for (int i = 0; i < this.maxClientsCount; i++) {
             if (threads[i] != null && threads[i].clientName != null) {
-                threads[i].outStream.println(message);
+                this.sendMessage(threads[i].outStream, message);
             }
         }
     }
@@ -128,7 +128,7 @@ class ClientThread extends Thread {
         // TODO ENCODE
         for (int i = 0; i < this.maxClientsCount; i++) {
             if (threads[i] != null && threads[i].clientName != null && threads[i] != this) {
-                threads[i].outStream.println(message);
+                this.sendMessage(threads[i].outStream, message);
             }
         }
     }
@@ -146,15 +146,36 @@ class ClientThread extends Thread {
                     && this.threads[i] != this
                     && this.threads[i].clientName != null
                     && this.threads[i].clientName.equals(receiver)) {
-                this.threads[i].outStream.println("<" + this.clientName + "> " + message);
-                /*
-                 * Echo this message to let the client know the private
-                 * message was sent.
-                 */
-                this.outStream.println(">" + this.clientName + "> " + message);
-                break;
+                    // Send message to receiver
+                    this.sendMessage(this.threads[i].outStream, "<" + this.clientName + "> " + message);
+
+                    // Send message to sender
+                    this.sendMessage(this.outStream, ">" + this.clientName + "> " + message);
+                    break;
             }
         }
+    }
+
+    /**
+     * Writes a message to a specific PrintStream
+     *
+     * @param printStream stream to write message to
+     * @param message stands for itself
+     */
+    protected synchronized void sendMessage(PrintStream printStream, String message) {
+        // TODO Encrypt
+        printStream.println(message);
+    }
+    
+    /**
+     * Reads a message to a specific PrintStream
+     *
+     * @param printStream stream to write message to
+     * @param message stands for itself
+     */
+    protected synchronized String readMessage(DataInputStream inStream) throws IOException{
+        // TODO Decrypt
+        return inStream.readLine();
     }
 
     /**

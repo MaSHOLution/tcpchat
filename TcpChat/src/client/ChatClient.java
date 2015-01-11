@@ -80,10 +80,15 @@ public class ChatClient implements Runnable {
         if (clientSocket != null && outStream != null && inStream != null) {
             try {
 
+                String message;
                 // Create a thread to read from the server
                 new Thread(new ChatClient()).start();
                 while (!closed) {
-                    outStream.println(inputLine.readLine().trim());
+                    message = inputLine.readLine();
+                    // Check if line is not empty
+                    if (!message.trim().equals("")) {
+                        outStream.println();
+                    }
                 }
 
                 // Close the output stream, close the input stream, close the socket.

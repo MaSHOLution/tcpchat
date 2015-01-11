@@ -25,19 +25,32 @@ package gui;
 
 import javax.swing.Icon;
 import javax.swing.JOptionPane;
+import javax.swing.JFrame;
 
 /**
+ * This class helps to show dialogs on a frame
  *
  * @author Manuel Schmid
  */
 public class DialogHelper {
 
-    private javax.swing.JFrame frame = null;
+    private JFrame frame = null;
 
-    public DialogHelper(javax.swing.JFrame frame) {
+    /**
+     * Constructor
+     *
+     * @param frame parent frame to show dialog on, is disabled during dialog
+     */
+    public DialogHelper(JFrame frame) {
         this.frame = frame;
     }
 
+    /**
+     * Shows an info dialog on a frame
+     *
+     * @param title title of the dialog
+     * @param content content of the dialog
+     */
     public void showInfoDialog(String title, String content) {
         JOptionPane.showMessageDialog(frame,
                 content,
@@ -45,6 +58,12 @@ public class DialogHelper {
                 JOptionPane.INFORMATION_MESSAGE);
     }
 
+    /**
+     * Shows a warning dialog on a frame
+     *
+     * @param title title of the dialog
+     * @param content content of the dialog
+     */
     public void showWarningDialog(String title, String content) {
         JOptionPane.showMessageDialog(frame,
                 content,
@@ -52,6 +71,12 @@ public class DialogHelper {
                 JOptionPane.WARNING_MESSAGE);
     }
 
+    /**
+     * Shows a plain dialog on a frame (with no icon)
+     *
+     * @param title title of the dialog
+     * @param content content of the dialog
+     */
     public void showPlainDialog(String title, String content) {
         JOptionPane.showMessageDialog(frame,
                 content,
@@ -59,6 +84,13 @@ public class DialogHelper {
                 JOptionPane.PLAIN_MESSAGE);
     }
 
+        /**
+     * Shows a custom dialog on a frame
+     * 
+     * @param title title of the dialog
+     * @param content content of the dialog
+     * @param icon icon of the dialog
+     */
     public void showCustomDialog(String title, String content, Icon icon) {
         JOptionPane.showMessageDialog(frame,
                 content,

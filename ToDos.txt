@@ -10,9 +10,10 @@ server.ChatServer
 	- Allgemein Quit-Request anders behandeln
 	- Wegen jFrame Close-Event schließen ohne Rückgabe ermöglichen
 	- Sperre bei Spam
+	- Bei schließen alle Clients trennen 
+	- Logpath anpassen
 
 Allgemein:
-	- Logging
 	- Userliste
 	- Verschlüsselung der Daten
 	- Wegen jFrame Close-Event schließen ohne Rückgabe ermöglichen

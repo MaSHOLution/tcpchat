@@ -23,6 +23,8 @@
  */
 package logging;
 
+import java.io.File;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -32,30 +34,33 @@ import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
 /**
- * This class can create a logger
- * 
+ * This class can create loggers
+ *
  * @author Manuel Schmid
  */
 public class CustomLogger {
 
     /**
      * Creates a logger and adds handler
-     * 
-     * @param loggerName Name of the logger
-     * @param filename
+     *
+     * @param logName Name of the logger, element of enum LogName
+     * @param logPath Path to logfile, element of enum LogPath
      * @return Logger
      */
-    public static Logger create(String loggerName, String filename) {
-        
+    public static Logger create(LogName logName, LogPath logPath) {
+
         // Basic declarations
-        Logger logger = Logger.getLogger(loggerName);
+        Logger logger = Logger.getLogger(logName + "." + logPath);
         FileHandler fh = null;
-        
+
+        checkDir();
+        resetLogger();
+
         // Setting up format for filename
         SimpleDateFormat format = new SimpleDateFormat("M-d_HHmmss"); //just to make our log file nicer :)
         try {
-            fh = new FileHandler(filename + "_" +  format.format(Calendar.getInstance().getTime()) + ".log");
-        } catch (Exception e) {
+            fh = new FileHandler(logPath.getPath());
+        } catch (IOException | SecurityException e) {
             // TODO handle
             e.printStackTrace();
         }
@@ -89,8 +94,47 @@ public class CustomLogger {
                 return returnString;
             }
         });
-        
+
         logger.addHandler(fh);
         return logger;
+    }
+
+    /**
+     * Returns a Logger by name and purpose
+     *
+     * @param logName name of the logger, defined in enum LogName
+     * @param logPath purpose of logger, defined in enum LogPath
+     * @return
+     */
+    public static Logger getLogger(LogName logName, LogPath logPath) {
+        Logger logger = Logger.getLogger(logName + "." + logPath);
+        return logger;
+    }
+
+//   /**
+//    * Creates an array of loggers
+//    * @param className name of the class calling this method
+//    * @return Logger[3]
+//    */
+//   public static Logger[] createBasicLoggers(String className){
+//       Logger[] loggers = new Logger[3];
+//       loggers[0] = logging.CustomLogger.create(className, LogPath.CONNECTION);
+//       loggers[1] = logging.CustomLogger.create(className, LogPath.EXCEPTION);
+//       loggers[2] = logging.CustomLogger.create(className, LogPath.GENERAL);
+//       return loggers;
+//   }
+    /**
+     * Checks if the log dir exists if not, create it
+     */
+    private static void checkDir() {
+
+        File f = new File(LogPath.LOGDIR.getPath());
+        if (!f.exists() || !f.isDirectory()) {
+            f.mkdir();
+        }
+    }
+
+    private static void resetLogger() {
+        //LogManager.getLogManager().reset();
     }
 }

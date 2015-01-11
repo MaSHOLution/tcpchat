@@ -1,7 +1,17 @@
-gui.ClientGui
+﻿gui.ClientGui
 	- DialogHelper einbinden
+	- OnClose-jFrame erweitern
+	- Private Nachrichten in Tabs anzeigen lassen
 	- Connect-Button:
 		- Fix für Connect-Problem mit Name "/quit"
 
 server.ChatServer
 	- Name "/quit" nicht erlauben
+	- Allgemein Quit-Request anders behandeln
+	- Wegen jFrame Close-Event schließen ohne Rückgabe ermöglichen
+	- Sperre bei Spam
+
+Allgemein:
+	- Userliste
+	- Private Nachrichten
+	- Verschlüsselung der Daten

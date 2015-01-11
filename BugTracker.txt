@@ -7,7 +7,6 @@
 
 server.ChatServer
 	- Name "/quit" nicht erlauben
-<<<<<<< HEAD
 	- Allgemein Quit-Request anders behandeln
 	- Wegen jFrame Close-Event schließen ohne Rückgabe ermöglichen
 	- Sperre bei Spam
@@ -19,4 +18,3 @@ Allgemein:
 =======
 	- Wegen jFrame Close-Event schließen ohne Rückgabe ermöglichen
 	- Sperre bei Spam
->>>>>>> ec467cbf25dc57b0d7ef4efefe0a3b94223223b9

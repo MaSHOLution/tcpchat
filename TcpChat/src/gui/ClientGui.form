@@ -106,6 +106,9 @@
           </Events>
         </Component>
         <Component class="javax.swing.JTextField" name="tbPort">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="8000"/>
+          </Properties>
           <BindingProperties>
             <BindingProperty name="enabled" source="connectionPanel" sourcePath="${enabled}" target="tbPort" targetPath="enabled" updateStrategy="0" immediately="false"/>
           </BindingProperties>
@@ -130,6 +133,9 @@
           </BindingProperties>
         </Component>
         <Component class="javax.swing.JTextField" name="tbServer">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="localhost"/>
+          </Properties>
           <BindingProperties>
             <BindingProperty name="enabled" source="connectionPanel" sourcePath="${enabled}" target="tbServer" targetPath="enabled" updateStrategy="0" immediately="false"/>
           </BindingProperties>
@@ -185,8 +191,8 @@
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="1" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="tbMessage" min="-2" pref="433" max="-2" attributes="0"/>
-                  <EmptySpace max="32767" attributes="0"/>
+                  <Component id="tbMessage" max="32767" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
                   <Component id="bSendMessage" min="-2" pref="70" max="-2" attributes="0"/>
               </Group>
           </Group>

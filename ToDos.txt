@@ -4,6 +4,7 @@
 	- Private Nachrichten in Tabs anzeigen lassen
 	- Connect-Button:
 		- Fix für Connect-Problem mit Name "/quit"
+	- Nickname in tbNickname verwenden anstatt Nutzereingabe
 
 server.ChatServer
 	- Name "/quit" nicht erlauben

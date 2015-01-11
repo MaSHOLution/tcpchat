@@ -279,14 +279,14 @@ public class ClientGui extends javax.swing.JFrame {
     private boolean connect() {
         // Initiating variables
         String host = this.tbServer.getText();
-        int portNumber = Integer.parseInt(this.tbPort.getText());
+        int port = Integer.parseInt(this.tbPort.getText());
 
         /*
          * Open a socket on a given host and port. Open input and output streams.
          */
         try {
             // Set up socket and streams
-            clientSocket = new Socket(host, portNumber);
+            clientSocket = new Socket(host, port);
             inputLine = new BufferedReader(new InputStreamReader(System.in));
             outStream = new PrintStream(clientSocket.getOutputStream());
             inStream = new DataInputStream(clientSocket.getInputStream());
@@ -301,9 +301,9 @@ public class ClientGui extends javax.swing.JFrame {
             return true;
 
         } catch (UnknownHostException e) {
-            System.err.println("Don't know about host " + host);
+            this.dialogHelper.showWarningDialog("Warning", "Don't know about host " + host);
         } catch (IOException e) {
-            System.err.println("Could not connect to host \"" + host + "\"");
+            this.dialogHelper.showWarningDialog("Connection failed", "Could not connect to host \"" + host + "\" on Port " + port);
         }
         return false;
     }

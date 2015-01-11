@@ -11,11 +11,10 @@ server.ChatServer
 	- Wegen jFrame Close-Event schließen ohne Rückgabe ermöglichen
 	- Sperre bei Spam
 	- Logging
+		- Logpath anpassen
 		- Nicht auf Konsole ausgeben lassen
-		- General
-		- Connection
-		- Exception
-
+	- Bei schließen alle Clients trennen 
+	
 Allgemein:
 	- Userliste
 	- Verschlüsselung der Daten

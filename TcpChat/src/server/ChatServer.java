@@ -51,6 +51,8 @@ public class ChatServer {
         } else {
             portNumber = Integer.valueOf(args[0]);
         }
+        
+        System.out.println("Server started");
 
         // Open a server socket on the portNumber (default 8000)
         try {

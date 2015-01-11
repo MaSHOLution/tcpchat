@@ -46,7 +46,7 @@ class ClientThread extends Thread {
     public ClientThread(Socket clientSocket, ClientThread[] threads) {
         this.clientSocket = clientSocket;
         this.threads = threads;
-        maxClientsCount = threads.length;
+        this.maxClientsCount = threads.length;
     }
 
     /**
@@ -65,7 +65,7 @@ class ClientThread extends Thread {
             this.linkNameToThread(name);
 
             // Broadcasts welcome message to all clients
-            broadcastExceptMe("*** A new user " + name + " entered the chat room !!! ***");
+            this.broadcastExceptMe("*** A new user " + name + " entered the chat room !!! ***");
             this.sendMessage(this.outStream, "Welcome to our chat room.\nTo leave, enter \"/quit\" in a new line.");
 
             // Start conversation
@@ -92,7 +92,7 @@ class ClientThread extends Thread {
                     broadcast("<" + name + "> " + line);
                 }
             }
-            broadcastExceptMe("*** " + name + " has left ***");
+            this.broadcastExceptMe("*** " + name + " has left ***");
             this.sendMessage(this.outStream, "*** Bye " + name + " ***");
 
             disconnect();
@@ -102,16 +102,16 @@ class ClientThread extends Thread {
             this.outStream.close();
             this.clientSocket.close();
         } catch (IOException e) {
+            // TODO Exception-Handling
         }
     }
 
     /**
-     * Sends a message to all other clients
+     * Sends a message to all clients
      *
      * @param message message to send
-     */
+     */ 
     protected synchronized void broadcast(String message) {
-        // TODO ENCODE
         for (int i = 0; i < this.maxClientsCount; i++) {
             if (threads[i] != null && threads[i].clientName != null) {
                 this.sendMessage(threads[i].outStream, message);
@@ -120,14 +120,15 @@ class ClientThread extends Thread {
     }
 
     /**
-     * Sends a message to all other clients except the current client
+     * Sends a message to all other clients except the current client (this)
      *
      * @param message message to send
      */
     protected synchronized void broadcastExceptMe(String message) {
-        // TODO ENCODE
         for (int i = 0; i < this.maxClientsCount; i++) {
-            if (threads[i] != null && threads[i].clientName != null && threads[i] != this) {
+            if (threads[i] != null
+                    && threads[i].clientName != null
+                    && threads[i] != this) {
                 this.sendMessage(threads[i].outStream, message);
             }
         }
@@ -140,18 +141,24 @@ class ClientThread extends Thread {
      * @param message message to send
      */
     protected synchronized void sendPrivateMessage(String receiver, String message) {
-        // TODO ENCODE
-        for (int i = 0; i < maxClientsCount; i++) {
-            if (this.threads[i] != null
-                    && this.threads[i] != this
-                    && this.threads[i].clientName != null
-                    && this.threads[i].clientName.equals(receiver)) {
+
+        // Check if sender wants to send message to himself
+        if (receiver.equals(this.clientName)) {
+            this.outStream.println("You can't send a private message to yourself");
+        } else {
+            for (int i = 0; i < maxClientsCount; i++) {
+                if (this.threads[i] != null
+                        && this.threads[i] != this
+                        && this.threads[i].clientName != null
+                        && this.threads[i].clientName.equals(receiver)) {
+
                     // Send message to receiver
                     this.sendMessage(this.threads[i].outStream, "<" + this.clientName + "> " + message);
 
                     // Send message to sender
                     this.sendMessage(this.outStream, ">" + this.clientName + "> " + message);
                     break;
+                }
             }
         }
     }

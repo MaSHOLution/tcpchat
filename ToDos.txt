@@ -10,9 +10,13 @@ server.ChatServer
 	- Allgemein Quit-Request anders behandeln
 	- Wegen jFrame Close-Event schließen ohne Rückgabe ermöglichen
 	- Sperre bei Spam
+	- Logging
+		- Nicht auf Konsole ausgeben lassen
+		- General
+		- Connection
+		- Exception
 
 Allgemein:
-	- Logging
 	- Userliste
 	- Verschlüsselung der Daten
 	- Wegen jFrame Close-Event schließen ohne Rückgabe ermöglichen

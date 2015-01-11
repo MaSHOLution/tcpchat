@@ -12,9 +12,12 @@ server.ChatServer
 	- Sperre bei Spam
 
 Allgemein:
+	- Logging
 	- Userliste
-	- Private Nachrichten
 	- Verschlüsselung der Daten
-=======
 	- Wegen jFrame Close-Event schließen ohne Rückgabe ermöglichen
-	- Sperre bei Spam
+	- Dateien versenden
+	- Benutzerkonten
+	- Nachrichten auf Server zwischenspeichern, wenn Empfänger offline ist
+	- Sperre bei Spam, Userban
+	- Admin-Account

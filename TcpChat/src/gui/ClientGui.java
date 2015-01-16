@@ -49,6 +49,10 @@ public class ClientGui extends javax.swing.JFrame {
 
     protected DialogHelper dialogHelper = null;
 
+    protected boolean isConnected = false;
+
+    protected boolean hasWrittenMessage = false;
+
     protected enum connectButtonText {
 
         Connect,
@@ -60,7 +64,9 @@ public class ClientGui extends javax.swing.JFrame {
      */
     public ClientGui() {
         initComponents();
+        // Initialize a new DialogHelper
         this.dialogHelper = new DialogHelper(this);
+        // Center JFrame
         setLocationRelativeTo(null);
     }
 
@@ -93,6 +99,11 @@ public class ClientGui extends javax.swing.JFrame {
         setMinimumSize(new java.awt.Dimension(580, 400));
         setPreferredSize(new java.awt.Dimension(580, 400));
         setResizable(false);
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                formWindowClosing(evt);
+            }
+        });
 
         bConnect.setText("Connect");
         bConnect.addActionListener(new java.awt.event.ActionListener() {
@@ -273,6 +284,14 @@ public class ClientGui extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_bConnectActionPerformed
 
+    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
+        if (this.isConnected) {
+            if (this.hasWrittenMessage) {
+                this.disconnect();
+            }
+        }
+    }//GEN-LAST:event_formWindowClosing
+
     /**
      * Connects the client to the server
      */
@@ -298,6 +317,7 @@ public class ClientGui extends javax.swing.JFrame {
             new Thread(new ClientGuiThread(this)).start();
 
             this.switchGui(true);
+            this.isConnected = true;
             return true;
 
         } catch (UnknownHostException e) {
@@ -326,6 +346,8 @@ public class ClientGui extends javax.swing.JFrame {
             this.outStream.println(message);
             this.tbMessage.setText("");
         }
+
+        this.hasWrittenMessage = true;
     }
 
     /**

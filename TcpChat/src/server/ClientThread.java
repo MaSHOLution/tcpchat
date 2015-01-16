@@ -38,9 +38,9 @@ class ClientThread extends Thread {
     protected DataInputStream inStream = null;
     protected PrintStream outStream = null;
     protected Socket clientSocket = null;
-    protected final ClientThread[] threads;
     protected int maxClientsCount;
     protected SocketAddress ip;
+    protected String name;
 
     // Logging
     private static final Logger logConnection = CustomLogger.getLogger(LogName.SERVER, LogPath.CONNECTION);
@@ -53,10 +53,9 @@ class ClientThread extends Thread {
      * @param clientSocket Sochet where the connection was accepted
      * @param threads
      */
-    public ClientThread(Socket clientSocket, ClientThread[] threads) {
+    public ClientThread(Socket clientSocket) {
         this.clientSocket = clientSocket;
-        this.threads = threads;
-        this.maxClientsCount = threads.length;
+        this.maxClientsCount = this.getThreads().length;
         this.ip = clientSocket.getRemoteSocketAddress();
     }
 
@@ -67,57 +66,67 @@ class ClientThread extends Thread {
     public void run() {
 
         try {
-            // Create input and output streams for this client.
-            this.inStream = new DataInputStream(this.clientSocket.getInputStream());
-            this.outStream = new PrintStream(this.clientSocket.getOutputStream());
+            // Setting up streams
+            this.initStreams();
 
             // Setting up name
-            String name = this.setName();
-            this.linkNameToThread(name);
+            if (this.setName()) {
+                this.linkNameToThread(name);
 
-            // Broadcasts welcome message to all clients
-            this.broadcastExceptMe("*** A new user " + name + " entered the chat room !!! ***");
-            this.sendMessage(this.outStream, "Welcome " + name + " to our chat room.\nTo leave, enter \"/quit\" in a new line.");
-            logGeneral.log(Level.INFO, name + " has entered");
+                // Broadcasts welcome message to all clients
+                this.broadcastExceptMe("*** A new user " + name + " entered the chat room !!! ***");
+                this.sendMessage(this.outStream, "Welcome " + name + " to our chat room.\nTo leave, enter \"/quit\" in a new line.");
+                logGeneral.log(Level.INFO, name + " has entered");
 
-            // Start conversation
-            while (true) {
-                String line = this.readMessage(inStream);
-                if (line.startsWith("/quit")) {
-                    break;
-                } else if (line.startsWith("*** Bye")) {
-                    this.sendMessage(this.outStream, "*** WARNING: String not allowed ***");
-                    logGeneral.log(Level.WARNING, name + " wanted to send \"*** Bye\", rejected message");
-                } else if (line.startsWith("@")) {
-                    // If the message is private sent it to the given client 
-                    // words[0] == name of receiver
-                    // words[1] == message
-                    String[] words = line.split("\\s", 2);
-                    if (words.length > 1 && words[1] != null) {
-                        words[1] = words[1].trim();
-                        if (!words[1].isEmpty()) {
-                            this.sendPrivateMessage(words[0], words[1]);
+                // Start conversation
+                while (true) {
+                    String line = this.readMessage(inStream);
+                    if (line.equals("/quit")) {
+                        break;
+                    } else if (line.startsWith("*** Bye")) {
+                        this.sendMessage(this.outStream, "*** WARNING: String not allowed ***");
+                        logGeneral.log(Level.WARNING, name + " wanted to send \"*** Bye\", rejected message");
+                    } else if (line.startsWith("@")) {
+                        // If the message is private sent it to the given client 
+                        // words[0] == name of receiver
+                        // words[1] == message
+                        String[] words = line.split("\\s", 2);
+                        if (words.length > 1 && words[1] != null) {
+                            words[1] = words[1].trim();
+                            if (!words[1].isEmpty()) {
+                                this.sendPrivateMessage(words[0], words[1]);
+                            }
                         }
+                    } else {
+                        // Broadcast message to all other clients
+                        this.broadcast("<" + name + "> " + line);
                     }
-                } else {
-                    // Broadcast message to all other clients
-                    this.broadcast("<" + name + "> " + line);
                 }
+
+                // Tell every client, that the current client is going offline
+                this.broadcastExceptMe("*** " + name + " has left ***");
+                this.sendMessage(this.outStream, "*** Bye " + name + " ***");
+
+                // Remove client from threads array and close connections
+                disconnect();
+                logGeneral.log(Level.INFO, name + " has disconnected");
+            } else {
+                disconnect(true);
             }
-
-            // Tell every client, that the current client is going offline
-            this.broadcastExceptMe("*** " + name + " has left ***");
-            this.sendMessage(this.outStream, "*** Bye " + name + " ***");
-
-            // Remove client from threads array and close connections
-            disconnect();
-            
-            logGeneral.log(Level.INFO, name + " has disconnected");
-            Counters.disconnect();
 
         } catch (IOException e) {
             // TODO Exception-Handling
         }
+    }
+
+    /**
+     * Creates input and output streams for this client
+     *
+     * @throws IOException
+     */
+    protected synchronized void initStreams() throws IOException {
+        this.inStream = new DataInputStream(this.clientSocket.getInputStream());
+        this.outStream = new PrintStream(this.clientSocket.getOutputStream());
     }
 
     /**
@@ -127,8 +136,8 @@ class ClientThread extends Thread {
      */
     protected synchronized void broadcast(String message) {
         for (int i = 0; i < this.maxClientsCount; i++) {
-            if (threads[i] != null && threads[i].clientName != null) {
-                this.sendMessage(threads[i].outStream, message);
+            if (this.getThreads()[i] != null && this.getThreads()[i].clientName != null) {
+                this.sendMessage(this.getThreads()[i].outStream, message);
             }
         }
         logGeneral.log(Level.INFO, "GM #" + Counters.Totals.Messages.gmTotal + " from " + this.clientName);
@@ -141,7 +150,9 @@ class ClientThread extends Thread {
      * @param message message to send
      */
     protected synchronized void broadcastExceptMe(String message) {
+        ClientThread[] threads = this.getThreads();
         for (int i = 0; i < this.maxClientsCount; i++) {
+
             if (threads[i] != null
                     && threads[i].clientName != null
                     && threads[i] != this) {
@@ -162,21 +173,22 @@ class ClientThread extends Thread {
         // Check if sender wants to send message to himself
         if (receiver.equals(this.clientName)) {
             this.outStream.println("You can't send a private message to yourself");
-            logGeneral.log(Level.WARNING, this.clientName + " wanted to send himself a private message");
+            logGeneral.log(Level.INFO, this.clientName + " wanted to send himself a private message");
         } else {
+            ClientThread[] threads = this.getThreads();
             for (int i = 0; i < maxClientsCount; i++) {
-                if (this.threads[i] != null
-                        && this.threads[i] != this
-                        && this.threads[i].clientName != null
-                        && this.threads[i].clientName.equals(receiver)) {
+                if (threads[i] != null
+                        && threads[i] != this
+                        && threads[i].clientName != null
+                        && threads[i].clientName.equals(receiver)) {
 
                     // Send message to receiver
-                    this.sendMessage(this.threads[i].outStream, "<" + this.clientName + "> " + message);
+                    this.sendMessage(threads[i].outStream, "<" + this.clientName + "> " + message);
 
                     // Send message to sender
                     this.sendMessage(this.outStream, ">" + this.clientName + "> " + message);
                     Counters.pm();
-                    logGeneral.log(Level.INFO, "PM #" + Counters.Totals.Messages.pmTotal + " from " + this.clientName + " to " + receiver );
+                    logGeneral.log(Level.INFO, "PM #" + Counters.Totals.Messages.pmTotal + " from " + this.clientName + " to " + receiver);
                     break;
                 }
             }
@@ -189,10 +201,15 @@ class ClientThread extends Thread {
      * @param printStream stream to write message to
      * @param message stands for itself
      */
-    protected synchronized void sendMessage(PrintStream printStream, String message) {
+    protected synchronized boolean sendMessage(PrintStream printStream, String message) {
         // TODO Encrypt
-        printStream.println(message);
-        Counters.connection();
+        try {
+            Counters.connection();
+            printStream.println(message);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     /**
@@ -205,7 +222,7 @@ class ClientThread extends Thread {
         // TODO Decrypt
         String readLine = inStream.readLine();
         Counters.connection();
-        return  readLine;
+        return readLine;
     }
 
     /**
@@ -213,21 +230,20 @@ class ClientThread extends Thread {
      *
      * @return name
      */
-    protected String setName() throws IOException {
+    protected boolean setName() throws IOException {
 
-        String name;
         while (true) {
             this.sendMessage(this.outStream, "Please enter a nickname:");
-            name = this.readMessage(inStream);
-            if (name.contains("@")) {
-               this.sendMessage(this.outStream, "The name needn't contain '@' character.");
-                Counters.connection();
+            this.name = this.readMessage(inStream);
+            if (this.name.equals("/quit")) {
+                return false;
+            } else if (this.name.contains("@")) {
+                this.sendMessage(this.outStream, "The name needn't contain '@' character.");
             } else {
                 break;
             }
         }
-
-        return name;
+        return true;
     }
 
     /**
@@ -236,8 +252,9 @@ class ClientThread extends Thread {
      * @param name name of the client
      */
     protected void linkNameToThread(String name) {
+        ClientThread[] threads = this.getThreads();
         for (int i = 0; i < this.maxClientsCount; i++) {
-            if (this.threads[i] != null && this.threads[i] == this) {
+            if (threads[i] != null && threads[i] == this) {
                 this.clientName = "@" + name;
                 logConnection.log(Level.INFO, this.ip + ": is now " + name);
                 break;
@@ -246,12 +263,13 @@ class ClientThread extends Thread {
     }
 
     /**
-     * Disconnect the client, set slot in clientArray free for new client
+     * Disconnects the client, set slot in clientArray free for new client
      */
     protected synchronized void disconnect() throws IOException {
+        ClientThread[] threads = this.getThreads();
         for (int i = 0; i < this.maxClientsCount; i++) {
-            if (this.threads[i] == this) {
-                this.threads[i] = null;
+            if (threads[i] == this) {
+                threads[i] = null;
             }
         }
 
@@ -259,7 +277,36 @@ class ClientThread extends Thread {
         this.inStream.close();
         this.outStream.close();
         this.clientSocket.close();
-        
-        
+
+        Counters.disconnect();
+    }
+
+    /**
+     * Disconnects the client
+     */
+    protected synchronized void disconnect(boolean closeOnly) throws IOException {
+        if (!closeOnly) {
+            for (int i = 0; i < this.maxClientsCount; i++) {
+                if (this.getThreads()[i] == this) {
+                    this.getThreads()[i] = null;
+                }
+            }
+        }
+
+        // Close streams and socket
+        this.inStream.close();
+        this.outStream.close();
+        this.clientSocket.close();
+
+        Counters.disconnect();
+    }
+
+    /**
+     * Getter of currently logged in users
+     *
+     * @return ClientThread[]
+     */
+    protected synchronized ClientThread[] getThreads() {
+        return ChatServer.threads;
     }
 }

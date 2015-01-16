@@ -53,11 +53,16 @@ public class ChatServer {
 
         // Default port
         int portNumber = 8000;
-        if (args.length < 1) {
-            System.out.println("Usage: java ChatServer <portNumber>\n"
+        if (args.length == 0) {
+            System.out.println("Usage: java ChatServer <portNumber> <logging YES/no>\n"
                     + "Now using port number " + portNumber);
-        } else {
+        } else if (args.length == 1) {
             portNumber = Integer.valueOf(args[0]);
+        } else if (args.length == 2) {
+            portNumber = Integer.valueOf(args[0]);
+            if (args[1].equals("no")) {
+                CustomLogger.resetLogger();
+            }
         }
 
         System.out.println("Server started");
@@ -76,7 +81,7 @@ public class ChatServer {
                     int i;
                     for (i = 0; i < maxClientsCount; i++) {
                         if (threads[i] == null) {
-                            (threads[i] = new ClientThread(clientSocket, threads)).start();
+                            (threads[i] = new ClientThread(clientSocket)).start();
                             logConnection.log(Level.INFO, clientSocket.getRemoteSocketAddress() + ": accepted, thread started");
                             Counters.login();
                             break;

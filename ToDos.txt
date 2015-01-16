@@ -1,19 +1,16 @@
 ﻿gui.ClientGui
-	- DialogHelper einbinden
-	- OnClose-jFrame erweitern
 	- Private Nachrichten in Tabs anzeigen lassen
 	- Connect-Button:
 		- Fix für Connect-Problem mit Name "/quit"
 	- Nickname in tbNickname verwenden anstatt Nutzereingabe
+	- Userliste
+		- Listbox rechts
+		- ComboBox unten mit Namensauswahl
 
 server.ChatServer
-	- Name "/quit" nicht erlauben
-	- Allgemein Quit-Request anders behandeln
-	- Wegen jFrame Close-Event schließen ohne Rückgabe ermöglichen
 	- Sperre bei Spam
 	- Logging
 		- Logpath anpassen
-		- Nicht auf Konsole ausgeben lassen
 	- Bei schließen alle Clients trennen 
 	
 Allgemein:
@@ -25,3 +22,11 @@ Allgemein:
 	- Nachrichten auf Server zwischenspeichern, wenn Empfänger offline ist
 	- Sperre bei Spam, Userban
 	- Admin-Account
+
+
+
+Nächste Schritte:
+	- Logging
+		- (Logpath anpassen)
+	- (Nickname in tbNickname verwenden anstatt Nutzereingabe)
+	

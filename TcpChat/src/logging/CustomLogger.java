@@ -30,6 +30,7 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.logging.FileHandler;
 import java.util.logging.Formatter;
+import java.util.logging.LogManager;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
@@ -54,7 +55,6 @@ public class CustomLogger {
         FileHandler fh = null;
 
         checkDir();
-        resetLogger();
 
         // Setting up format for filename
         SimpleDateFormat format = new SimpleDateFormat("M-d_HHmmss"); //just to make our log file nicer :)
@@ -134,7 +134,7 @@ public class CustomLogger {
         }
     }
 
-    private static void resetLogger() {
-        //LogManager.getLogManager().reset();
+    public static void resetLogger() {
+        LogManager.getLogManager().reset();
     }
 }

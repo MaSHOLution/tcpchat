@@ -39,10 +39,6 @@ import static server.ChatServer.*;
 /**
  * Class ChatServer initializes threads and accepts new clients
  */
-
-    // Sockets
-    protected static ServerSocket serverSocket = null;
-    protected static Socket clientSocket = null;
 public final class ChatServer {
 
     // Setting up client
@@ -53,7 +49,6 @@ public final class ChatServer {
     protected static Logger logConnection = null;
     protected static Logger logException = null;
     protected static Logger logGeneral = null;
-
     protected static LoggingController logControl = null;
 
     public static void main(String args[]) {
@@ -87,11 +82,13 @@ public final class ChatServer {
 
             // Open a server socket on the portNumber (default 8000)
             try {
-                serverSocket = new ServerSocket(portNumber);
+                ServerSocket serverSocket = new ServerSocket(portNumber);
 
                 // Adding shutdown handle
                 Runtime.getRuntime().addShutdownHook(new ShutdownHandle());
-
+                
+                Socket clientSocket = null;
+                
                 // Create client socket for each connection
                 while (true) {
                     try {
@@ -101,7 +98,7 @@ public final class ChatServer {
                         int i;
                         for (i = 0; i < maxClientsCount; i++) {
                             if (threads[i] == null) {
-                                (threads[i] = new ClientThread(clientSocket, logControl)).start();
+                                (threads[i] = new ClientThread(clientSocket)).start();
                                 logControl.log(logConnection, Level.INFO, clientSocket.getRemoteSocketAddress() + ": accepted, thread started");
                                 Counters.login();
                                 break;
@@ -150,8 +147,8 @@ class ShutdownHandle extends Thread {
         logControl.log(logConnection, Level.INFO, "*** SERVER IS GOING DOWN ***");
         for (int i = 0; i < maxClientsCount; i++) {
             if (threads[i] != null && threads[i].clientName != null) {
-                sendMessage(threads[i].outStream, "*** SERVER IS GOING DOWN ***");
-                sendMessage(threads[i].outStream, "*** Bye " + threads[i].clientName + " ***");
+                sendMessage(threads[i], "*** SERVER IS GOING DOWN ***");
+                sendMessage(threads[i], "*** Bye " + threads[i].clientName + " ***");
             }
         }
         // TODO Logger schließen
@@ -164,11 +161,11 @@ class ShutdownHandle extends Thread {
      * @param printStream stream to write message to
      * @param message stands for itself
      */
-    private boolean sendMessage(PrintStream printStream, String message) {
-        // TODO Encrypt
+    private boolean sendMessage(ClientThread thread, String message) {
+        message = thread.encMethod.encrypt(message);
         try {
             Counters.connection();
-            printStream.println(message);
+            thread.outStream.println(message);
             return true;
         } catch (Exception e) {
             ChatServer.logControl.log(CustomLogging.get(LogName.SERVER, LogPath.EXCEPTION), Level.INFO, e.getMessage());

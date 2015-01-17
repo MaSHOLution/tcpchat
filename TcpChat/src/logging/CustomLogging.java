@@ -90,13 +90,7 @@ public final class CustomLogging {
                 // Building output string
                 String returnString = recordLevel
                         + logTime.format(cal.getTime())
-                        + " || "
-                        + record.getSourceClassName().substring(
-                                record.getSourceClassName().lastIndexOf(".") + 1,
-                                record.getSourceClassName().length())
-                        + "."
-                        + record.getSourceMethodName()
-                        + "() : "
+                        + ": "
                         + record.getMessage() + System.getProperty("line.separator");
                 return returnString;
             }

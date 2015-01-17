@@ -74,7 +74,7 @@ class ClientThread extends Thread {
 
                 // Broadcasts welcome message to all clients
                 this.broadcastExceptMe("*** User \"" + name + "\" joined ***");
-                this.sendMessage(this.outStream, "Welcome " + name + " to our chat room.\nTo leave, enter \"" + this.quitString + "\" in a new line.");
+                this.sendMessage(this.outStream, "Welcome " + name + " to our chat room.\n"); //To leave, enter \"" + this.quitString + "\" in a new line.");
                 this.logControl.log(logGeneral, Level.INFO, name + " joined");
 
                 // Start conversation

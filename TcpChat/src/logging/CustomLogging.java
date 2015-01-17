@@ -33,13 +33,15 @@ import java.util.logging.Formatter;
 import java.util.logging.LogManager;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
+import logging.enums.LogName;
+import logging.enums.LogPath;
 
 /**
  * This class can create loggers
  *
  * @author Manuel Schmid
  */
-public class CustomLogger {
+public class CustomLogging {
 
     /**
      * Creates a logger and adds handler
@@ -55,11 +57,13 @@ public class CustomLogger {
         FileHandler fh = null;
 
         checkDir();
+        
+        logger.setUseParentHandlers(false);
 
         // Setting up format for filename
         SimpleDateFormat format = new SimpleDateFormat("M-d_HHmmss"); //just to make our log file nicer :)
         try {
-            fh = new FileHandler(logPath.getPath());
+            fh = new FileHandler(LogPath.LOGDIR.getPath() + "/" + logPath.getPath());
         } catch (IOException | SecurityException e) {
             // TODO handle
             e.printStackTrace();
@@ -106,23 +110,11 @@ public class CustomLogger {
      * @param logPath purpose of logger, defined in enum LogPath
      * @return
      */
-    public static Logger getLogger(LogName logName, LogPath logPath) {
+    public static Logger get(LogName logName, LogPath logPath) {
         Logger logger = Logger.getLogger(logName + "." + logPath);
         return logger;
     }
 
-//   /**
-//    * Creates an array of loggers
-//    * @param className name of the class calling this method
-//    * @return Logger[3]
-//    */
-//   public static Logger[] createBasicLoggers(String className){
-//       Logger[] loggers = new Logger[3];
-//       loggers[0] = logging.CustomLogger.create(className, LogPath.CONNECTION);
-//       loggers[1] = logging.CustomLogger.create(className, LogPath.EXCEPTION);
-//       loggers[2] = logging.CustomLogger.create(className, LogPath.GENERAL);
-//       return loggers;
-//   }
     /**
      * Checks if the log dir exists if not, create it
      */
@@ -134,7 +126,10 @@ public class CustomLogger {
         }
     }
 
-    public static void resetLogger() {
+    /** 
+     * Resets all loggers
+     */
+    public static void resetAllLoggers() {
         LogManager.getLogManager().reset();
     }
 }

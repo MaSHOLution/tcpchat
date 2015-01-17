@@ -33,7 +33,7 @@ import logging.Counters;
 import logging.LoggingController;
 import static server.ChatServer.*;
 
-class ClientThread extends Thread {
+public final class ClientThread extends Thread {
 
     protected String clientName = null;
     protected DataInputStream inStream = null;

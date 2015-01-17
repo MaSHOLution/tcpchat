@@ -39,11 +39,11 @@ import static server.ChatServer.*;
 /**
  * Class ChatServer initializes threads and accepts new clients
  */
-public class ChatServer {
 
     // Sockets
     protected static ServerSocket serverSocket = null;
     protected static Socket clientSocket = null;
+public final class ChatServer {
 
     // Setting up client
     protected static final int maxClientsCount = 10;

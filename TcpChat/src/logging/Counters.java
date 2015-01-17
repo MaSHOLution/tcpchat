@@ -28,7 +28,7 @@ package logging;
  *
  * @author Manuel Schmid
  */
-public class Counters {
+public final class Counters {
 
     /**
      * Contains counters of clients

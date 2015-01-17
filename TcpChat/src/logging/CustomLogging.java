@@ -41,7 +41,7 @@ import logging.enums.LogPath;
  *
  * @author Manuel Schmid
  */
-public class CustomLogging {
+public final class CustomLogging {
 
     /**
      * Creates a logger and adds handler

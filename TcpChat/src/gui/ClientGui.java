@@ -261,12 +261,12 @@ public class ClientGui extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void bSendMessageActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bSendMessageActionPerformed
-        this.sendMessage();
+        this.sendMessage(this.tbMessage.getText());
     }//GEN-LAST:event_bSendMessageActionPerformed
 
     private void tbMessageKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tbMessageKeyPressed
         if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
-            this.sendMessage();
+            this.sendMessage(this.tbMessage.getText());
         }
     }//GEN-LAST:event_tbMessageKeyPressed
 
@@ -296,34 +296,42 @@ public class ClientGui extends javax.swing.JFrame {
      * Connects the client to the server
      */
     private boolean connect() {
-        // Initiating variables
-        String host = this.tbServer.getText();
-        int port = Integer.parseInt(this.tbPort.getText());
 
-        /*
-         * Open a socket on a given host and port. Open input and output streams.
-         */
-        try {
-            // Set up socket and streams
-            clientSocket = new Socket(host, port);
-            inputLine = new BufferedReader(new InputStreamReader(System.in));
-            outStream = new PrintStream(clientSocket.getOutputStream());
-            inStream = new DataInputStream(clientSocket.getInputStream());
+        if (checkConnData()) {
 
-            // Initial clear of the chat text area
-            this.clearChatArea();
+            // Initiating variables
+            String host = this.tbServer.getText();
+            int port = Integer.parseInt(this.tbPort.getText());
 
-            // Create a thread to read from the server
-            new Thread(new ClientGuiThread(this)).start();
+            /*
+             * Open a socket on a given host and port. Open input and output streams.
+             */
+            try {
+                // Set up socket and streams
+                clientSocket = new Socket(host, port);
+                inputLine = new BufferedReader(new InputStreamReader(System.in));
+                outStream = new PrintStream(clientSocket.getOutputStream());
+                inStream = new DataInputStream(clientSocket.getInputStream());
 
-            this.switchGui(true);
-            this.isConnected = true;
-            return true;
+                // Initial clear of the chat text area
+                this.clearChatArea();
 
-        } catch (UnknownHostException e) {
-            this.dialogHelper.showWarningDialog("Warning", "Don't know about host " + host);
-        } catch (IOException e) {
-            this.dialogHelper.showWarningDialog("Connection failed", "Could not connect to host \"" + host + "\" on Port " + port);
+                // Create a thread to read from the server
+                new Thread(new ClientGuiThread(this)).start();
+
+                // Send nickname
+                this.sendMessage(this.tbNickname.getText());
+                
+                this.switchGui(true);
+                this.isConnected = true;
+                return true;
+
+            } catch (UnknownHostException e) {
+                this.dialogHelper.showWarningDialog("Warning", "Don't know about host " + host);
+            } catch (IOException e) {
+                this.dialogHelper.showWarningDialog("Connection failed", "Could not connect to host \"" + host + "\" on Port " + port);
+            }
+            return false;
         }
         return false;
     }
@@ -335,13 +343,32 @@ public class ClientGui extends javax.swing.JFrame {
         this.outStream.println("/quit");
     }
 
+    private boolean checkConnData() {
+        String nickname = this.tbNickname.getText();
+        String server = this.tbServer.getText();
+        String portText = this.tbPort.getText();
+        int port = Integer.parseInt(portText);
+
+        if (nickname.trim().equals("")) {
+            this.dialogHelper.showInfoDialog("Info", "Nickname darf nicht leer sein");
+        } else if (server.trim().equals("")) {
+            this.dialogHelper.showInfoDialog("Info", "Server darf nicht leer sein");
+        } else if (portText.trim().equals("")) {
+            this.dialogHelper.showInfoDialog("Info", "Server darf nicht leer sein");
+        } else if (port < 1 || port > 65555) {
+            this.dialogHelper.showInfoDialog("Info", "Port muss zwischen 1 und 65555 liegen");
+        } else {
+            return true;
+        }
+        return false;
+    }
+
     /**
      * Sends a message through the outStream to the server
      */
-    private void sendMessage() {
+    private void sendMessage(String message) {
 
         // Check if line is empty
-        String message = this.tbMessage.getText();
         if (!message.trim().equals("")) {
             this.outStream.println(message);
             this.tbMessage.setText("");

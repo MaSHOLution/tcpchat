@@ -65,10 +65,11 @@ public class ClientGuiThread implements Runnable {
         String responseLine;
         try {
             while ((responseLine = inStream.readLine()) != null) {
+                // TODO Decrypt
                 gui.outputLineOnGui(responseLine);
                 // If received line contains bye, break while and close connection
                 if (responseLine.startsWith("*** Bye")) {
-                    gui.outputLineOnGui("You have successfully signed out.");
+                    gui.outputLineOnGui("*** Disconnected ***");
                     break;
                 }
             }

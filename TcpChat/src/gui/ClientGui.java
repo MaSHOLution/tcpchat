@@ -58,6 +58,8 @@ public class ClientGui extends javax.swing.JFrame {
         Connect,
         Disconnect
     }
+    
+    protected static final String quitString = "/quit";
 
     /**
      * Initializes the gui elements
@@ -340,7 +342,7 @@ public class ClientGui extends javax.swing.JFrame {
      * Disconnects the client to the server
      */
     private void disconnect() {
-        this.outStream.println("/quit");
+        this.sendMessage(this.quitString);
     }
 
     private boolean checkConnData() {
@@ -370,6 +372,7 @@ public class ClientGui extends javax.swing.JFrame {
 
         // Check if line is empty
         if (!message.trim().equals("")) {
+            // TODO Encrypt
             this.outStream.println(message);
             this.tbMessage.setText("");
         }

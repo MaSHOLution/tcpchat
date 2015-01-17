@@ -43,6 +43,7 @@ class ClientThread extends Thread {
     protected SocketAddress ip;
     protected String name;
     protected LoggingController logControl = null;
+    protected static final String quitString = "/quit";
 
     /**
      * Constructor
@@ -73,13 +74,13 @@ class ClientThread extends Thread {
 
                 // Broadcasts welcome message to all clients
                 this.broadcastExceptMe("*** User \"" + name + "\" joined ***");
-                this.sendMessage(this.outStream, "Welcome " + name + " to our chat room.\nTo leave, enter \"/quit\" in a new line.");
+                this.sendMessage(this.outStream, "Welcome " + name + " to our chat room.\nTo leave, enter \"" + this.quitString + "\" in a new line.");
                 this.logControl.log(logGeneral, Level.INFO, name + " joined");
 
                 // Start conversation
                 while (true) {
                     String line = this.readMessage(inStream);
-                    if (line.equals("/quit")) {
+                    if (line.equals(this.quitString)) {
                         break;
                     } else if (line.startsWith("*** Bye")) {
                         this.sendMessage(this.outStream, "*** WARNING: String not allowed ***");
@@ -232,7 +233,7 @@ class ClientThread extends Thread {
         while (true) {
             this.sendMessage(this.outStream, "Please enter a nickname:");
             name = this.readMessage(inStream);
-            if (name.equals("/quit")) {
+            if (name.equals(this.quitString)) {
                 return false;
             } else if (name.contains("@")) {
                 this.sendMessage(this.outStream, "The name needn't contain '@' character.");

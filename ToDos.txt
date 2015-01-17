@@ -1,23 +1,20 @@
 ﻿gui.ClientGui
 	- Private Nachrichten in Tabs anzeigen lassen
-	- Nickname in tbNickname verwenden anstatt Nutzereingabe
 	- Userliste
 		- Listbox rechts
 		- ComboBox unten mit Namensauswahl
 
 server.ChatServer
 	- Sperre bei Spam
-	- Bei schließen alle Clients trennen 
 	
 Allgemein:
 	- Userliste
 	- Verschlüsselung der Daten
+	- Datenbankanbindung
 	- Dateien versenden
 	- Benutzerkonten
 	- Nachrichten auf Server zwischenspeichern, wenn Empfänger offline ist
 	- Sperre bei Spam, Userban
 	- Admin-Account
 
-Nächste Schritte:
-	- (Nickname in tbNickname verwenden anstatt Nutzereingabe)
 	

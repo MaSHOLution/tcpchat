@@ -34,6 +34,7 @@ import logging.CustomLogging;
 import logging.LoggingController;
 import logging.enums.LogName;
 import logging.enums.LogPath;
+import static server.ChatServer.*;
 
 /**
  * Class ChatServer initializes threads and accepts new clients
@@ -145,13 +146,15 @@ class ShutdownHandle extends Thread {
 
     @Override
     public void run() {
-        ClientThread[] threads = ChatServer.threads;
-        for (int i = 0; i < ChatServer.maxClientsCount; i++) {
+        logControl.log(logGeneral, Level.INFO, "*** SERVER IS GOING DOWN ***");
+        logControl.log(logConnection, Level.INFO, "*** SERVER IS GOING DOWN ***");
+        for (int i = 0; i < maxClientsCount; i++) {
             if (threads[i] != null && threads[i].clientName != null) {
                 sendMessage(threads[i].outStream, "*** SERVER IS GOING DOWN ***");
                 sendMessage(threads[i].outStream, "*** Bye " + threads[i].clientName + " ***");
             }
         }
+        // TODO Logger schließen
         CustomLogging.resetAllLoggers();
     }
 

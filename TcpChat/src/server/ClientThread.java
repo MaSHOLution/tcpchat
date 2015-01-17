@@ -106,8 +106,7 @@ class ClientThread extends Thread {
                 this.sendMessage(this.outStream, "*** Bye " + name + " ***");
 
                 // Remove client from threads array and close connections
-                disconnect();
-                logGeneral.log(Level.INFO, name + " has disconnected");
+                disconnect(false);
             } else {
                 disconnect(true);
             }
@@ -135,8 +134,8 @@ class ClientThread extends Thread {
      */
     protected synchronized void broadcast(String message) {
         for (int i = 0; i < this.maxClientsCount; i++) {
-            if (this.getThreads()[i] != null && this.getThreads()[i].clientName != null) {
-                this.sendMessage(this.getThreads()[i].outStream, message);
+            if (threads[i] != null && threads[i].clientName != null) {
+                this.sendMessage(threads[i].outStream, message);
             }
         }
         this.logControl.log(logGeneral, Level.INFO, "GM #" + Counters.Totals.Messages.gmTotal + " from " + this.clientName);
@@ -149,7 +148,6 @@ class ClientThread extends Thread {
      * @param message message to send
      */
     protected synchronized void broadcastExceptMe(String message) {
-        ClientThread[] threads = this.getThreads();
         for (int i = 0; i < this.maxClientsCount; i++) {
 
             if (threads[i] != null
@@ -171,10 +169,9 @@ class ClientThread extends Thread {
 
         // Check if sender wants to send message to himself
         if (receiver.equals(this.clientName)) {
-            this.outStream.println("You can't send a private message to yourself");
+            this.outStream.println("You can't send private messages to yourself");
             this.logControl.log(logGeneral, Level.INFO, this.clientName + " wanted to send himself a private message");
         } else {
-            ClientThread[] threads = this.getThreads();
             for (int i = 0; i < maxClientsCount; i++) {
                 if (threads[i] != null
                         && threads[i] != this
@@ -185,7 +182,7 @@ class ClientThread extends Thread {
                     this.sendMessage(threads[i].outStream, "<" + this.clientName + "> " + message);
 
                     // Send message to sender
-                    this.sendMessage(this.outStream, ">" + this.clientName + "> " + message);
+                    this.sendMessage(this.outStream, ">" + receiver + "> " + message);
                     Counters.pm();
                     this.logControl.log(logGeneral, Level.INFO, "PM #" + Counters.Totals.Messages.pmTotal + " from " + this.clientName + " to " + receiver);
                     break;
@@ -231,15 +228,16 @@ class ClientThread extends Thread {
      * @return name
      */
     protected boolean setName() throws IOException {
-
+        String name;
         while (true) {
             this.sendMessage(this.outStream, "Please enter a nickname:");
-            this.name = this.readMessage(inStream);
-            if (this.name.equals("/quit")) {
+            name = this.readMessage(inStream);
+            if (name.equals("/quit")) {
                 return false;
-            } else if (this.name.contains("@")) {
+            } else if (name.contains("@")) {
                 this.sendMessage(this.outStream, "The name needn't contain '@' character.");
             } else {
+                this.name = name;
                 break;
             }
         }
@@ -252,33 +250,13 @@ class ClientThread extends Thread {
      * @param name name of the client
      */
     protected void linkNameToThread(String name) {
-        ClientThread[] threads = this.getThreads();
         for (int i = 0; i < this.maxClientsCount; i++) {
             if (threads[i] != null && threads[i] == this) {
                 this.clientName = "@" + name;
-                logConnection.log(Level.INFO, this.ip + ": is now " + name);
+                this.logControl.log(logConnection, Level.INFO, this.ip + ": is now " + name);
                 break;
             }
         }
-    }
-
-    /**
-     * Disconnects the client, set slot in clientArray free for new client
-     */
-    protected synchronized void disconnect() throws IOException {
-        ClientThread[] threads = this.getThreads();
-        for (int i = 0; i < this.maxClientsCount; i++) {
-            if (threads[i] == this) {
-                threads[i] = null;
-            }
-        }
-
-        // Close streams and socket
-        this.inStream.close();
-        this.outStream.close();
-        this.clientSocket.close();
-
-        Counters.disconnect();
     }
 
     /**
@@ -287,8 +265,8 @@ class ClientThread extends Thread {
     protected synchronized void disconnect(boolean closeOnly) throws IOException {
         if (!closeOnly) {
             for (int i = 0; i < this.maxClientsCount; i++) {
-                if (this.getThreads()[i] == this) {
-                    this.getThreads()[i] = null;
+                if (threads[i] == this) {
+                    threads[i] = null;
                 }
             }
         }
@@ -302,14 +280,5 @@ class ClientThread extends Thread {
             this.logControl.log(logConnection, Level.INFO, this.ip + ": " + this.name + " has disconnected");
         }
         Counters.disconnect();
-    }
-
-    /**
-     * Getter of currently logged in users
-     *
-     * @return ClientThread[]
-     */
-    protected synchronized ClientThread[] getThreads() {
-        return ChatServer.threads;
     }
 }

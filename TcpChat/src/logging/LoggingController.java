@@ -57,10 +57,6 @@ public class LoggingController {
     public void log(Logger logger, Level logLevel, String message) {
         // Only log when logging is enabled
         if (this.enableLogging) {
-            // Sync output on console with logger
-            if (logger.getUseParentHandlers() != showOnConsole) {
-                logger.setUseParentHandlers(showOnConsole);
-            }
             logger.log(logLevel, message);
         }
     }
@@ -76,7 +72,7 @@ public class LoggingController {
         // Check if logging is enabled
         if (this.enableLogging) {
             // Create logger
-             return CustomLogging.create(logName, logPath);
+             return CustomLogging.create(logName, logPath, showOnConsole);
         }
         return null;
     }

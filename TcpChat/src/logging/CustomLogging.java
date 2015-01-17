@@ -48,15 +48,20 @@ public class CustomLogging {
      *
      * @param logName Name of the logger, element of enum LogName
      * @param logPath Path to logfile, element of enum LogPath
+     * @param showOnConsole enable/disable output on console
      * @return Logger
      */
-    public static Logger create(LogName logName, LogPath logPath) {
+    public static Logger create(LogName logName, LogPath logPath, boolean showOnConsole) {
 
         // Basic declarations
         Logger logger = Logger.getLogger(logName + "." + logPath);
         FileHandler fh = null;
 
         checkDir();
+        
+        if (!showOnConsole) {
+            logger.setUseParentHandlers(false);
+        }
 
         // Setting up format for filename
         SimpleDateFormat format = new SimpleDateFormat("M-d_HHmmss"); //just to make our log file nicer :)

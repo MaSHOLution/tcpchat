@@ -29,8 +29,9 @@ import java.io.PrintStream;
 import java.net.Socket;
 import java.net.SocketAddress;
 import java.util.logging.Level;
-import java.util.logging.Logger;
-import logging.*;
+import logging.Counters;
+import logging.LoggingController;
+import static server.ChatServer.*;
 
 class ClientThread extends Thread {
 
@@ -41,11 +42,7 @@ class ClientThread extends Thread {
     protected int maxClientsCount;
     protected SocketAddress ip;
     protected String name;
-
-    // Logging
-    private static final Logger logConnection = CustomLogger.getLogger(LogName.SERVER, LogPath.CONNECTION);
-    private static final Logger logException = CustomLogger.getLogger(LogName.SERVER, LogPath.EXCEPTION);
-    private static final Logger logGeneral = CustomLogger.getLogger(LogName.SERVER, LogPath.GENERAL);
+    protected LoggingController logControl = null;
 
     /**
      * Constructor
@@ -53,10 +50,11 @@ class ClientThread extends Thread {
      * @param clientSocket Sochet where the connection was accepted
      * @param threads
      */
-    public ClientThread(Socket clientSocket) {
+    public ClientThread(Socket clientSocket, LoggingController logControl) {
         this.clientSocket = clientSocket;
-        this.maxClientsCount = this.getThreads().length;
+        this.maxClientsCount = threads.length;
         this.ip = clientSocket.getRemoteSocketAddress();
+        this.logControl = logControl;
     }
 
     /**
@@ -74,9 +72,9 @@ class ClientThread extends Thread {
                 this.linkNameToThread(name);
 
                 // Broadcasts welcome message to all clients
-                this.broadcastExceptMe("*** A new user " + name + " entered the chat room !!! ***");
+                this.broadcastExceptMe("*** User \"" + name + "\" joined ***");
                 this.sendMessage(this.outStream, "Welcome " + name + " to our chat room.\nTo leave, enter \"/quit\" in a new line.");
-                logGeneral.log(Level.INFO, name + " has entered");
+                this.logControl.log(logGeneral, Level.INFO, name + " joined");
 
                 // Start conversation
                 while (true) {
@@ -85,7 +83,7 @@ class ClientThread extends Thread {
                         break;
                     } else if (line.startsWith("*** Bye")) {
                         this.sendMessage(this.outStream, "*** WARNING: String not allowed ***");
-                        logGeneral.log(Level.WARNING, name + " wanted to send \"*** Bye\", rejected message");
+                        this.logControl.log(logGeneral, Level.WARNING, name + " wanted to send \"*** Bye\", rejected message");
                     } else if (line.startsWith("@")) {
                         // If the message is private sent it to the given client 
                         // words[0] == name of receiver
@@ -116,6 +114,7 @@ class ClientThread extends Thread {
 
         } catch (IOException e) {
             // TODO Exception-Handling
+            this.logControl.log(logException, Level.INFO, this.ip + "(" + this.name + "): " + e.getMessage());
         }
     }
 
@@ -140,7 +139,7 @@ class ClientThread extends Thread {
                 this.sendMessage(this.getThreads()[i].outStream, message);
             }
         }
-        logGeneral.log(Level.INFO, "GM #" + Counters.Totals.Messages.gmTotal + " from " + this.clientName);
+        this.logControl.log(logGeneral, Level.INFO, "GM #" + Counters.Totals.Messages.gmTotal + " from " + this.clientName);
         Counters.gm();
     }
 
@@ -173,7 +172,7 @@ class ClientThread extends Thread {
         // Check if sender wants to send message to himself
         if (receiver.equals(this.clientName)) {
             this.outStream.println("You can't send a private message to yourself");
-            logGeneral.log(Level.INFO, this.clientName + " wanted to send himself a private message");
+            this.logControl.log(logGeneral, Level.INFO, this.clientName + " wanted to send himself a private message");
         } else {
             ClientThread[] threads = this.getThreads();
             for (int i = 0; i < maxClientsCount; i++) {
@@ -188,7 +187,7 @@ class ClientThread extends Thread {
                     // Send message to sender
                     this.sendMessage(this.outStream, ">" + this.clientName + "> " + message);
                     Counters.pm();
-                    logGeneral.log(Level.INFO, "PM #" + Counters.Totals.Messages.pmTotal + " from " + this.clientName + " to " + receiver);
+                    this.logControl.log(logGeneral, Level.INFO, "PM #" + Counters.Totals.Messages.pmTotal + " from " + this.clientName + " to " + receiver);
                     break;
                 }
             }
@@ -208,6 +207,7 @@ class ClientThread extends Thread {
             printStream.println(message);
             return true;
         } catch (Exception e) {
+            this.logControl.log(logException, Level.INFO, this.ip + "(" + this.name + "): " + e.getMessage());
             return false;
         }
     }
@@ -298,6 +298,9 @@ class ClientThread extends Thread {
         this.outStream.close();
         this.clientSocket.close();
 
+        if (!closeOnly) {
+            this.logControl.log(logConnection, Level.INFO, this.ip + ": " + this.name + " has disconnected");
+        }
         Counters.disconnect();
     }
 

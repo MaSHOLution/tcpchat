@@ -25,6 +25,7 @@ package logging;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import logging.enums.*;
 
 /**
  *
@@ -62,5 +63,21 @@ public class LoggingController {
             }
             logger.log(logLevel, message);
         }
+    }
+    
+    /**
+     * Creates a logger
+     *
+     * @param logName Name of the logger, element of enum LogName
+     * @param logPath Path to logfile, element of enum LogPath
+     * @return Logger
+     */
+    public Logger create(LogName logName, LogPath logPath) {
+        // Check if logging is enabled
+        if (this.enableLogging) {
+            // Create logger
+             return CustomLogging.create(logName, logPath);
+        }
+        return null;
     }
 }

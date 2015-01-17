@@ -23,13 +23,17 @@
  */
 package server;
 
-import java.io.PrintStream;
 import java.io.IOException;
-import java.net.Socket;
+import java.io.PrintStream;
 import java.net.ServerSocket;
+import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import logging.*;
+import logging.Counters;
+import logging.CustomLogging;
+import logging.LoggingController;
+import logging.enums.LogName;
+import logging.enums.LogPath;
 
 /**
  * Class ChatServer initializes threads and accepts new clients
@@ -45,68 +49,127 @@ public class ChatServer {
     protected static final ClientThread[] threads = new ClientThread[maxClientsCount];
 
     // Logging
-    private static final Logger logConnection = CustomLogger.create(LogName.SERVER, LogPath.CONNECTION);
-    private static final Logger logException = CustomLogger.create(LogName.SERVER, LogPath.EXCEPTION);
-    private static final Logger logGeneral = CustomLogger.create(LogName.SERVER, LogPath.GENERAL);
+    protected static Logger logConnection = null;
+    protected static Logger logException = null;
+    protected static Logger logGeneral = null;
+
+    protected static LoggingController logControl = null;
 
     public static void main(String args[]) {
 
-        // Default port
-        int portNumber = 8000;
-        if (args.length == 0) {
-            System.out.println("Usage: java ChatServer <portNumber> <logging YES/no>\n"
-                    + "Now using port number " + portNumber);
-        } else if (args.length == 1) {
-            portNumber = Integer.valueOf(args[0]);
-        } else if (args.length == 2) {
-            portNumber = Integer.valueOf(args[0]);
-            if (args[1].equals("no")) {
-                CustomLogger.resetLogger();
+        // Default values
+        int portNumber = 0;
+        boolean loggingEnabled = false;
+        boolean showOnConsole = false;
+        boolean init = false;
+
+        // Switch command line arguments
+        switch (args.length) {
+            case 2:
+                portNumber = Integer.parseInt(args[0]);
+                if (args[1].equals("yes")) {
+                    loggingEnabled = true;
+                }
+                init = true;
+                break;
+            default:
+                System.out.println("Usage: java ChatServer <portNumber> <logging yes/NO>");
+        }
+
+        // Check if everything is set up successfully
+        if (init) {
+            // Setting up LoggingController
+            logControl = new LoggingController(loggingEnabled, showOnConsole);
+            initLoggers();
+            System.out.println("Server started");
+            logControl.log(logGeneral, Level.INFO, "Server started on port " + portNumber);
+
+            // Open a server socket on the portNumber (default 8000)
+            try {
+                serverSocket = new ServerSocket(portNumber);
+
+                // Adding shutdown handle
+                Runtime.getRuntime().addShutdownHook(new ShutdownHandle());
+
+                // Create client socket for each connection
+                while (true) {
+                    try {
+                        // Handle for new connection, put it into empty array-slot
+                        clientSocket = serverSocket.accept();
+                        Counters.connection();
+                        int i;
+                        for (i = 0; i < maxClientsCount; i++) {
+                            if (threads[i] == null) {
+                                (threads[i] = new ClientThread(clientSocket, logControl)).start();
+                                logControl.log(logConnection, Level.INFO, clientSocket.getRemoteSocketAddress() + ": accepted, thread started");
+                                Counters.login();
+                                break;
+                            }
+                        }
+
+                        // Only when maxclients is reached
+                        if (i == maxClientsCount) {
+                            PrintStream pStream = new PrintStream(clientSocket.getOutputStream());
+                            pStream.println("Too many clients. Please try later.");
+                            pStream.close();
+                            Counters.connection();
+                            logControl.log(logConnection, Level.INFO, clientSocket.getRemoteSocketAddress() + ": rejected, server is full");
+                            clientSocket.close();
+                        }
+                    } catch (IOException e) {
+                        System.out.println(e);
+                        logControl.log(logException, Level.SEVERE, clientSocket.getRemoteSocketAddress() + ": error while logging in (" + e.getMessage() + ")");
+                    }
+                }
+            } catch (IOException e) {
+                System.out.println(e);
+                logControl.log(logException, Level.SEVERE, "Could not open Server Socket");
+                logControl.log(logException, Level.SEVERE, "Exiting Server");
+                logControl.log(logGeneral, Level.SEVERE, "Exiting Server");
             }
         }
 
-        System.out.println("Server started");
-        logGeneral.log(Level.INFO, "Server started on port " + portNumber);
+    }
 
-        // Open a server socket on the portNumber (default 8000)
-        try {
-            serverSocket = new ServerSocket(portNumber);
+    /**
+     * Initializes loggers with LoggingController
+     */
+    protected static void initLoggers() {
+        logConnection = logControl.create(LogName.SERVER, LogPath.CONNECTION);
+        logException = logControl.create(LogName.SERVER, LogPath.EXCEPTION);
+        logGeneral = logControl.create(LogName.SERVER, LogPath.GENERAL);
+    }
+}
 
-            // Create client socket for each connection
-            while (true) {
-                try {
-                    // Handle for new connection, put it into empty array-slot
-                    clientSocket = serverSocket.accept();
-                    Counters.connection();
-                    int i;
-                    for (i = 0; i < maxClientsCount; i++) {
-                        if (threads[i] == null) {
-                            (threads[i] = new ClientThread(clientSocket)).start();
-                            logConnection.log(Level.INFO, clientSocket.getRemoteSocketAddress() + ": accepted, thread started");
-                            Counters.login();
-                            break;
-                        }
-                    }
+class ShutdownHandle extends Thread {
 
-                    // Only when maxclients is reached
-                    if (i == maxClientsCount) {
-                        PrintStream pStream = new PrintStream(clientSocket.getOutputStream());
-                        pStream.println("Too many clients. Please try later.");
-                        pStream.close();
-                        Counters.connection();
-                        logConnection.log(Level.INFO, clientSocket.getRemoteSocketAddress() + ": rejected, server is full");
-                        clientSocket.close();
-                    }
-                } catch (IOException e) {
-                    System.out.println(e);
-                    logException.log(Level.SEVERE, clientSocket.getRemoteSocketAddress() + ": error while logging in (" + e.getMessage() + ")");
-                }
+    @Override
+    public void run() {
+        ClientThread[] threads = ChatServer.threads;
+        for (int i = 0; i < ChatServer.maxClientsCount; i++) {
+            if (threads[i] != null && threads[i].clientName != null) {
+                sendMessage(threads[i].outStream, "*** SERVER IS GOING DOWN ***");
+                sendMessage(threads[i].outStream, "*** Bye " + threads[i].clientName + " ***");
             }
-        } catch (IOException e) {
-            System.out.println(e);
-            logException.log(Level.SEVERE, "Could not open Server Socket");
-            logException.log(Level.SEVERE, "Exiting Server");
-            logGeneral.log(Level.SEVERE, "Exiting Server");
+        }
+        CustomLogging.resetAllLoggers();
+    }
+
+    /**
+     * Writes a message to a specific PrintStream
+     *
+     * @param printStream stream to write message to
+     * @param message stands for itself
+     */
+    private boolean sendMessage(PrintStream printStream, String message) {
+        // TODO Encrypt
+        try {
+            Counters.connection();
+            printStream.println(message);
+            return true;
+        } catch (Exception e) {
+            ChatServer.logControl.log(CustomLogging.get(LogName.SERVER, LogPath.EXCEPTION), Level.INFO, e.getMessage());
+            return false;
         }
     }
 }

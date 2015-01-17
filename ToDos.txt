@@ -1,7 +1,5 @@
 ﻿gui.ClientGui
 	- Private Nachrichten in Tabs anzeigen lassen
-	- Connect-Button:
-		- Fix für Connect-Problem mit Name "/quit"
 	- Nickname in tbNickname verwenden anstatt Nutzereingabe
 	- Userliste
 		- Listbox rechts
@@ -9,24 +7,17 @@
 
 server.ChatServer
 	- Sperre bei Spam
-	- Logging
-		- Logpath anpassen
 	- Bei schließen alle Clients trennen 
 	
 Allgemein:
 	- Userliste
 	- Verschlüsselung der Daten
-	- Wegen jFrame Close-Event schließen ohne Rückgabe ermöglichen
 	- Dateien versenden
 	- Benutzerkonten
 	- Nachrichten auf Server zwischenspeichern, wenn Empfänger offline ist
 	- Sperre bei Spam, Userban
 	- Admin-Account
 
-
-
 Nächste Schritte:
-	- Logging
-		- (Logpath anpassen)
 	- (Nickname in tbNickname verwenden anstatt Nutzereingabe)
 	

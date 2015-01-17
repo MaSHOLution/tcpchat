@@ -57,8 +57,6 @@ public class CustomLogging {
         FileHandler fh = null;
 
         checkDir();
-        
-        logger.setUseParentHandlers(false);
 
         // Setting up format for filename
         SimpleDateFormat format = new SimpleDateFormat("M-d_HHmmss"); //just to make our log file nicer :)

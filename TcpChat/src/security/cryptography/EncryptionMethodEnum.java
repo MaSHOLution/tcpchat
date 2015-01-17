@@ -30,5 +30,6 @@ package security.cryptography;
  */
 public enum EncryptionMethodEnum {
 
+    OFF,
     AES;
 }

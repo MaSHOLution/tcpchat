@@ -24,8 +24,8 @@
 package gui;
 
 import javax.swing.Icon;
-import javax.swing.JOptionPane;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 
 /**
  * This class helps to show dialogs on a frame

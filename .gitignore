@@ -13,6 +13,4 @@ hs_err_pid*
 /TcpChat/nbproject/private/
 /TcpChat/build/
 /TcpChat/dist/
-/JavaApplication5/nbproject/private/
-/JavaApplication5/build/
-/JavaApplication5/dist/
+/TcpChat/logs/

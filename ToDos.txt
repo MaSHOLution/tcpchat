@@ -8,13 +8,13 @@ server.ChatServer
 	- Sperre bei Spam
 	
 Allgemein:
-	- Userliste
 	- Verschlüsselung der Daten
 	- Datenbankanbindung
 	- Dateien versenden
+	- Userliste
 	- Benutzerkonten
-	- Nachrichten auf Server zwischenspeichern, wenn Empfänger offline ist
+		- Nachrichten auf Server zwischenspeichern, wenn Empfänger offline ist
+		- Admin-Account
 	- Sperre bei Spam, Userban
-	- Admin-Account
 
 	

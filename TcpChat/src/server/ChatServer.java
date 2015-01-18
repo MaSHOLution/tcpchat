@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import logging.Counters;
@@ -86,9 +87,9 @@ public final class ChatServer {
 
                 // Adding shutdown handle
                 Runtime.getRuntime().addShutdownHook(new ShutdownHandle());
-                
+
                 Socket clientSocket = null;
-                
+
                 // Create client socket for each connection
                 while (true) {
                     try {
@@ -145,14 +146,20 @@ class ShutdownHandle extends Thread {
     public void run() {
         logControl.log(logGeneral, Level.INFO, "*** SERVER IS GOING DOWN ***");
         logControl.log(logConnection, Level.INFO, "*** SERVER IS GOING DOWN ***");
+        
+        // Send closing of server to all clients
         for (int i = 0; i < maxClientsCount; i++) {
             if (threads[i] != null && threads[i].clientName != null) {
                 sendMessage(threads[i], "*** SERVER IS GOING DOWN ***");
                 sendMessage(threads[i], "*** Bye " + threads[i].clientName + " ***");
             }
         }
-        // TODO Logger schließen
-        CustomLogging.resetAllLoggers();
+        // Close all loggers
+        for (Logger logger : logControl.getAllLoggers()) {
+            for (Handler handler : logger.getHandlers()) {
+                handler.close();
+            }
+        }
     }
 
     /**

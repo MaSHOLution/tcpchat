@@ -23,6 +23,7 @@
  */
 package server;
 
+import security.CryptoBasics;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -43,7 +44,7 @@ public final class ClientThread extends Thread {
     protected SocketAddress ip;
     protected String name;
     protected static final String quitString = "/quit";
-    protected EncryptionMethod encMethod = CryptoBasics.getNewEncryptionObject();
+    protected EncryptionMethod encMethod = CryptoBasics.makeEncryptionObject();
     protected final String sessionId = encMethod.sessionId;
 
     /**

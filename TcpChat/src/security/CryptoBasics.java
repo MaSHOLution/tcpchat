@@ -21,7 +21,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package security.cryptography;
+package security;
+
+import security.cryptography.method.*;
+import security.cryptography.EncryptionMethod;
+import security.cryptography.Method;
 
 /**
  * Contains all basic information for session and cryptography
@@ -31,28 +35,28 @@ package security.cryptography;
 public final class CryptoBasics {
 
     /**
-     * Bits to make SessionId from
+     * Encryption in bytes,
      */
-    public static final int sessionBits = 128;
+    public static final int encryption = 256;
 
     /**
-     * Length of the SessionId
+     * Bits to make SessionId from
      */
-    public static final int sessionStringLength = 32;
+    public static final int encryptionBits = (encryption * 8);
 
     /**
      * Currently used encryption method
      */
-    public static final EncryptionMethodEnum encMethod = EncryptionMethodEnum.AES;
+    public static final Method encMethod = Method.OFF;
 
     // TODO write javadoc
     /**
-     * 
+     *
      * @param <T>
      * @param encMethod
      * @return
      */
-    public static final <T> T getNewEncryptionObject() {
+    public static final <T> T makeEncryptionObject() {
         switch (encMethod) {
             case AES:
                 return (T) new Aes();

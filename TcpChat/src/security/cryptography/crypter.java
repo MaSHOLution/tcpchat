@@ -33,16 +33,6 @@ import security.SessionIdGenerator;
 public interface crypter {
 
     /**
-     * SessionId for current client
-     */
-    final String currentSessionId = new SessionIdGenerator().nextSessionId();
-
-    /**
-     * Makes a secret key from a given key
-     */
-    void makeKey();
-
-    /**
      * Encrypts a message
      * 
      * @param message message to encrypt

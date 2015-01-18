@@ -28,7 +28,7 @@ package security.cryptography;
  *
  * @author Manuel Schmid
  */
-public enum EncryptionMethodEnum {
+public enum Method {
 
     OFF,
     AES;

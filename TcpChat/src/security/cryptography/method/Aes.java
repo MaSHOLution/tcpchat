@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package security.cryptography;
+package security.cryptography.method;
 
 import java.io.IOException;
 import java.security.InvalidKeyException;
@@ -34,36 +34,43 @@ import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
-import security.SessionIdGenerator;
-import security.cryptography.CryptoBasics;
+import security.CryptoBasics;
+import security.cryptography.EncryptionMethod;
+import security.cryptography.crypter;
 
 import sun.misc.BASE64Decoder;
 import sun.misc.BASE64Encoder;
 
 /**
  * Encryption method AES
- * 
+ *
  * @see http://blog.axxg.de/java-aes-verschluesselung-mit-beispiel/
  * @author Manuel Schmid
  */
 public final class Aes extends EncryptionMethod implements crypter {
-    
-    protected SecretKeySpec secretKeySpec;
+
+    private SecretKeySpec secretKeySpec;
+
+    /**
+     * Constructor, makes a new secretKeySpec from the SessionId
+     */
+    public Aes() {
+        this.makeKey();
+    }
 
     @Override
     public String encrypt(String message) {
         try {
-            // Verschluesseln
+            // Encrypt bytes
             Cipher cipher = Cipher.getInstance("AES");
             cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec);
             byte[] encrypted = cipher.doFinal(message.getBytes());
 
-            // bytes zu Base64-String konvertieren (dient der Lesbarkeit)
+            // Convert bytes to Base64-String
             BASE64Encoder myEncoder = new BASE64Encoder();
-            String geheim = myEncoder.encode(encrypted);
 
-            // Ergebnis
-            return geheim;
+            // Result
+            return myEncoder.encode(encrypted);
         } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException ex) {
             // TODO handle exceptions
         }
@@ -92,19 +99,63 @@ public final class Aes extends EncryptionMethod implements crypter {
         return null;
     }
 
-    @Override
     public void makeKey() {
         try {
             // Make Byte-Array out of session id
             byte[] key = sessionId.getBytes("UTF-8");
             // Create MD5 hash from array
-            MessageDigest sha = MessageDigest.getInstance("MD5");
+            MessageDigest sha = MessageDigest.getInstance("SHA-256");
             // Create secret key
+            // TODO Change SecretKeySpec creation
             key = sha.digest(key);
-            key = Arrays.copyOf(key, CryptoBasics.sessionStringLength);
-            secretKeySpec = new SecretKeySpec(key, "AES");
+            key = Arrays.copyOf(key, CryptoBasics.encryption);
+            this.secretKeySpec = new SecretKeySpec(key, "AES");
         } catch (Exception e) {
             // TODO handle exceptions
         }
+    }
+
+    public static void main(String[] args) throws Exception {
+
+        // Das Passwort bzw der Schluesseltext
+        String keyStr = "geheim";
+        // byte-Array erzeugen
+        byte[] key = (keyStr).getBytes("UTF-8");
+        // aus dem Array einen Hash-Wert erzeugen mit MD5 oder SHA
+        MessageDigest sha = MessageDigest.getInstance("MD5");
+        key = sha.digest(key);
+        // nur die ersten 128 bit nutzen
+        key = Arrays.copyOf(key, 16);
+        // der fertige Schluessel
+        SecretKeySpec secretKeySpec = new SecretKeySpec(key, "AES");
+
+        // der zu verschl. Text
+        String text = "Das ist der Text";
+
+        // Verschluesseln
+        Cipher cipher = Cipher.getInstance("AES");
+        cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec);
+        byte[] encrypted = cipher.doFinal(text.getBytes());
+
+        // bytes zu Base64-String konvertieren (dient der Lesbarkeit)
+        BASE64Encoder myEncoder = new BASE64Encoder();
+        String geheim = myEncoder.encode(encrypted);
+
+        // Ergebnis
+        System.out.println(geheim);
+
+        // BASE64 String zu Byte-Array konvertieren
+        BASE64Decoder myDecoder2 = new BASE64Decoder();
+        byte[] crypted2 = myDecoder2.decodeBuffer(geheim);
+
+        // Entschluesseln
+        Cipher cipher2 = Cipher.getInstance("AES");
+        cipher2.init(Cipher.DECRYPT_MODE, secretKeySpec);
+        byte[] cipherData2 = cipher2.doFinal(crypted2);
+        String erg = new String(cipherData2);
+
+        // Klartext
+        System.out.println(erg);
+
     }
 }

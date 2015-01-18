@@ -25,7 +25,6 @@ package security;
 
 import java.math.BigInteger;
 import java.security.SecureRandom;
-import security.cryptography.CryptoBasics;
 
 /**
  * Class for a session id generator
@@ -42,6 +41,6 @@ public final class SessionIdGenerator {
      * @return String sessionId
      */
     public String nextSessionId() {
-        return new BigInteger(CryptoBasics.sessionBits, random).toString(CryptoBasics.sessionStringLength);
+        return new BigInteger(CryptoBasics.encryptionBits, random).toString(CryptoBasics.encryption);
     }
 }

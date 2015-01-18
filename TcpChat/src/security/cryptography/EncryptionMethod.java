@@ -23,18 +23,19 @@
  */
 package security.cryptography;
 
+import security.SessionIdGenerator;
+
 /**
+ * Standard EncryptionMethod with no encryption
  *
  * @author Manuel Schmid
  */
-public class EncryptionMethod implements crypter{
+public class EncryptionMethod implements crypter {
 
-    public final String sessionId = currentSessionId;
-    
-    @Override
-    public void makeKey() {
-
-    }
+    /**
+     * SessionID for the current client
+     */
+    public final String sessionId = new SessionIdGenerator().nextSessionId();
 
     @Override
     public String encrypt(String message) {
@@ -43,7 +44,6 @@ public class EncryptionMethod implements crypter{
 
     @Override
     public String decrypt(String message) {
-       return message;
+        return message;
     }
-    
 }

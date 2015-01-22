@@ -23,6 +23,7 @@
  */
 package common.networking;
 
+import common.networking.packets.PacketType;
 import java.io.Serializable;
 
 /**
@@ -31,11 +32,10 @@ import java.io.Serializable;
  */
 //TODO: implementierung Packets
 public class Packet implements Serializable {
-    protected int header = 0;
+    protected PacketType PacketIdentifier = PacketType.PACKET;
     
-    public int getHeader() {
-        return this.header;
+    public PacketType getIdentifier() {
+        return this.PacketIdentifier;
     }
   
 }
-

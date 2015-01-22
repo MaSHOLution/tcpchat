@@ -21,57 +21,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package server;
-
-import common.networking.NetworkManager;
-import common.networking.Packet;
-import java.io.IOException;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+package common.networking.packets;
 
 /**
  *
  * @author Fabi
  */
-public class BetaServer extends NetworkManager implements Runnable  {
-    List<Socket> Clients;
-    
-    @Override
-    public boolean connect() {
-        
-    }
-
-    @Override
-    public boolean disconnect() {
-        
-    }
-
-    @Override
-    public boolean sendPacket(Packet packet) {
-        
-    }
-
-    @Override
-    public Packet receivePacket() {
-       
-    }
-    
-    @Override
-    public void run() {
-        try {
-            ServerSocket sc = new ServerSocket(8001);
-            while(true) {
-                Socket client = sc.accept();
-                Clients.add(client);
-            }
-        } catch (IOException ex) {
-            //shit happens
-        }
-        
-    }
-    
+public enum PacketType {
+    PACKET,
+    MESSAGEPACKET,
+    CONNECTPACKET,
+    KICKPACKET,
+    COMMANDPACKET
 }

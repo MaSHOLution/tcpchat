@@ -31,7 +31,7 @@ public class MessagePacket extends Packet {
     
     public MessagePacket(String message) {
         this.message = message;
-        this.header = 4;
+        this.PacketIdentifier = PacketType.MESSAGEPACKET;
     }
     public String getMessage() {
         return this.message;

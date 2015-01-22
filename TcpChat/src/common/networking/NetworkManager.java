@@ -27,8 +27,10 @@ package common.networking;
 /**
  *
  * @author Fabi
+ * Nicht benutzen
  */
-public abstract class NetworkManager {
+@Deprecated
+public abstract  class NetworkManager {
     public char port = 0;
     public String ipAddress = "";
     private static NetworkManager instance;

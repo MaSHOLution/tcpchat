@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package server;
+package server.console;
 
 import java.io.IOException;
 import java.io.PrintStream;
@@ -35,7 +35,7 @@ import logging.CustomLogging;
 import logging.LoggingController;
 import logging.enums.LogName;
 import logging.enums.LogPath;
-import static server.ChatServer.*;
+import static server.console.ChatServer.*;
 
 /**
  * Class ChatServer initializes threads and accepts new clients
@@ -108,9 +108,9 @@ public final class ChatServer {
 
                         // Only when maxclients is reached
                         if (i == maxClientsCount) {
-                            PrintStream pStream = new PrintStream(clientSocket.getOutputStream());
-                            pStream.println("Too many clients. Please try later.");
-                            pStream.close();
+                            try (PrintStream pStream = new PrintStream(clientSocket.getOutputStream())) {
+                                pStream.println("Too many clients. Please try later.");
+                            }
                             Counters.connection();
                             logControl.log(logConnection, Level.INFO, clientSocket.getRemoteSocketAddress() + ": rejected, server is full");
                             clientSocket.close();
@@ -146,7 +146,7 @@ class ShutdownHandle extends Thread {
     public void run() {
         logControl.log(logGeneral, Level.INFO, "*** SERVER IS GOING DOWN ***");
         logControl.log(logConnection, Level.INFO, "*** SERVER IS GOING DOWN ***");
-        
+
         // Send closing of server to all clients
         for (int i = 0; i < maxClientsCount; i++) {
             if (threads[i] != null && threads[i].clientName != null) {

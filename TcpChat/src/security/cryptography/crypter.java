@@ -23,8 +23,6 @@
  */
 package security.cryptography;
 
-import security.basics.SessionIdGenerator;
-
 /**
  * Interface for various encryption methods
  *
@@ -34,7 +32,7 @@ public interface crypter {
 
     /**
      * Encrypts a message
-     * 
+     *
      * @param message message to encrypt
      * @return encrypted message
      */
@@ -42,7 +40,7 @@ public interface crypter {
 
     /**
      * Decrypts a message
-     * 
+     *
      * @param message message to decrypt
      * @return decrypted message
      */

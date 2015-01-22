@@ -58,7 +58,7 @@ public final class CustomLogging {
         FileHandler fh = null;
 
         checkDir();
-        
+
         if (!showOnConsole) {
             logger.setUseParentHandlers(false);
         }
@@ -69,7 +69,6 @@ public final class CustomLogging {
             fh = new FileHandler(LogPath.LOGDIR.getPath() + "/" + logPath.getPath());
         } catch (IOException | SecurityException e) {
             // TODO handle
-            e.printStackTrace();
         }
 
         // Set formatter for logger to get rid of ugly standard format
@@ -123,7 +122,7 @@ public final class CustomLogging {
         }
     }
 
-    /** 
+    /**
      * Resets all loggers
      */
     public static void resetAllLoggers() {

@@ -21,25 +21,26 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package logging.enums;
+package common.networking;
+
+import java.io.Serializable;
 
 /**
- * Enum for logger names (classnames)
+ * Abstract class for packets
  *
  * @author Manuel Schmid
  */
-public enum LogName {
+public abstract class Packet implements Serializable {
 
-    SERVER(server.console.ChatServer.class.getName()),
-    CLIENT(client.console.ChatClient.class.getName());
+    protected PacketType packetIdentifier = PacketType.PACKET;
 
-    private final String name;
-
-    LogName(String name) {
-        this.name = name;
+    /**
+     * Getter for identifier
+     *
+     * @return
+     */
+    public PacketType getIdentifier() {
+        return this.packetIdentifier;
     }
 
-    public String getName() {
-        return name;
-    }
 }

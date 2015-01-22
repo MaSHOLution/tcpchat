@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package gui;
+package client.gui;
 
 import javax.swing.Icon;
 import javax.swing.JFrame;

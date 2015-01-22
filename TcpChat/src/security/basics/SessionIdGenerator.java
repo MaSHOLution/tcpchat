@@ -34,7 +34,7 @@ import java.security.SecureRandom;
 public final class SessionIdGenerator {
 
     private final SecureRandom random = new SecureRandom();
-    
+
     /**
      * Creates a new SessionId
      *

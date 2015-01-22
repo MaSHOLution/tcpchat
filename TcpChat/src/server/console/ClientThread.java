@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package server;
+package server.console;
 
 import security.basics.CryptoBasics;
 import java.io.DataInputStream;
@@ -31,8 +31,8 @@ import java.net.Socket;
 import java.net.SocketAddress;
 import java.util.logging.Level;
 import logging.Counters;
-import static server.ChatServer.*;
 import security.cryptography.*;
+import static server.console.ChatServer.*;
 
 public final class ClientThread extends Thread {
 
@@ -51,7 +51,6 @@ public final class ClientThread extends Thread {
      * Constructor
      *
      * @param clientSocket Sochet where the connection was accepted
-     * @param logControl
      */
     public ClientThread(Socket clientSocket) {
         this.clientSocket = clientSocket;
@@ -81,7 +80,7 @@ public final class ClientThread extends Thread {
                 // Start conversation
                 while (true) {
                     String line = this.readMessage(inStream);
-                    if (line.equals(this.quitString)) {
+                    if (line.equals(quitString)) {
                         break;
                     } else if (line.startsWith("*** Bye")) {
                         this.sendMessage("*** WARNING: String not allowed ***");
@@ -196,6 +195,7 @@ public final class ClientThread extends Thread {
      * Writes a message to a specific PrintStream
      *
      * @param message stands for itself
+     * @return result of sending
      */
     protected synchronized boolean sendMessage(String message) {
         message = this.encMethod.encrypt(message);
@@ -214,8 +214,9 @@ public final class ClientThread extends Thread {
      *
      * @param message stands for itself
      * @param thread ClientThread to send message to
+     * @return result of sending
      */
-    protected synchronized boolean sendMessage(String message,ClientThread thread) {
+    protected synchronized boolean sendMessage(String message, ClientThread thread) {
         message = thread.encMethod.encrypt(message);
         try {
             Counters.connection();
@@ -231,7 +232,7 @@ public final class ClientThread extends Thread {
      * Reads a message from a specific inStream
      *
      * @param inStream
-     * @return 
+     * @return
      * @throws java.io.IOException
      */
     protected synchronized String readMessage(DataInputStream inStream) throws IOException {
@@ -245,18 +246,19 @@ public final class ClientThread extends Thread {
      * Let the user choose a nickname
      *
      * @return name
+     * @throws java.io.IOException
      */
     protected boolean setName() throws IOException {
-        String name;
+        String username;
         while (true) {
             this.sendMessage("Please enter a nickname:");
-            name = this.readMessage(inStream);
-            if (name.equals(this.quitString)) {
+            username = this.readMessage(inStream);
+            if (username.equals(ClientThread.quitString)) {
                 return false;
-            } else if (name.contains("@")) {
+            } else if (username.contains("@")) {
                 this.sendMessage("The name needn't contain '@' character.");
             } else {
-                this.name = name;
+                this.name = username;
                 break;
             }
         }
@@ -280,6 +282,9 @@ public final class ClientThread extends Thread {
 
     /**
      * Disconnects the client
+     *
+     * @param closeOnly close streams without deleting client from threads
+     * @throws java.io.IOException
      */
     protected synchronized void disconnect(boolean closeOnly) throws IOException {
         if (!closeOnly) {

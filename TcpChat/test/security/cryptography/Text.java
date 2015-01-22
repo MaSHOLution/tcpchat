@@ -28,21 +28,14 @@ import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.crypto.Cipher;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import security.basics.CryptoBasics;
 import static org.junit.Assert.*;
 import security.basics.SessionIdGenerator;
 import security.cryptography.method.Aes;
-import security.cryptography.EncryptionMethod;
 
 /**
  * Tests for encrypting and decrypting text
@@ -51,7 +44,7 @@ import security.cryptography.EncryptionMethod;
  */
 public class Text {
 
-    private String base = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut l";
+    private final String base = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut l";
 
     /**
      * Test for Aes Cipher class
@@ -59,6 +52,7 @@ public class Text {
      * @throws NoSuchAlgorithmException
      * @throws NoSuchPaddingException
      * @throws InvalidKeyException
+     * @throws java.io.UnsupportedEncodingException
      */
     @Test
     public void aesCipherTest() throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, UnsupportedEncodingException {

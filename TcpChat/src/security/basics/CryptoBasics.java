@@ -53,7 +53,6 @@ public final class CryptoBasics {
     /**
      *
      * @param <T>
-     * @param encMethod
      * @return
      */
     public static final <T> T makeEncryptionObject() {

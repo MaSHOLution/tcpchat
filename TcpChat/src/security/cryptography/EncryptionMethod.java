@@ -23,7 +23,7 @@
  */
 package security.cryptography;
 
-import security.SessionIdGenerator;
+import security.basics.SessionIdGenerator;
 
 /**
  * Standard EncryptionMethod with no encryption

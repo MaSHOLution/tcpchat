@@ -34,7 +34,7 @@ import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
-import security.CryptoBasics;
+import security.basics.CryptoBasics;
 import security.cryptography.EncryptionMethod;
 import security.cryptography.crypter;
 

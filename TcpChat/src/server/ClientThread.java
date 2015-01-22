@@ -23,7 +23,7 @@
  */
 package server;
 
-import security.CryptoBasics;
+import security.basics.CryptoBasics;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.PrintStream;

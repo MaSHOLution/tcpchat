@@ -38,9 +38,9 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import security.CryptoBasics;
+import security.basics.CryptoBasics;
 import static org.junit.Assert.*;
-import security.SessionIdGenerator;
+import security.basics.SessionIdGenerator;
 import security.cryptography.method.Aes;
 import security.cryptography.EncryptionMethod;
 

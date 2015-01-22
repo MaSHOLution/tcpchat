@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package security;
+package security.basics;
 
 import security.cryptography.method.*;
 import security.cryptography.EncryptionMethod;

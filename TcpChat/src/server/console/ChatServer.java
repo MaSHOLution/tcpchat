@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package server;
+package server.console;
 
 import java.io.IOException;
 import java.io.PrintStream;
@@ -34,7 +34,7 @@ import logging.CustomLogging;
 import logging.LoggingController;
 import logging.enums.LogName;
 import logging.enums.LogPath;
-import static server.ChatServer.*;
+import static server.console.ChatServer.*;
 
 /**
  * Class ChatServer initializes threads and accepts new clients

@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package gui;
+package client.gui;
 
 import java.awt.event.KeyEvent;
 import java.io.BufferedReader;
@@ -99,7 +99,6 @@ public class ClientGui extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Chat-Client");
         setMinimumSize(new java.awt.Dimension(580, 400));
-        setPreferredSize(new java.awt.Dimension(580, 400));
         setResizable(false);
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent evt) {

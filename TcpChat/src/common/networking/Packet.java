@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2015 Fabi.
+ * Copyright 2015 Manuel Schmid.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,19 +23,24 @@
  */
 package common.networking;
 
-import common.networking.packets.PacketType;
 import java.io.Serializable;
 
 /**
+ * Abstract class for packets
  *
- * @author Fabi
+ * @author Manuel Schmid
  */
-//TODO: implementierung Packets
-public class Packet implements Serializable {
-    protected PacketType PacketIdentifier = PacketType.PACKET;
-    
+public abstract class Packet implements Serializable {
+
+    protected PacketType packetIdentifier = PacketType.PACKET;
+
+    /**
+     * Getter for identifier
+     * 
+     * @return 
+     */
     public PacketType getIdentifier() {
-        return this.PacketIdentifier;
+        return this.packetIdentifier;
     }
-  
+
 }

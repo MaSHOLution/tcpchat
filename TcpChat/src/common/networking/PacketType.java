@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2015 Fabi.
+ * Copyright 2015 Manuel Schmid.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,11 +21,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package common.networking.packets;
+package common.networking;
 
 /**
- *
- * @author Fabi
+ * Enum for packet types
+ * 
+ * @author Manuel Schmid, Fabian Fink
  */
 public enum PacketType {
     PACKET,

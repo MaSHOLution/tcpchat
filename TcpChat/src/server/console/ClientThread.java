@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package server;
+package server.console;
 
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -31,7 +31,7 @@ import java.net.SocketAddress;
 import java.util.logging.Level;
 import logging.Counters;
 import logging.LoggingController;
-import static server.ChatServer.*;
+import static server.console.ChatServer.*;
 
 class ClientThread extends Thread {
 

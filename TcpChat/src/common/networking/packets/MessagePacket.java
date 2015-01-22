@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2015 Fabi.
+ * Copyright 2015 Manuel Schmid.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,17 +24,34 @@
 package common.networking.packets;
 
 import common.networking.Packet;
+import common.networking.PacketType;
 
-
+/**
+ * Class for a specific packet type
+ *
+ * @author Manuel Schmid, Fabian Fink
+ */
 public class MessagePacket extends Packet {
+
     protected String message;
-    
+
+    /**
+     * Constructor
+     * 
+     * @param message
+     */
     public MessagePacket(String message) {
         this.message = message;
-        this.PacketIdentifier = PacketType.MESSAGEPACKET;
+        this.packetIdentifier = PacketType.MESSAGEPACKET;
     }
+
+    /**
+     * Getter for the message
+     * 
+     * @return 
+     */
     public String getMessage() {
         return this.message;
     }
-    
+
 }

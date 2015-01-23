@@ -31,7 +31,7 @@ import common.networking.PacketType;
  *
  * @author Manuel Schmid, Fabian Fink
  */
-public class MessagePacket extends Packet {
+public class GroupMessagePacket extends Packet {
 
     protected String message;
 
@@ -40,9 +40,9 @@ public class MessagePacket extends Packet {
      *
      * @param message
      */
-    public MessagePacket(String message) {
+    public GroupMessagePacket(String message) {
         this.message = message;
-        this.packetIdentifier = PacketType.MESSAGEPACKET;
+        this.packetIdentifier = PacketType.GROUPMESSAGEPACKET;
     }
 
     /**

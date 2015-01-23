@@ -21,59 +21,37 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package common.networking;
+package common.networking.packets;
 
-import java.io.Serializable;
+import common.networking.Packet;
+import common.networking.PacketType;
 
 /**
- * Abstract class for packets
+ * Class for a specific packet type
  *
- * @author Manuel Schmid
+ * @author Manuel Schmid, Fabian Fink
  */
-public abstract class Packet implements Serializable {
+public class KickPacket extends Packet {
 
-    protected PacketType packetIdentifier = PacketType.PACKET;
-    protected String senderAlias = "Server";
-    protected boolean isPrepared = false;
+    protected String reason;
 
     /**
-     * Getter for identifier
+     * Constructor
+     *
+     * @param message
+     */
+    public KickPacket(String message) {
+        this.reason = message;
+        this.packetIdentifier = PacketType.KICKPACKET;
+    }
+
+    /**
+     * Getter for the reason
      *
      * @return
      */
-    public PacketType getIdentifier() {
-        return this.packetIdentifier;
+    public String getReason() {
+        return this.reason;
     }
 
-    /**
-     * Getter for senderAlias
-     *
-     * @return
-     */
-    public String getSenderAlias() {
-        return this.senderAlias;
-    }
-
-    /**
-     * Setter for senderAlias
-     * protected because of one time usage of packets
-     *
-     * @param senderAlias
-     */
-    protected void setSenderAlias(String senderAlias) {
-        this.senderAlias = senderAlias;
-    }
-    /**
-     * Setter for senderAlias protected because of one time usage of packets
-     *
-     */
-    public void prepare() {
-        if (this.isPrepared) {
-            // TODO Decrypt
-            this.isPrepared = false;
-        } else {
-            // TODO Encrypt
-            this.isPrepared = true;
-        }
-    }
 }

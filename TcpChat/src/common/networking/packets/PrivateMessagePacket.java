@@ -21,59 +21,48 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package common.networking;
+package common.networking.packets;
 
-import java.io.Serializable;
+import common.networking.Packet;
+import common.networking.PacketType;
 
 /**
- * Abstract class for packets
+ * Class for a specific packet type
  *
- * @author Manuel Schmid
+ * @author Manuel Schmid, Fabian Fink
  */
-public abstract class Packet implements Serializable {
+public class PrivateMessagePacket extends Packet {
 
-    protected PacketType packetIdentifier = PacketType.PACKET;
-    protected String senderAlias = "Server";
-    protected boolean isPrepared = false;
+    protected String message;
+    protected String receiver;
 
     /**
-     * Getter for identifier
+     * Constructor
+     *
+     * @param message
+     */
+    public PrivateMessagePacket(String message, String receiver) {
+        this.message = message;
+        this.receiver = receiver;
+        this.packetIdentifier = PacketType.PRIVATEMESSAGEPACKET;
+    }
+
+    /**
+     * Getter for the message
      *
      * @return
      */
-    public PacketType getIdentifier() {
-        return this.packetIdentifier;
+    public String getMessage() {
+        return this.message;
     }
-
+    
     /**
-     * Getter for senderAlias
+     * Getter for the receiver
      *
      * @return
      */
-    public String getSenderAlias() {
-        return this.senderAlias;
+    public String getReceiver() {
+        return this.receiver;
     }
 
-    /**
-     * Setter for senderAlias
-     * protected because of one time usage of packets
-     *
-     * @param senderAlias
-     */
-    protected void setSenderAlias(String senderAlias) {
-        this.senderAlias = senderAlias;
-    }
-    /**
-     * Setter for senderAlias protected because of one time usage of packets
-     *
-     */
-    public void prepare() {
-        if (this.isPrepared) {
-            // TODO Decrypt
-            this.isPrepared = false;
-        } else {
-            // TODO Encrypt
-            this.isPrepared = true;
-        }
-    }
 }

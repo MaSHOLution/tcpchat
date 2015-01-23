@@ -23,7 +23,7 @@
  */
 package common.networking;
 
-import common.networking.packets.MessagePacket;
+import common.networking.packets.GroupMessagePacket;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -31,6 +31,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import org.junit.Test;
+import static org.junit.Assert.*;
 
 /**
  *
@@ -38,36 +39,38 @@ import org.junit.Test;
  */
 public class Transfer {
 
+    private final String testMessage = "Test1";
+
     /**
      * Test for writing an object to a stream
-     * 
+     *
      * @throws FileNotFoundException
-     * @throws IOException 
+     * @throws IOException
      */
     @Test
     public void write() throws FileNotFoundException, IOException {
         FileOutputStream fos = new FileOutputStream("msgPackage.tmp");
         ObjectOutputStream oos = new ObjectOutputStream(fos);
-        
-        oos.writeObject(new MessagePacket("test1"));
 
+        oos.writeObject(new GroupMessagePacket(this.testMessage));
         oos.close();
     }
-    
+
     /**
      * Test for reading an object from a stream
-     * 
+     *
      * @throws FileNotFoundException
-     * @throws IOException 
-     * @throws java.lang.ClassNotFoundException 
+     * @throws IOException
+     * @throws java.lang.ClassNotFoundException
      */
     @Test
     public void read() throws FileNotFoundException, IOException, ClassNotFoundException {
-       FileInputStream fis = new FileInputStream("msgPackage.tmp");
-      ObjectInputStream ois = new ObjectInputStream(fis);
+        FileInputStream fis = new FileInputStream("msgPackage.tmp");
+        ObjectInputStream ois = new ObjectInputStream(fis);
 
-      Packet msgPacket = (Packet) ois.readObject();
-      
-      ois.close();
+        GroupMessagePacket msgPacket = (GroupMessagePacket) ois.readObject();
+        ois.close();
+
+        assertEquals(msgPacket.getMessage(), this.testMessage);
     }
 }

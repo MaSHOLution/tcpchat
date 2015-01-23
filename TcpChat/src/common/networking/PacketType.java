@@ -31,8 +31,8 @@ package common.networking;
 public enum PacketType {
 
     PACKET,
-    MESSAGEPACKET,
+    GROUPMESSAGEPACKET,
+    PRIVATEMESSAGEPACKET,
     CONNECTPACKET,
-    KICKPACKET,
-    COMMANDPACKET
+    KICKPACKET
 }

@@ -23,8 +23,10 @@
  */
 package client.gui;
 
-import java.io.DataInputStream;
+import common.networking.*;
+import common.networking.packets.*;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 
 /**
  * This class serves as an outsourced thread, as the gui can only handle one
@@ -35,7 +37,7 @@ import java.io.IOException;
 public class ClientGuiThread implements Runnable {
 
     // Stream
-    protected DataInputStream inStream = null;
+    protected ObjectInputStream inStream = null;
 
     // Current gui thread
     protected ClientGui gui = null;
@@ -62,21 +64,27 @@ public class ClientGuiThread implements Runnable {
          * Keep on reading from the socket untill "Bye" is received from the
          * server
          */
-        String responseLine;
+        Packet responsePacket;
         try {
-            while ((responseLine = inStream.readLine()) != null) {
-                // TODO Decrypt
-                gui.outputLineOnGui(responseLine);
+            while (true) {
+
+                responsePacket = (Packet) inStream.readObject();
                 // If received line contains bye, break while and close connection
-                if (responseLine.startsWith("*** Bye")) {
+                if (responsePacket.getIdentifier() == PacketType.DISCONNECT) {
                     gui.outputLineOnGui("*** Disconnected ***");
                     break;
+                } else if (responsePacket.getIdentifier() == PacketType.KICK) {
+                    gui.outputLineOnGui(((KickPacket) responsePacket).getMessage());
+                    break;
+                } else {
+                    // Output message
+                     gui.outputLineOnGui(((MessagePacket) responsePacket).getMessage());
                 }
             }
             // Close the connection as it is no longer needed
             gui.closeConnection();
-        } catch (IOException e) {
-            System.err.println("IOException:  " + e);
+        } catch (IOException | ClassNotFoundException e) {
+            System.err.println("Exception:  " + e);
         }
     }
 }

@@ -23,8 +23,10 @@
  */
 package server.console;
 
+import common.networking.Packet;
+import common.networking.packets.KickPacket;
 import java.io.IOException;
-import java.io.PrintStream;
+import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.logging.Handler;
@@ -108,8 +110,9 @@ public final class ChatServer {
 
                         // Only when maxclients is reached
                         if (i == maxClientsCount) {
-                            try (PrintStream pStream = new PrintStream(clientSocket.getOutputStream())) {
-                                pStream.println("Too many clients. Please try later.");
+                            
+                            try (ObjectOutputStream oos = new ObjectOutputStream(clientSocket.getOutputStream())) {
+                                  oos.writeObject(new KickPacket("Too many clients. Please try later."));
                             }
                             Counters.connection();
                             logControl.log(logConnection, Level.INFO, clientSocket.getRemoteSocketAddress() + ": rejected, server is full");
@@ -150,8 +153,7 @@ class ShutdownHandle extends Thread {
         // Send closing of server to all clients
         for (int i = 0; i < maxClientsCount; i++) {
             if (threads[i] != null && threads[i].clientName != null) {
-                sendMessage(threads[i], "*** SERVER IS GOING DOWN ***");
-                sendMessage(threads[i], "*** Bye " + threads[i].clientName + " ***");
+                sendMessage(threads[i], new KickPacket("SERVER IS GOING DOWN"));
             }
         }
         // Close all loggers
@@ -163,16 +165,15 @@ class ShutdownHandle extends Thread {
     }
 
     /**
-     * Writes a message to a specific PrintStream
+     * Writes a packet to a specific PrintStream
      *
-     * @param printStream stream to write message to
-     * @param message stands for itself
+     * @param printStream stream to write packet to
+     * @param packet stands for itself
      */
-    private boolean sendMessage(ClientThread thread, String message) {
-        message = thread.encMethod.encrypt(message);
+    private boolean sendMessage(ClientThread thread, Packet packet) {
         try {
             Counters.connection();
-            thread.outStream.println(message);
+            thread.outStream.writeObject(packet);
             return true;
         } catch (Exception e) {
             ChatServer.logControl.log(CustomLogging.get(LogName.SERVER, LogPath.EXCEPTION), Level.INFO, e.getMessage());

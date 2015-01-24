@@ -23,14 +23,18 @@
  */
 package client.gui;
 
+import common.networking.Packet;
+import common.networking.packets.*;
 import java.awt.event.KeyEvent;
 import java.io.BufferedReader;
-import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.PrintStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * This is the gui class for the client Run this file to initialize gui
@@ -43,8 +47,8 @@ public class ClientGui extends javax.swing.JFrame {
     protected Socket clientSocket = null;
 
     // Streams
-    protected PrintStream outStream = null;
-    protected DataInputStream inStream = null;
+    protected ObjectOutputStream outStream = null;
+    protected ObjectInputStream inStream = null;
     protected BufferedReader inputLine = null;
 
     protected DialogHelper dialogHelper = null;
@@ -58,8 +62,6 @@ public class ClientGui extends javax.swing.JFrame {
         Connect,
         Disconnect
     }
-
-    protected static final String quitString = "/quit";
 
     /**
      * Initializes the gui elements
@@ -262,12 +264,12 @@ public class ClientGui extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void bSendMessageActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bSendMessageActionPerformed
-        this.sendMessage(this.tbMessage.getText());
+        this.sendMessage(new GroupMessagePacket(this.tbMessage.getText()));
     }//GEN-LAST:event_bSendMessageActionPerformed
 
     private void tbMessageKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tbMessageKeyPressed
         if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
-            this.sendMessage(this.tbMessage.getText());
+            this.sendMessage(new GroupMessagePacket(this.tbMessage.getText()));
         }
     }//GEN-LAST:event_tbMessageKeyPressed
 
@@ -311,8 +313,8 @@ public class ClientGui extends javax.swing.JFrame {
                 // Set up socket and streams
                 clientSocket = new Socket(host, port);
                 inputLine = new BufferedReader(new InputStreamReader(System.in));
-                outStream = new PrintStream(clientSocket.getOutputStream());
-                inStream = new DataInputStream(clientSocket.getInputStream());
+                outStream = new ObjectOutputStream(clientSocket.getOutputStream());
+                inStream = new ObjectInputStream(clientSocket.getInputStream());
 
                 // Initial clear of the chat text area
                 this.clearChatArea();
@@ -321,7 +323,7 @@ public class ClientGui extends javax.swing.JFrame {
                 new Thread(new ClientGuiThread(this)).start();
 
                 // Send nickname
-                this.sendMessage(this.tbNickname.getText());
+                this.sendMessage(new ConnectPacket(this.tbNickname.getText()));
 
                 this.switchGui(true);
                 this.isConnected = true;
@@ -341,7 +343,7 @@ public class ClientGui extends javax.swing.JFrame {
      * Disconnects the client to the server
      */
     private void disconnect() {
-        this.sendMessage(ClientGui.quitString);
+        this.sendMessage(new DisconnectPacket());
     }
 
     private boolean checkConnData() {
@@ -365,18 +367,22 @@ public class ClientGui extends javax.swing.JFrame {
     }
 
     /**
-     * Sends a message through the outStream to the server
+     * Sends a packet through the outStream to the server
      */
-    private void sendMessage(String message) {
+    private void sendMessage(Packet packet) {
 
-        // Check if line is empty
-        if (!message.trim().equals("")) {
-            // TODO Encrypt
-            this.outStream.println(message);
+        try {
+            // TODO check line
+            // Check if line is empty
+            // if (!packet.trim().equals("")) {
+            this.outStream.writeObject(packet);
             this.tbMessage.setText("");
+            // }
+            
+            this.hasWrittenMessage = true;
+        } catch (IOException ex) {
+           // TODO exception handling
         }
-
-        this.hasWrittenMessage = true;
     }
 
     /**

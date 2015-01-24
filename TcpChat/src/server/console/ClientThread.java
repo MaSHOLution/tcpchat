@@ -23,10 +23,13 @@
  */
 package server.console;
 
+import common.networking.Packet;
+import common.networking.PacketType;
+import common.networking.packets.*;
 import security.basics.CryptoBasics;
-import java.io.DataInputStream;
 import java.io.IOException;
-import java.io.PrintStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.SocketAddress;
 import java.util.logging.Level;
@@ -37,8 +40,8 @@ import static server.console.ChatServer.*;
 public final class ClientThread extends Thread {
 
     protected String clientName = null;
-    protected DataInputStream inStream = null;
-    protected PrintStream outStream = null;
+    protected ObjectInputStream inStream = null;
+    protected ObjectOutputStream outStream = null;
     protected Socket clientSocket = null;
     protected int maxClientsCount;
     protected SocketAddress ip;
@@ -69,42 +72,44 @@ public final class ClientThread extends Thread {
             this.initStreams();
 
             // Setting up name
-            if (this.setName()) {
-                this.linkNameToThread(name);
+            ConnectPacket cPacket = this.setName();
+            if (cPacket != null) {
+                this.linkNameToThread(cPacket.getName());
 
                 // Broadcasts welcome message to all clients
                 this.broadcastExceptMe("*** User \"" + name + "\" joined ***");
-                this.sendMessage("Welcome " + name + " to our chat room.\n"); //To leave, enter \"" + this.quitString + "\" in a new line.");
+                this.sendPacket(new InfoPacket("Welcome " + name + " to our chat room.\n")); //To leave, enter \"" + this.quitString + "\" in a new line.");
                 logControl.log(logGeneral, Level.INFO, name + " joined");
 
                 // Start conversation
                 while (true) {
-                    String line = this.readMessage(inStream);
-                    if (line.equals(quitString)) {
+                    Packet packet = this.readPacket(inStream);
+                    PacketType ptype = packet.getIdentifier();
+                    if(ptype == PacketType.DISCONNECT){
                         break;
-                    } else if (line.startsWith("*** Bye")) {
-                        this.sendMessage("*** WARNING: String not allowed ***");
-                        logControl.log(logGeneral, Level.WARNING, name + " wanted to send \"*** Bye\", rejected message");
-                    } else if (line.startsWith("@")) {
+                    } else if (ptype == PacketType.PRIVATEMESSAGE) {
                         // If the message is private sent it to the given client 
                         // words[0] == name of receiver
                         // words[1] == message
-                        String[] words = line.split("\\s", 2);
+                        PrivateMessagePacket pmPacket = (PrivateMessagePacket) packet;
+                        // TODO PM PACKAGE
+                        String[] words = pmPacket.getMessage().split("\\s", 2);
                         if (words.length > 1 && words[1] != null) {
                             words[1] = words[1].trim();
                             if (!words[1].isEmpty()) {
-                                this.sendPrivateMessage(words[0], words[1]);
+                                this.sendPrivateMessage(words[0], pmPacket);
                             }
                         }
                     } else {
                         // Broadcast message to all other clients
-                        this.broadcast("<" + name + "> " + line);
+                        // this.broadcast("<" + name + "> " + line);
+                        this.broadcast((GroupMessagePacket) packet);
                     }
                 }
 
                 // Tell every client, that the current client is going offline
                 this.broadcastExceptMe("*** " + name + " has left ***");
-                this.sendMessage("*** Bye " + name + " ***");
+                this.sendPacket(new DisconnectPacket());
 
                 // Remove client from threads array and close connections
                 disconnect(false);
@@ -123,8 +128,8 @@ public final class ClientThread extends Thread {
      * @throws IOException
      */
     protected synchronized void initStreams() throws IOException {
-        this.inStream = new DataInputStream(this.clientSocket.getInputStream());
-        this.outStream = new PrintStream(this.clientSocket.getOutputStream());
+        this.inStream = new ObjectInputStream(this.clientSocket.getInputStream());
+        this.outStream = new ObjectOutputStream(this.clientSocket.getOutputStream());
     }
 
     /**
@@ -135,7 +140,22 @@ public final class ClientThread extends Thread {
     protected synchronized void broadcast(String message) {
         for (int i = 0; i < this.maxClientsCount; i++) {
             if (threads[i] != null && threads[i].clientName != null) {
-                this.sendMessage(message, threads[i]);
+                this.sendMessage(new GroupMessagePacket(message), threads[i]);
+            }
+        }
+        logControl.log(logGeneral, Level.INFO, "GM #" + Counters.Totals.Messages.gmTotal + " from " + this.clientName);
+        Counters.gm();
+    }
+    
+    /**
+     * Sends a message to all clients
+     *
+     * @param gmPacket GroupMessagePacket to send
+     */
+    protected synchronized void broadcast(GroupMessagePacket gmPacket) {
+        for (int i = 0; i < this.maxClientsCount; i++) {
+            if (threads[i] != null && threads[i].clientName != null) {
+                this.sendMessage(gmPacket, threads[i]);
             }
         }
         logControl.log(logGeneral, Level.INFO, "GM #" + Counters.Totals.Messages.gmTotal + " from " + this.clientName);
@@ -153,23 +173,23 @@ public final class ClientThread extends Thread {
             if (threads[i] != null
                     && threads[i].clientName != null
                     && threads[i] != this) {
-                sendMessage(message, threads[i]);
+                sendMessage(new GroupMessagePacket(message), threads[i]);
             }
         }
         // Counters.gm(); is normally no group but system shoutout
     }
 
     /**
-     * Sends a private message to one client
+     * Sends a private privatePacket to one client
      *
      * @param receiver name of the receiver
-     * @param message message to send
+     * @param privatePacket privatePacket to send
      */
-    protected synchronized void sendPrivateMessage(String receiver, String message) {
+    protected synchronized void sendPrivateMessage(String receiver, PrivateMessagePacket privatePacket) {
 
-        // Check if sender wants to send message to himself
+        // Check if sender wants to send privatePacket to himself
         if (receiver.equals(this.clientName)) {
-            this.outStream.println("You can't send private messages to yourself");
+            this.sendInfo("You can't send private messages to yourself");
             logControl.log(logGeneral, Level.INFO, this.clientName + " wanted to send himself a private message");
         } else {
             for (int i = 0; i < maxClientsCount; i++) {
@@ -178,11 +198,11 @@ public final class ClientThread extends Thread {
                         && threads[i].clientName != null
                         && threads[i].clientName.equals(receiver)) {
 
-                    // Send message to receiver
-                    this.sendMessage("<" + this.clientName + "> " + message);
+                    // Send privatePacket to receiver
+                    this.sendMessage(privatePacket, threads[i]);
 
-                    // Send message to sender
-                    this.sendMessage(">" + receiver + "> " + message);
+                    // Send privatePacket to sender
+                    this.sendPacket(privatePacket);
                     Counters.pm();
                     logControl.log(logGeneral, Level.INFO, "PM #" + Counters.Totals.Messages.pmTotal + " from " + this.clientName + " to " + receiver);
                     break;
@@ -192,16 +212,33 @@ public final class ClientThread extends Thread {
     }
 
     /**
-     * Writes a message to a specific PrintStream
+     * Writes a packet to a specific PrintStream
      *
-     * @param message stands for itself
+     * @param packet stands for itself
      * @return result of sending
      */
-    protected synchronized boolean sendMessage(String message) {
-        message = this.encMethod.encrypt(message);
+    protected synchronized boolean sendPacket(Packet packet) {
         try {
             Counters.connection();
-            this.outStream.println(message);
+            this.outStream.writeObject(packet);
+            return true;
+        } catch (IOException e) {
+            logControl.log(logException, Level.INFO, this.ip + "(" + this.name + "): " + e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Writes a packet to a specific PrintStream
+     *
+     * @param packet stands for itself
+     * @param thread ClientThread to send packet to
+     * @return result of sending
+     */
+    protected synchronized boolean sendMessage(Packet packet, ClientThread thread) {
+        try {
+            Counters.connection();
+            thread.outStream.writeObject(packet);
             return true;
         } catch (Exception e) {
             logControl.log(logException, Level.INFO, this.ip + "(" + this.name + "): " + e.getMessage());
@@ -210,17 +247,16 @@ public final class ClientThread extends Thread {
     }
 
     /**
-     * Writes a message to a specific PrintStream
+     * Writes a packet to a specific PrintStream
      *
-     * @param message stands for itself
-     * @param thread ClientThread to send message to
+     * @param packet stands for itself
+     * @param thread ClientThread to send packet to
      * @return result of sending
      */
-    protected synchronized boolean sendMessage(String message, ClientThread thread) {
-        message = thread.encMethod.encrypt(message);
+    protected synchronized boolean sendInfo(String message) {
         try {
             Counters.connection();
-            thread.outStream.println(message);
+            this.outStream.writeObject(new InfoPacket(message));
             return true;
         } catch (Exception e) {
             logControl.log(logException, Level.INFO, this.ip + "(" + this.name + "): " + e.getMessage());
@@ -233,13 +269,16 @@ public final class ClientThread extends Thread {
      *
      * @param inStream
      * @return
-     * @throws java.io.IOException
      */
-    protected synchronized String readMessage(DataInputStream inStream) throws IOException {
-        String readLine = inStream.readLine();
-        readLine = encMethod.encrypt(readLine);
-        Counters.connection();
-        return readLine;
+    protected synchronized Packet readPacket(ObjectInputStream inStream) {
+        try {
+            Packet readPacket = (Packet) inStream.readObject();
+            Counters.connection();
+            return readPacket;
+        } catch (IOException | ClassNotFoundException ex) {
+           // TODO handle exception
+        }
+        return null;
     }
 
     /**
@@ -248,21 +287,21 @@ public final class ClientThread extends Thread {
      * @return name
      * @throws java.io.IOException
      */
-    protected boolean setName() throws IOException {
-        String username;
+    protected ConnectPacket setName() throws IOException {
+        ConnectPacket clientAnswer;
+        // TODO make packet secure
         while (true) {
-            this.sendMessage("Please enter a nickname:");
-            username = this.readMessage(inStream);
-            if (username.equals(ClientThread.quitString)) {
-                return false;
-            } else if (username.contains("@")) {
-                this.sendMessage("The name needn't contain '@' character.");
+            clientAnswer = (ConnectPacket) this.readPacket(inStream);
+            if (clientAnswer.getIdentifier() == PacketType.DISCONNECT) {
+                return null;
+            } else if (clientAnswer.getName().contains("@")) {
+                this.sendPacket(new InfoPacket("The name needn't contain '@' character."));
             } else {
-                this.name = username;
+                this.name = clientAnswer.getName();
                 break;
             }
         }
-        return true;
+        return (ConnectPacket) clientAnswer;
     }
 
     /**

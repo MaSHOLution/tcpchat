@@ -32,6 +32,8 @@ import common.networking.PacketType;
  * @author Manuel Schmid, Fabian Fink
  */
 public class ConnectPacket extends Packet {
+    
+    protected final String name;
 
     /**
      * Constructor
@@ -39,17 +41,15 @@ public class ConnectPacket extends Packet {
      * @param name
      */
     public ConnectPacket(String name) {
-        this.senderAlias = name;
-        this.packetIdentifier = PacketType.CONNECTPACKET;
+        this.name = name;
+        this.packetIdentifier = PacketType.CONNECT;
     }
-
+    
     /**
-     * Getter for the senderAlias
-     *
-     * @return
+     * Getter for name
+     * @return name
      */
-    public String getName() {
-        return this.senderAlias;
+    public String getName(){
+        return this.name;
     }
-
 }

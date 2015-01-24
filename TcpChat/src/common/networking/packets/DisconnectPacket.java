@@ -21,21 +21,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package common.networking;
+package common.networking.packets;
+
+import common.networking.Packet;
+import common.networking.PacketType;
 
 /**
- * Enum for packet types
+ * Class for a specific packet type
  *
  * @author Manuel Schmid, Fabian Fink
  */
-public enum PacketType {
+public class DisconnectPacket extends Packet {
 
-    CONNECT,
-    DISCONNECT,
-    GROUPMESSAGE,
-    INFO,
-    MESSAGEPACKET,  // Abstract
-    KICK,
-    PACKET,         // Abstract
-    PRIVATEMESSAGE, 
+    /**
+     * Constructor
+     */
+    public DisconnectPacket() {
+        this.packetIdentifier = PacketType.DISCONNECT;
+    }
 }

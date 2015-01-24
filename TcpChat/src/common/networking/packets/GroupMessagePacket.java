@@ -23,6 +23,7 @@
  */
 package common.networking.packets;
 
+import common.networking.MessagePacket;
 import common.networking.Packet;
 import common.networking.PacketType;
 
@@ -31,9 +32,8 @@ import common.networking.PacketType;
  *
  * @author Manuel Schmid, Fabian Fink
  */
-public class GroupMessagePacket extends Packet {
+public class GroupMessagePacket extends MessagePacket {
 
-    protected String message;
 
     /**
      * Constructor
@@ -42,16 +42,6 @@ public class GroupMessagePacket extends Packet {
      */
     public GroupMessagePacket(String message) {
         this.message = message;
-        this.packetIdentifier = PacketType.GROUPMESSAGEPACKET;
+        this.packetIdentifier = PacketType.GROUPMESSAGE;
     }
-
-    /**
-     * Getter for the message
-     *
-     * @return
-     */
-    public String getMessage() {
-        return this.message;
-    }
-
 }

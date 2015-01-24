@@ -23,19 +23,24 @@
  */
 package common.networking;
 
-/**
- * Enum for packet types
- *
- * @author Manuel Schmid, Fabian Fink
- */
-public enum PacketType {
+import java.io.Serializable;
 
-    CONNECT,
-    DISCONNECT,
-    GROUPMESSAGE,
-    INFO,
-    MESSAGEPACKET,  // Abstract
-    KICK,
-    PACKET,         // Abstract
-    PRIVATEMESSAGE, 
+/**
+ * Abstract class for packets
+ *
+ * @author Manuel Schmid
+ */
+public abstract class MessagePacket extends Packet {
+
+    protected PacketType packetIdentifier = PacketType.MESSAGEPACKET;
+    protected String message;
+    
+    /**
+     * Getter for message
+     *
+     * @return mesage
+     */
+    public String getMessage() {
+        return this.message;
+    }
 }

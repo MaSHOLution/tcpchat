@@ -33,7 +33,7 @@ import common.networking.PacketType;
  */
 public class KickPacket extends Packet {
 
-    protected String reason;
+    protected String message;
 
     /**
      * Constructor
@@ -41,17 +41,16 @@ public class KickPacket extends Packet {
      * @param message
      */
     public KickPacket(String message) {
-        this.reason = message;
-        this.packetIdentifier = PacketType.KICKPACKET;
+        this.message = message;
+        this.packetIdentifier = PacketType.KICK;
     }
 
     /**
      * Getter for the reason
      *
-     * @return
+     * @return reason
      */
-    public String getReason() {
-        return this.reason;
+    public String getMessage() {
+        return "You have been kicked from the server, reason: " + this.message;
     }
-
 }

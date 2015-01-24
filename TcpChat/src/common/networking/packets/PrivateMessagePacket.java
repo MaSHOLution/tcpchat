@@ -40,22 +40,14 @@ public class PrivateMessagePacket extends Packet {
      * Constructor
      *
      * @param message
+     * @param receiver
      */
     public PrivateMessagePacket(String message, String receiver) {
         this.message = message;
         this.receiver = receiver;
-        this.packetIdentifier = PacketType.PRIVATEMESSAGEPACKET;
+        this.packetIdentifier = PacketType.PRIVATEMESSAGE;
     }
 
-    /**
-     * Getter for the message
-     *
-     * @return
-     */
-    public String getMessage() {
-        return this.message;
-    }
-    
     /**
      * Getter for the receiver
      *
@@ -64,5 +56,13 @@ public class PrivateMessagePacket extends Packet {
     public String getReceiver() {
         return this.receiver;
     }
-
+    
+    /**
+     * Getter for message
+     * 
+     * @return mesage
+     */
+    public String getMessage(){
+        return this.message;
+    }
 }

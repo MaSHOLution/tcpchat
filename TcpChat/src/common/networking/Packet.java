@@ -35,7 +35,6 @@ public abstract class Packet implements Serializable {
     protected PacketType packetIdentifier = PacketType.PACKET;
     protected String senderAlias = "Server";
     protected boolean isPrepared = false;
-
     /**
      * Getter for identifier
      *

@@ -21,21 +21,36 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package common.networking;
+package common.networking.packets;
+
+import common.networking.MessagePacket;
+import common.networking.PacketType;
 
 /**
- * Enum for packet types
+ * Class for a specific packet type
  *
  * @author Manuel Schmid, Fabian Fink
  */
-public enum PacketType {
+public class InfoPacket extends MessagePacket {
 
-    CONNECT,
-    DISCONNECT,
-    GROUPMESSAGE,
-    INFO,
-    MESSAGEPACKET,  // Abstract
-    KICK,
-    PACKET,         // Abstract
-    PRIVATEMESSAGE, 
+    protected String message;
+    
+    /**
+     * Constructor
+     *
+     * @param message
+     */
+    public InfoPacket(String message) {
+        this.message = message;
+        this.packetIdentifier = PacketType.INFO;
+    }
+    
+    /**
+     * Getter for message
+     * 
+     * @return mesage
+     */
+    public String getMessage(){
+        return this.message;
+    }
 }

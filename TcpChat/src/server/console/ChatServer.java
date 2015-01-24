@@ -153,7 +153,7 @@ class ShutdownHandle extends Thread {
         // Send closing of server to all clients
         for (int i = 0; i < maxClientsCount; i++) {
             if (threads[i] != null && threads[i].clientName != null) {
-                sendMessage(threads[i], new KickPacket("SERVER IS GOING DOWN"));
+                send(threads[i], new KickPacket("SERVER IS GOING DOWN"));
             }
         }
         // Close all loggers
@@ -170,7 +170,7 @@ class ShutdownHandle extends Thread {
      * @param printStream stream to write packet to
      * @param packet stands for itself
      */
-    private boolean sendMessage(ClientThread thread, Packet packet) {
+    private boolean send(ClientThread thread, Packet packet) {
         try {
             Counters.connection();
             thread.outStream.writeObject(packet);

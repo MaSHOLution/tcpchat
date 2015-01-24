@@ -32,10 +32,10 @@ public enum PacketType {
 
     CONNECT,
     DISCONNECT,
-    GROUPMESSAGE,
+    GM,
     INFO,
-    MESSAGEPACKET,  // Abstract
+    MESSAGE,  // Abstract
     KICK,
-    PACKET,         // Abstract
-    PRIVATEMESSAGE, 
+    PACKET,   // Abstract
+    PM, 
 }

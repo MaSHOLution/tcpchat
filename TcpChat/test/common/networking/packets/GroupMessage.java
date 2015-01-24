@@ -21,9 +21,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package common.networking;
+package common.networking.packets;
 
-import common.networking.packets.GroupMessagePacket;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -37,9 +36,11 @@ import static org.junit.Assert.*;
  *
  * @author Manuel Schmid
  */
-public class Transfer {
+public class GroupMessage {
 
-    private final String testMessage = "Test1";
+    private final String message = "TestMessage";
+    private final String sender = "TestSender";
+    private final String filename = "PacketTest.junit";
 
     /**
      * Test for writing an object to a stream
@@ -49,10 +50,10 @@ public class Transfer {
      */
     @Test
     public void write() throws FileNotFoundException, IOException {
-        FileOutputStream fos = new FileOutputStream("msgPackage.tmp");
+        FileOutputStream fos = new FileOutputStream(filename);
         ObjectOutputStream oos = new ObjectOutputStream(fos);
 
-        oos.writeObject(new GroupMessagePacket(this.testMessage));
+        oos.writeObject(new GroupMessagePacket(this.message, this.sender));
         oos.close();
     }
 
@@ -65,12 +66,13 @@ public class Transfer {
      */
     @Test
     public void read() throws FileNotFoundException, IOException, ClassNotFoundException {
-        FileInputStream fis = new FileInputStream("msgPackage.tmp");
+        FileInputStream fis = new FileInputStream(filename);
         ObjectInputStream ois = new ObjectInputStream(fis);
 
         GroupMessagePacket msgPacket = (GroupMessagePacket) ois.readObject();
         ois.close();
 
-        assertEquals(msgPacket.getMessage(), this.testMessage);
+        assertEquals(msgPacket.getMessage(), this.message);
+        assertEquals(msgPacket.getSender(), this.sender);
     }
 }

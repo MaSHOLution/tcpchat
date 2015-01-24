@@ -49,9 +49,9 @@ public final class CryptoBasics {
      */
     public static final Method encMethod = Method.OFF;
 
-    // TODO write javadoc
     /**
-     *
+     * Makes an encryption object of type encMethod
+     * 
      * @param <T>
      * @return
      */

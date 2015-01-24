@@ -65,22 +65,43 @@ public class ClientGuiThread implements Runnable {
          * server
          */
         Packet responsePacket;
+        PacketType ptype;
+        boolean exitWhile = false;
+        String message, sender, receiver;
         try {
-            while (true) {
+            do {
 
                 responsePacket = (Packet) inStream.readObject();
-                // If received line contains bye, break while and close connection
-                if (responsePacket.getIdentifier() == PacketType.DISCONNECT) {
-                    gui.outputLineOnGui("*** Disconnected ***");
-                    break;
-                } else if (responsePacket.getIdentifier() == PacketType.KICK) {
-                    gui.outputLineOnGui(((KickPacket) responsePacket).getMessage());
-                    break;
-                } else {
-                    // Output message
-                     gui.outputLineOnGui(((MessagePacket) responsePacket).getMessage());
+                ptype = responsePacket.getIdentifier();
+
+                switch (ptype) {
+                    case DISCONNECT:
+                        gui.outputLineOnGui("*** Disconnected ***");
+                        exitWhile = true;
+                        break;
+                    case KICK:
+                        gui.outputLineOnGui(((KickPacket) responsePacket).getMessage());
+                        exitWhile = true;
+                        break;
+                    case PM:
+                        PrivateMessagePacket pm = ((PrivateMessagePacket) responsePacket);
+                        message = pm.getMessage();
+                        sender = pm.getSender();
+                        receiver = pm.getReceiver();
+                        
+                        gui.outputLineOnGui("<" + sender + " to " + receiver + "> " + message);
+                        break;
+                    case GM:
+                        GroupMessagePacket gm = ((GroupMessagePacket) responsePacket);
+                        message = gm.getMessage();
+                        sender = gm.getSender();
+                        
+                        gui.outputLineOnGui("<" + sender + "> " + message);
+                        break;
+                    default:
+                        gui.outputLineOnGui(((MessagePacket) responsePacket).getMessage());
                 }
-            }
+            } while(!exitWhile);
             // Close the connection as it is no longer needed
             gui.closeConnection();
         } catch (IOException | ClassNotFoundException e) {

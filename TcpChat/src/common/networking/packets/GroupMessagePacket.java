@@ -24,7 +24,6 @@
 package common.networking.packets;
 
 import common.networking.MessagePacket;
-import common.networking.Packet;
 import common.networking.PacketType;
 
 /**
@@ -34,14 +33,26 @@ import common.networking.PacketType;
  */
 public class GroupMessagePacket extends MessagePacket {
 
+protected String sender;
 
     /**
      * Constructor
      *
-     * @param message
+     * @param message message to send
+     * @param sender name of sender
      */
-    public GroupMessagePacket(String message) {
+    public GroupMessagePacket(String message, String sender) {
         this.message = message;
-        this.packetIdentifier = PacketType.GROUPMESSAGE;
+        this.sender = sender;
+        this.packetIdentifier = PacketType.GM;
+    }
+    
+    /**
+     * Getter for the sender
+     *
+     * @return
+     */
+    public String getSender() {
+        return this.sender;
     }
 }

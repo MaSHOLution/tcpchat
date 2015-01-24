@@ -23,7 +23,7 @@
  */
 package common.networking.packets;
 
-import common.networking.Packet;
+import common.networking.MessagePacket;
 import common.networking.PacketType;
 
 /**
@@ -31,23 +31,34 @@ import common.networking.PacketType;
  *
  * @author Manuel Schmid, Fabian Fink
  */
-public class PrivateMessagePacket extends Packet {
+public class PrivateMessagePacket extends MessagePacket {
 
-    protected String message;
+    protected String sender;
     protected String receiver;
 
     /**
      * Constructor
      *
-     * @param message
-     * @param receiver
+     * @param message message to send
+     * @param sender sender
+     * @param receiver receiver
      */
-    public PrivateMessagePacket(String message, String receiver) {
+    public PrivateMessagePacket(String message, String sender, String receiver) {
         this.message = message;
+        this.sender = sender;
         this.receiver = receiver;
-        this.packetIdentifier = PacketType.PRIVATEMESSAGE;
+        this.packetIdentifier = PacketType.PM;
     }
 
+    /**
+     * Getter for the sender
+     *
+     * @return
+     */
+    public String getSender() {
+        return this.sender;
+    }
+    
     /**
      * Getter for the receiver
      *
@@ -55,14 +66,5 @@ public class PrivateMessagePacket extends Packet {
      */
     public String getReceiver() {
         return this.receiver;
-    }
-    
-    /**
-     * Getter for message
-     * 
-     * @return mesage
-     */
-    public String getMessage(){
-        return this.message;
     }
 }

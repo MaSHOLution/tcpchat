@@ -23,8 +23,6 @@
  */
 package common.networking;
 
-import java.io.Serializable;
-
 /**
  * Abstract class for packets
  *
@@ -32,7 +30,7 @@ import java.io.Serializable;
  */
 public abstract class MessagePacket extends Packet {
 
-    protected PacketType packetIdentifier = PacketType.MESSAGEPACKET;
+    //protected PacketType packetIdentifier = PacketType.MESSAGEPACKET;
     protected String message;
     
     /**

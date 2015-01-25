@@ -23,6 +23,7 @@
  */
 package common.networking.packets;
 
+import common.networking.packets.GroupMessagePacket;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;

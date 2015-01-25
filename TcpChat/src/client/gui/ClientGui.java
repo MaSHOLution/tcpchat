@@ -100,7 +100,6 @@ public final class ClientGui extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Chat-Client");
         setMinimumSize(new java.awt.Dimension(580, 400));
-        setResizable(false);
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent evt) {
                 formWindowClosing(evt);
@@ -233,7 +232,6 @@ public final class ClientGui extends javax.swing.JFrame {
         sendPanelLayout.setHorizontalGroup(
             sendPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, sendPanelLayout.createSequentialGroup()
-                .addContainerGap()
                 .addComponent(tbMessage)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(bSendMessage, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -241,7 +239,7 @@ public final class ClientGui extends javax.swing.JFrame {
         sendPanelLayout.setVerticalGroup(
             sendPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(sendPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                .addComponent(bSendMessage, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(bSendMessage, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addComponent(tbMessage))
         );
 
@@ -263,7 +261,7 @@ public final class ClientGui extends javax.swing.JFrame {
                 .addContainerGap()
                 .addComponent(connectionPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(serverPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 338, Short.MAX_VALUE)
+                .addComponent(serverPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 345, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(sendPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -273,16 +271,6 @@ public final class ClientGui extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
-    private void bSendMessageActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bSendMessageActionPerformed
-        this.sendMessageBox();
-    }//GEN-LAST:event_bSendMessageActionPerformed
-
-    private void tbMessageKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tbMessageKeyPressed
-        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
-            this.sendMessageBox();
-        }
-    }//GEN-LAST:event_tbMessageKeyPressed
 
     private void tbPortKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tbPortKeyPressed
         if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
@@ -317,6 +305,16 @@ public final class ClientGui extends javax.swing.JFrame {
             this.connect();
         }
     }//GEN-LAST:event_tbServerKeyPressed
+
+    private void bSendMessageActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bSendMessageActionPerformed
+        this.sendMessageBox();
+    }//GEN-LAST:event_bSendMessageActionPerformed
+
+    private void tbMessageKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tbMessageKeyPressed
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            this.sendMessageBox();
+        }
+    }//GEN-LAST:event_tbMessageKeyPressed
 
     /**
      * Connects the client to the server
@@ -496,7 +494,7 @@ public final class ClientGui extends javax.swing.JFrame {
          */
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
+                if ("Windows".equals(info.getName())) {
                     javax.swing.UIManager.setLookAndFeel(info.getClassName());
                     break;
                 }

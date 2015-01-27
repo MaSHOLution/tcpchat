@@ -21,25 +21,38 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package logging.enums;
+package common.networking.packets;
+
+import common.networking.MessagePacket;
+import common.networking.PacketType;
 
 /**
- * Enum for logger names (classnames)
+ * Class for a specific packet type
  *
- * @author Manuel Schmid
+ * @author Manuel Schmid, Fabian Fink
  */
-public enum LogName {
+public class GroupMessagePacket extends MessagePacket {
 
-    SERVER(server.console.ChatServer.class.getName()),
-    CLIENT(client.console.ChatClient.class.getName());
+protected String sender;
 
-    private final String name;
-
-    LogName(String name) {
-        this.name = name;
+    /**
+     * Constructor
+     *
+     * @param message message to send
+     * @param sender name of sender
+     */
+    public GroupMessagePacket(String message, String sender) {
+        this.message = message;
+        this.sender = sender;
+        this.packetIdentifier = PacketType.GM;
     }
-
-    public String getName() {
-        return name;
+    
+    /**
+     * Getter for the sender
+     *
+     * @return
+     */
+    public String getSender() {
+        return this.sender;
     }
 }

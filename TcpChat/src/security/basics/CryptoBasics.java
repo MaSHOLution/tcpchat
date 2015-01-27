@@ -21,25 +21,47 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package logging.enums;
+package security.basics;
+
+import security.cryptography.method.*;
+import security.cryptography.EncryptionMethod;
+import security.cryptography.Method;
 
 /**
- * Enum for logger names (classnames)
+ * Contains all basic information for session and cryptography
  *
  * @author Manuel Schmid
  */
-public enum LogName {
+public final class CryptoBasics {
 
-    SERVER(server.console.ChatServer.class.getName()),
-    CLIENT(client.console.ChatClient.class.getName());
+    /**
+     * Encryption in bytes,
+     */
+    public static final int encryption = 256;
 
-    private final String name;
+    /**
+     * Bits to make SessionId from
+     */
+    public static final int encryptionBits = (encryption * 8);
 
-    LogName(String name) {
-        this.name = name;
+    /**
+     * Currently used encryption method
+     */
+    public static final Method encMethod = Method.OFF;
+
+    /**
+     * Makes an encryption object of type encMethod
+     * 
+     * @param <T>
+     * @return
+     */
+    public static final <T> T makeEncryptionObject() {
+        switch (encMethod) {
+            case AES:
+                return (T) new Aes();
+            default:
+                return (T) new EncryptionMethod();
+        }
     }
 
-    public String getName() {
-        return name;
-    }
 }

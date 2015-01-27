@@ -23,6 +23,8 @@
  */
 package logging;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import logging.enums.*;
@@ -31,10 +33,11 @@ import logging.enums.*;
  *
  * @author Manuel Schmid
  */
-public class LoggingController {
+public final class LoggingController {
 
     private final boolean enableLogging;
     private final boolean showOnConsole;
+    private final List<Logger> loggerList = new ArrayList<>();
 
     /**
      * Constructor
@@ -60,7 +63,7 @@ public class LoggingController {
             logger.log(logLevel, message);
         }
     }
-    
+
     /**
      * Creates a logger
      *
@@ -72,8 +75,20 @@ public class LoggingController {
         // Check if logging is enabled
         if (this.enableLogging) {
             // Create logger
-             return CustomLogging.create(logName, logPath, showOnConsole);
+            Logger logger = CustomLogging.create(logName, logPath, showOnConsole);
+            // Add logger to internal list
+            loggerList.add(logger);
+            return logger;
         }
         return null;
+    }
+
+    /**
+     * Gets all loggers which were created in this LoggingController
+     *
+     * @return List of all loggers created in this LoggingController
+     */
+    public List<Logger> getAllLoggers() {
+        return loggerList;
     }
 }

@@ -21,25 +21,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package logging.enums;
+package common.networking.packets;
+
+import common.networking.Packet;
+import common.networking.PacketType;
 
 /**
- * Enum for logger names (classnames)
+ * Class for a specific packet type
  *
- * @author Manuel Schmid
+ * @author Manuel Schmid, Fabian Fink
  */
-public enum LogName {
+public class DisconnectPacket extends Packet {
 
-    SERVER(server.console.ChatServer.class.getName()),
-    CLIENT(client.console.ChatClient.class.getName());
-
-    private final String name;
-
-    LogName(String name) {
-        this.name = name;
-    }
-
-    public String getName() {
-        return name;
+    /**
+     * Constructor
+     */
+    public DisconnectPacket() {
+        this.packetIdentifier = PacketType.DISCONNECT;
     }
 }

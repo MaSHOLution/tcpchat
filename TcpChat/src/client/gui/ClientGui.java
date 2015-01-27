@@ -21,14 +21,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package gui;
+package client.gui;
 
+import common.networking.Packet;
+import common.networking.packets.*;
 import java.awt.event.KeyEvent;
 import java.io.BufferedReader;
-import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.PrintStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
@@ -37,29 +39,28 @@ import java.net.UnknownHostException;
  *
  * @author Manuel Schmid
  */
-public class ClientGui extends javax.swing.JFrame {
+public final class ClientGui extends javax.swing.JFrame {
 
     // Socket
     protected Socket clientSocket = null;
 
     // Streams
-    protected PrintStream outStream = null;
-    protected DataInputStream inStream = null;
+    protected ObjectOutputStream outStream = null;
+    protected ObjectInputStream inStream = null;
     protected BufferedReader inputLine = null;
 
     protected DialogHelper dialogHelper = null;
-
+    
     protected boolean isConnected = false;
-
     protected boolean hasWrittenMessage = false;
+    
+    protected String clientName;
 
     protected enum connectButtonText {
 
         Connect,
         Disconnect
     }
-    
-    protected static final String quitString = "/quit";
 
     /**
      * Initializes the gui elements
@@ -99,8 +100,6 @@ public class ClientGui extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Chat-Client");
         setMinimumSize(new java.awt.Dimension(580, 400));
-        setPreferredSize(new java.awt.Dimension(580, 400));
-        setResizable(false);
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent evt) {
                 formWindowClosing(evt);
@@ -135,10 +134,16 @@ public class ClientGui extends javax.swing.JFrame {
         binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, connectionPanel, org.jdesktop.beansbinding.ELProperty.create("${enabled}"), jLabel2, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
         bindingGroup.addBinding(binding);
 
-        tbServer.setText("localhost");
+        tbServer.setText("mash-it.org");
 
         binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, connectionPanel, org.jdesktop.beansbinding.ELProperty.create("${enabled}"), tbServer, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
         bindingGroup.addBinding(binding);
+
+        tbServer.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                tbServerKeyPressed(evt);
+            }
+        });
 
         jLabel3.setText("Nickname");
 
@@ -147,6 +152,12 @@ public class ClientGui extends javax.swing.JFrame {
 
         binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, connectionPanel, org.jdesktop.beansbinding.ELProperty.create("${enabled}"), tbNickname, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
         bindingGroup.addBinding(binding);
+
+        tbNickname.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                tbNicknameKeyPressed(evt);
+            }
+        });
 
         javax.swing.GroupLayout connectionPanelLayout = new javax.swing.GroupLayout(connectionPanel);
         connectionPanel.setLayout(connectionPanelLayout);
@@ -221,7 +232,6 @@ public class ClientGui extends javax.swing.JFrame {
         sendPanelLayout.setHorizontalGroup(
             sendPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, sendPanelLayout.createSequentialGroup()
-                .addContainerGap()
                 .addComponent(tbMessage)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(bSendMessage, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -229,7 +239,7 @@ public class ClientGui extends javax.swing.JFrame {
         sendPanelLayout.setVerticalGroup(
             sendPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(sendPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                .addComponent(bSendMessage, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(bSendMessage, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addComponent(tbMessage))
         );
 
@@ -251,7 +261,7 @@ public class ClientGui extends javax.swing.JFrame {
                 .addContainerGap()
                 .addComponent(connectionPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(serverPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 338, Short.MAX_VALUE)
+                .addComponent(serverPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 345, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(sendPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -261,16 +271,6 @@ public class ClientGui extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
-    private void bSendMessageActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bSendMessageActionPerformed
-        this.sendMessage(this.tbMessage.getText());
-    }//GEN-LAST:event_bSendMessageActionPerformed
-
-    private void tbMessageKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tbMessageKeyPressed
-        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
-            this.sendMessage(this.tbMessage.getText());
-        }
-    }//GEN-LAST:event_tbMessageKeyPressed
 
     private void tbPortKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tbPortKeyPressed
         if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
@@ -294,26 +294,49 @@ public class ClientGui extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_formWindowClosing
 
+    private void tbNicknameKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tbNicknameKeyPressed
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            this.connect();
+        }
+    }//GEN-LAST:event_tbNicknameKeyPressed
+
+    private void tbServerKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tbServerKeyPressed
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            this.connect();
+        }
+    }//GEN-LAST:event_tbServerKeyPressed
+
+    private void bSendMessageActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bSendMessageActionPerformed
+        this.sendMessageBox();
+    }//GEN-LAST:event_bSendMessageActionPerformed
+
+    private void tbMessageKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tbMessageKeyPressed
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            this.sendMessageBox();
+        }
+    }//GEN-LAST:event_tbMessageKeyPressed
+
     /**
      * Connects the client to the server
+     *
+     * @return
      */
-    private boolean connect() {
+    protected boolean connect() {
 
         if (checkConnData()) {
 
             // Initiating variables
             String host = this.tbServer.getText();
             int port = Integer.parseInt(this.tbPort.getText());
+            this.clientName = this.tbNickname.getText().trim();
 
-            /*
-             * Open a socket on a given host and port. Open input and output streams.
-             */
+            // Open a socket on a given host and port. Open input and output streams.
             try {
                 // Set up socket and streams
                 clientSocket = new Socket(host, port);
                 inputLine = new BufferedReader(new InputStreamReader(System.in));
-                outStream = new PrintStream(clientSocket.getOutputStream());
-                inStream = new DataInputStream(clientSocket.getInputStream());
+                outStream = new ObjectOutputStream(clientSocket.getOutputStream());
+                inStream = new ObjectInputStream(clientSocket.getInputStream());
 
                 // Initial clear of the chat text area
                 this.clearChatArea();
@@ -321,9 +344,9 @@ public class ClientGui extends javax.swing.JFrame {
                 // Create a thread to read from the server
                 new Thread(new ClientGuiThread(this)).start();
 
-                // Send nickname
-                this.sendMessage(this.tbNickname.getText());
-                
+                // Send clientName
+                this.send(new ConnectPacket(this.clientName));
+
                 this.switchGui(true);
                 this.isConnected = true;
                 return true;
@@ -341,11 +364,11 @@ public class ClientGui extends javax.swing.JFrame {
     /**
      * Disconnects the client to the server
      */
-    private void disconnect() {
-        this.sendMessage(this.quitString);
+    protected void disconnect() {
+        this.send(new DisconnectPacket());
     }
 
-    private boolean checkConnData() {
+    protected boolean checkConnData() {
         String nickname = this.tbNickname.getText();
         String server = this.tbServer.getText();
         String portText = this.tbPort.getText();
@@ -366,18 +389,43 @@ public class ClientGui extends javax.swing.JFrame {
     }
 
     /**
-     * Sends a message through the outStream to the server
+     * Sends a packet through the outStream to the server
+     * 
+     * @param packet packet to send
      */
-    private void sendMessage(String message) {
+    protected void send(Packet packet) {
 
-        // Check if line is empty
-        if (!message.trim().equals("")) {
-            // TODO Encrypt
-            this.outStream.println(message);
+        try {
+            this.outStream.writeObject(packet);
             this.tbMessage.setText("");
+            this.hasWrittenMessage = true;
+        } catch (IOException ex) {
+            // TODO exception handling
         }
+    }
 
-        this.hasWrittenMessage = true;
+    /**
+     * Tries to send content of message box
+     */
+    protected void sendMessageBox() {
+        String message = this.tbMessage.getText().trim();
+        //Check if line is empty
+        if (!message.equals("")) {
+            if (message.startsWith("@")) {
+                // messageArray[0] == clientName of receiver
+                // messageArray[1] == message
+                String[] messageArray = message.split("\\s", 2);
+                if (messageArray.length > 1 && messageArray[1] != null) {
+                    if (!messageArray[1].isEmpty()) {
+                        this.send(new PrivateMessagePacket(messageArray[1], this.clientName , messageArray[0].substring(1)));
+                    }
+                } else {
+                    this.outputLineOnGui("Format for PM: @<receiver> <message>");
+                }
+            } else {
+                this.send(new GroupMessagePacket(message, this.clientName));
+            }
+        }
     }
 
     /**
@@ -395,7 +443,7 @@ public class ClientGui extends javax.swing.JFrame {
     /**
      * Clears the chat text area
      */
-    private void clearChatArea() {
+    protected void clearChatArea() {
         this.taChat.setText("");
     }
 
@@ -421,7 +469,7 @@ public class ClientGui extends javax.swing.JFrame {
      *
      * @param isEnabled
      */
-    private void switchGui(boolean isEnabled) {
+    protected void switchGui(boolean isEnabled) {
 
         if (isEnabled) {
             this.bConnect.setText(connectButtonText.Disconnect.toString());
@@ -446,7 +494,7 @@ public class ClientGui extends javax.swing.JFrame {
          */
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
+                if ("Windows".equals(info.getName())) {
                     javax.swing.UIManager.setLookAndFeel(info.getClassName());
                     break;
                 }

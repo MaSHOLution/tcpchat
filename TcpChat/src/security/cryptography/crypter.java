@@ -21,25 +21,28 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package logging.enums;
+package security.cryptography;
 
 /**
- * Enum for logger names (classnames)
+ * Interface for various encryption methods
  *
  * @author Manuel Schmid
  */
-public enum LogName {
+public interface crypter {
 
-    SERVER(server.console.ChatServer.class.getName()),
-    CLIENT(client.console.ChatClient.class.getName());
+    /**
+     * Encrypts a message
+     *
+     * @param message message to encrypt
+     * @return encrypted message
+     */
+    String encrypt(String message);
 
-    private final String name;
-
-    LogName(String name) {
-        this.name = name;
-    }
-
-    public String getName() {
-        return name;
-    }
+    /**
+     * Decrypts a message
+     *
+     * @param message message to decrypt
+     * @return decrypted message
+     */
+    String decrypt(String message);
 }

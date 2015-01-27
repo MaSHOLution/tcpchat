@@ -21,12 +21,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package server;
+package server.console;
 
+import common.networking.Packet;
+import common.networking.packets.KickPacket;
 import java.io.IOException;
-import java.io.PrintStream;
+import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import logging.Counters;
@@ -34,16 +37,12 @@ import logging.CustomLogging;
 import logging.LoggingController;
 import logging.enums.LogName;
 import logging.enums.LogPath;
-import static server.ChatServer.*;
+import static server.console.ChatServer.*;
 
 /**
  * Class ChatServer initializes threads and accepts new clients
  */
-public class ChatServer {
-
-    // Sockets
-    protected static ServerSocket serverSocket = null;
-    protected static Socket clientSocket = null;
+public final class ChatServer {
 
     // Setting up client
     protected static final int maxClientsCount = 10;
@@ -53,7 +52,6 @@ public class ChatServer {
     protected static Logger logConnection = null;
     protected static Logger logException = null;
     protected static Logger logGeneral = null;
-
     protected static LoggingController logControl = null;
 
     public static void main(String args[]) {
@@ -87,10 +85,12 @@ public class ChatServer {
 
             // Open a server socket on the portNumber (default 8000)
             try {
-                serverSocket = new ServerSocket(portNumber);
+                ServerSocket serverSocket = new ServerSocket(portNumber);
 
                 // Adding shutdown handle
                 Runtime.getRuntime().addShutdownHook(new ShutdownHandle());
+
+                Socket clientSocket = null;
 
                 // Create client socket for each connection
                 while (true) {
@@ -101,7 +101,7 @@ public class ChatServer {
                         int i;
                         for (i = 0; i < maxClientsCount; i++) {
                             if (threads[i] == null) {
-                                (threads[i] = new ClientThread(clientSocket, logControl)).start();
+                                (threads[i] = new ClientThread(clientSocket)).start();
                                 logControl.log(logConnection, Level.INFO, clientSocket.getRemoteSocketAddress() + ": accepted, thread started");
                                 Counters.login();
                                 break;
@@ -110,9 +110,10 @@ public class ChatServer {
 
                         // Only when maxclients is reached
                         if (i == maxClientsCount) {
-                            PrintStream pStream = new PrintStream(clientSocket.getOutputStream());
-                            pStream.println("Too many clients. Please try later.");
-                            pStream.close();
+                            
+                            try (ObjectOutputStream oos = new ObjectOutputStream(clientSocket.getOutputStream())) {
+                                  oos.writeObject(new KickPacket("Too many clients. Please try later."));
+                            }
                             Counters.connection();
                             logControl.log(logConnection, Level.INFO, clientSocket.getRemoteSocketAddress() + ": rejected, server is full");
                             clientSocket.close();
@@ -148,27 +149,31 @@ class ShutdownHandle extends Thread {
     public void run() {
         logControl.log(logGeneral, Level.INFO, "*** SERVER IS GOING DOWN ***");
         logControl.log(logConnection, Level.INFO, "*** SERVER IS GOING DOWN ***");
+
+        // Send closing of server to all clients
         for (int i = 0; i < maxClientsCount; i++) {
             if (threads[i] != null && threads[i].clientName != null) {
-                sendMessage(threads[i].outStream, "*** SERVER IS GOING DOWN ***");
-                sendMessage(threads[i].outStream, "*** Bye " + threads[i].clientName + " ***");
+                send(threads[i], new KickPacket("SERVER IS GOING DOWN"));
             }
         }
-        // TODO Logger schließen
-        CustomLogging.resetAllLoggers();
+        // Close all loggers
+        for (Logger logger : logControl.getAllLoggers()) {
+            for (Handler handler : logger.getHandlers()) {
+                handler.close();
+            }
+        }
     }
 
     /**
-     * Writes a message to a specific PrintStream
+     * Writes a packet to a specific PrintStream
      *
-     * @param printStream stream to write message to
-     * @param message stands for itself
+     * @param printStream stream to write packet to
+     * @param packet stands for itself
      */
-    private boolean sendMessage(PrintStream printStream, String message) {
-        // TODO Encrypt
+    private boolean send(ClientThread thread, Packet packet) {
         try {
             Counters.connection();
-            printStream.println(message);
+            thread.outStream.writeObject(packet);
             return true;
         } catch (Exception e) {
             ChatServer.logControl.log(CustomLogging.get(LogName.SERVER, LogPath.EXCEPTION), Level.INFO, e.getMessage());

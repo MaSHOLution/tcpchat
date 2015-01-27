@@ -21,25 +21,36 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package logging.enums;
+package common.networking.packets;
+
+import common.networking.Packet;
+import common.networking.PacketType;
 
 /**
- * Enum for logger names (classnames)
+ * Class for a specific packet type
  *
- * @author Manuel Schmid
+ * @author Manuel Schmid, Fabian Fink
  */
-public enum LogName {
+public class KickPacket extends Packet {
 
-    SERVER(server.console.ChatServer.class.getName()),
-    CLIENT(client.console.ChatClient.class.getName());
+    protected String message;
 
-    private final String name;
-
-    LogName(String name) {
-        this.name = name;
+    /**
+     * Constructor
+     *
+     * @param message
+     */
+    public KickPacket(String message) {
+        this.message = message;
+        this.packetIdentifier = PacketType.KICK;
     }
 
-    public String getName() {
-        return name;
+    /**
+     * Getter for the reason
+     *
+     * @return reason
+     */
+    public String getMessage() {
+        return "You have been kicked from the server, reason: " + this.message;
     }
 }

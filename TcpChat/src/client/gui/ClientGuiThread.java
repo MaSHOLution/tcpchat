@@ -21,10 +21,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package gui;
+package client.gui;
 
-import java.io.DataInputStream;
+import common.networking.*;
+import common.networking.packets.*;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 
 /**
  * This class serves as an outsourced thread, as the gui can only handle one
@@ -35,7 +37,7 @@ import java.io.IOException;
 public class ClientGuiThread implements Runnable {
 
     // Stream
-    protected DataInputStream inStream = null;
+    protected ObjectInputStream inStream = null;
 
     // Current gui thread
     protected ClientGui gui = null;
@@ -62,21 +64,48 @@ public class ClientGuiThread implements Runnable {
          * Keep on reading from the socket untill "Bye" is received from the
          * server
          */
-        String responseLine;
+        Packet responsePacket;
+        PacketType ptype;
+        boolean exitWhile = false;
+        String message, sender, receiver;
         try {
-            while ((responseLine = inStream.readLine()) != null) {
-                // TODO Decrypt
-                gui.outputLineOnGui(responseLine);
-                // If received line contains bye, break while and close connection
-                if (responseLine.startsWith("*** Bye")) {
-                    gui.outputLineOnGui("*** Disconnected ***");
-                    break;
+            do {
+
+                responsePacket = (Packet) inStream.readObject();
+                ptype = responsePacket.getIdentifier();
+
+                switch (ptype) {
+                    case DISCONNECT:
+                        gui.outputLineOnGui("*** Disconnected ***");
+                        exitWhile = true;
+                        break;
+                    case KICK:
+                        gui.outputLineOnGui(((KickPacket) responsePacket).getMessage());
+                        exitWhile = true;
+                        break;
+                    case PM:
+                        PrivateMessagePacket pm = ((PrivateMessagePacket) responsePacket);
+                        message = pm.getMessage();
+                        sender = pm.getSender();
+                        receiver = pm.getReceiver();
+                        
+                        gui.outputLineOnGui("<" + sender + " to " + receiver + "> " + message);
+                        break;
+                    case GM:
+                        GroupMessagePacket gm = ((GroupMessagePacket) responsePacket);
+                        message = gm.getMessage();
+                        sender = gm.getSender();
+                        
+                        gui.outputLineOnGui("<" + sender + "> " + message);
+                        break;
+                    default:
+                        gui.outputLineOnGui(((MessagePacket) responsePacket).getMessage());
                 }
-            }
+            } while(!exitWhile);
             // Close the connection as it is no longer needed
             gui.closeConnection();
-        } catch (IOException e) {
-            System.err.println("IOException:  " + e);
+        } catch (IOException | ClassNotFoundException e) {
+            System.err.println("Exception:  " + e);
         }
     }
 }

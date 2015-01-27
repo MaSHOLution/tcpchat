@@ -21,25 +21,29 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package logging.enums;
+package security.cryptography;
+
+import security.basics.SessionIdGenerator;
 
 /**
- * Enum for logger names (classnames)
+ * Standard EncryptionMethod with no encryption
  *
  * @author Manuel Schmid
  */
-public enum LogName {
+public class EncryptionMethod implements crypter {
 
-    SERVER(server.console.ChatServer.class.getName()),
-    CLIENT(client.console.ChatClient.class.getName());
+    /**
+     * SessionID for the current client
+     */
+    public final String sessionId = new SessionIdGenerator().nextSessionId();
 
-    private final String name;
-
-    LogName(String name) {
-        this.name = name;
+    @Override
+    public String encrypt(String message) {
+        return message;
     }
 
-    public String getName() {
-        return name;
+    @Override
+    public String decrypt(String message) {
+        return message;
     }
 }

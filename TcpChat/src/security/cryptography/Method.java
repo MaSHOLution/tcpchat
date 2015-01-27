@@ -21,25 +21,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package logging.enums;
+package security.cryptography;
 
 /**
- * Enum for logger names (classnames)
+ * Enum for encryption methods
  *
  * @author Manuel Schmid
  */
-public enum LogName {
+public enum Method {
 
-    SERVER(server.console.ChatServer.class.getName()),
-    CLIENT(client.console.ChatClient.class.getName());
-
-    private final String name;
-
-    LogName(String name) {
-        this.name = name;
-    }
-
-    public String getName() {
-        return name;
-    }
+    OFF,
+    AES;
 }

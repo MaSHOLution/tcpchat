@@ -28,7 +28,7 @@ package logging;
  *
  * @author Manuel Schmid
  */
-public class Counters {
+public final class Counters {
 
     /**
      * Contains counters of clients
@@ -62,10 +62,21 @@ public class Counters {
              * private messages total
              */
             public static int pmTotal = 0;
+            
+            /**
+             * private messages failure total
+             */
+            public static int pmFailed = 0;
+            
             /**
              * group messages total
              */
             public static int gmTotal = 0;
+            
+            /**
+             * group messages failure total
+             */
+            public static int gmFailedTotal = 0;
         }
 
         /**
@@ -103,6 +114,10 @@ public class Counters {
 
     public static void pm() {
         Totals.Messages.pmTotal++;
+    }
+    
+    public static void pmFailed() {
+        Totals.Messages.pmFailed++;
     }
 
     public static void gm() {

@@ -21,25 +21,26 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package logging.enums;
+package security.basics;
+
+import java.math.BigInteger;
+import java.security.SecureRandom;
 
 /**
- * Enum for logger names (classnames)
+ * Class for a session id generator
  *
  * @author Manuel Schmid
  */
-public enum LogName {
+public final class SessionIdGenerator {
 
-    SERVER(server.console.ChatServer.class.getName()),
-    CLIENT(client.console.ChatClient.class.getName());
+    private final SecureRandom random = new SecureRandom();
 
-    private final String name;
-
-    LogName(String name) {
-        this.name = name;
-    }
-
-    public String getName() {
-        return name;
+    /**
+     * Creates a new SessionId
+     *
+     * @return String sessionId
+     */
+    public String nextSessionId() {
+        return new BigInteger(CryptoBasics.encryptionBits, random).toString(CryptoBasics.encryption);
     }
 }

@@ -21,25 +21,58 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package logging.enums;
+package common.networking;
+
+import java.io.Serializable;
 
 /**
- * Enum for logger names (classnames)
+ * Abstract class for packets
  *
  * @author Manuel Schmid
  */
-public enum LogName {
+public abstract class Packet implements Serializable {
 
-    SERVER(server.console.ChatServer.class.getName()),
-    CLIENT(client.console.ChatClient.class.getName());
-
-    private final String name;
-
-    LogName(String name) {
-        this.name = name;
+    protected PacketType packetIdentifier = PacketType.PACKET;
+    protected String senderAlias = "Server";
+    protected boolean isPrepared = false;
+    /**
+     * Getter for identifier
+     *
+     * @return
+     */
+    public PacketType getIdentifier() {
+        return this.packetIdentifier;
     }
 
-    public String getName() {
-        return name;
+    /**
+     * Getter for senderAlias
+     *
+     * @return
+     */
+    public String getSenderAlias() {
+        return this.senderAlias;
+    }
+
+    /**
+     * Setter for senderAlias
+     * protected because of one time usage of packets
+     *
+     * @param senderAlias
+     */
+    protected void setSenderAlias(String senderAlias) {
+        this.senderAlias = senderAlias;
+    }
+    /**
+     * Setter for senderAlias protected because of one time usage of packets
+     *
+     */
+    public void prepare() {
+        if (this.isPrepared) {
+            // TODO Decrypt
+            this.isPrepared = false;
+        } else {
+            // TODO Encrypt
+            this.isPrepared = true;
+        }
     }
 }

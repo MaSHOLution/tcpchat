@@ -41,7 +41,7 @@ import logging.enums.LogPath;
  *
  * @author Manuel Schmid
  */
-public class CustomLogging {
+public final class CustomLogging {
 
     /**
      * Creates a logger and adds handler
@@ -58,7 +58,7 @@ public class CustomLogging {
         FileHandler fh = null;
 
         checkDir();
-        
+
         if (!showOnConsole) {
             logger.setUseParentHandlers(false);
         }
@@ -69,7 +69,6 @@ public class CustomLogging {
             fh = new FileHandler(LogPath.LOGDIR.getPath() + "/" + logPath.getPath());
         } catch (IOException | SecurityException e) {
             // TODO handle
-            e.printStackTrace();
         }
 
         // Set formatter for logger to get rid of ugly standard format
@@ -90,13 +89,7 @@ public class CustomLogging {
                 // Building output string
                 String returnString = recordLevel
                         + logTime.format(cal.getTime())
-                        + " || "
-                        + record.getSourceClassName().substring(
-                                record.getSourceClassName().lastIndexOf(".") + 1,
-                                record.getSourceClassName().length())
-                        + "."
-                        + record.getSourceMethodName()
-                        + "() : "
+                        + ": "
                         + record.getMessage() + System.getProperty("line.separator");
                 return returnString;
             }
@@ -129,7 +122,7 @@ public class CustomLogging {
         }
     }
 
-    /** 
+    /**
      * Resets all loggers
      */
     public static void resetAllLoggers() {

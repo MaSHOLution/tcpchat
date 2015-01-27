@@ -133,7 +133,7 @@
         </Component>
         <Component class="javax.swing.JTextField" name="tbServer">
           <Properties>
-            <Property name="text" type="java.lang.String" value="localhost"/>
+            <Property name="text" type="java.lang.String" value="mash-it.org"/>
           </Properties>
           <BindingProperties>
             <BindingProperty name="enabled" source="connectionPanel" sourcePath="${enabled}" target="tbServer" targetPath="enabled" updateStrategy="0" immediately="false"/>

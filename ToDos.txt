@@ -1,8 +1,5 @@
 ﻿gui.ClientGui
 	- Private Nachrichten in Tabs anzeigen lassen
-	- Userliste
-		- Listbox rechts
-		- ComboBox unten mit Namensauswahl
 
 server.ChatServer
 	- Sperre bei Spam
@@ -11,7 +8,6 @@ Allgemein:
 	- Verschlüsselung der Daten
 	- Datenbankanbindung
 	- Dateien versenden
-	- Userliste
 	- Benutzerkonten
 		- Nachrichten auf Server zwischenspeichern, wenn Empfänger offline ist
 		- Admin-Account

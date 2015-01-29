@@ -21,22 +21,36 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package common.networking;
+package common.networking.packets;
+
+import common.networking.Packet;
+import common.networking.PacketType;
 
 /**
- * Enum for packet types
+ * Class for a specific packet type
  *
- * @author Manuel Schmid, Fabian Fink
+ * @author Manuel Schmid
  */
-public enum PacketType {
-
-    CONNECT,
-    DISCONNECT,
-    GM,
-    INFO,
-    MESSAGE,  // Abstract
-    USERLIST,
-    KICK,
-    PACKET,   // Abstract
-    PM, 
+public class UserListPacket extends Packet {
+    
+    protected String[] users;
+    
+    /**
+     * Constructor
+     *
+     * @param users
+     */
+    public UserListPacket(String[] users) {
+        this.users = users;
+        this.packetIdentifier = PacketType.USERLIST;
+    }
+    
+    /**
+     * Getter for users
+     * 
+     * @return users
+     */
+    public String[] getUserList(){
+        return this.users;
+    }
 }

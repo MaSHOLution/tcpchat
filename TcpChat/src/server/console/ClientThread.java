@@ -78,6 +78,7 @@ public final class ClientThread extends Thread {
                 this.linkNameToThread(cPacket.getName());
 
                 // Broadcasts welcome message to all clients
+                this.broadcastUserList(false);
                 this.broadcastExceptMe(new InfoPacket("*** User \"" + this.clientName + "\" joined ***"));
                 this.send(new InfoPacket("Welcome " + this.clientName + " to our chat room.\n")); //To leave, enter \"" + this.quitString + "\" in a new line.");
                 logControl.log(logGeneral, Level.INFO, this.clientName + " joined");
@@ -99,11 +100,13 @@ public final class ClientThread extends Thread {
                 }
 
                 // Tell every client, that the current client is going offline
-                this.broadcastExceptMe(new InfoPacket("*** " + this.clientName + " has left ***"));
+                this.broadcastExceptMe(new InfoPacket("*** User \"" + this.clientName + "\" has left ***"));
                 this.send(new DisconnectPacket());
 
                 // Remove client from threads array and close connections
                 disconnect(false);
+
+                this.broadcastUserList(true);
             } else {
                 disconnect(true);
             }
@@ -141,12 +144,12 @@ public final class ClientThread extends Thread {
     /**
      * Sends a message to all clients
      *
-     * @param gmPacket GroupMessagePacket to send
+     * @param packet Packet to send
      */
-    protected synchronized void broadcast(GroupMessagePacket gmPacket) {
+    protected synchronized void broadcast(Packet packet) {
         for (int i = 0; i < maxClientsCount; i++) {
             if (threads[i] != null && threads[i].clientName != null) {
-                this.send(gmPacket, threads[i]);
+                this.send(packet, threads[i]);
             }
         }
         logControl.log(logGeneral, Level.INFO, "GM #" + Counters.Totals.Messages.gmTotal + " from " + this.clientName);
@@ -156,7 +159,7 @@ public final class ClientThread extends Thread {
     /**
      * Sends a message to all other clients except the current client (this)
      *
-     * @param message message to send
+     * @param packet
      */
     protected synchronized void broadcastExceptMe(Packet packet) {
         for (int i = 0; i < maxClientsCount; i++) {
@@ -322,5 +325,21 @@ public final class ClientThread extends Thread {
             logControl.log(logConnection, Level.INFO, this.ip + ": " + this.clientName + " has disconnected");
         }
         Counters.disconnect();
+    }
+
+    protected synchronized void broadcastUserList(boolean excludeMe) {
+        String[] users = new String[ChatServer.maxClientsCount];
+        int i = 0;
+        for (ClientThread client : ChatServer.threads) {
+            if (client != null && client.clientName != null) {
+                users[i] = client.clientName;
+                i++;
+            }
+        }
+        if (excludeMe) {
+            this.broadcastExceptMe(new UserListPacket(users));
+        } else {
+            this.broadcast(new UserListPacket(users));
+        }
     }
 }

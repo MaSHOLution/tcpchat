@@ -83,6 +83,9 @@ public class ClientGuiThread implements Runnable {
                         gui.outputLineOnGui(((KickPacket) responsePacket).getMessage());
                         exitWhile = true;
                         break;
+                    case USERLIST:
+                        gui.updateUserList(((UserListPacket) responsePacket).getUserList());
+                        break;
                     case PM:
                         PrivateMessagePacket pm = ((PrivateMessagePacket) responsePacket);
                         message = pm.getMessage();

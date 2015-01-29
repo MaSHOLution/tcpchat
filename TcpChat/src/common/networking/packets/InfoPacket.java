@@ -32,8 +32,6 @@ import common.networking.PacketType;
  * @author Manuel Schmid, Fabian Fink
  */
 public class InfoPacket extends MessagePacket {
-
-    protected String message;
     
     /**
      * Constructor
@@ -50,6 +48,7 @@ public class InfoPacket extends MessagePacket {
      * 
      * @return mesage
      */
+    @Override
     public String getMessage(){
         return this.message;
     }

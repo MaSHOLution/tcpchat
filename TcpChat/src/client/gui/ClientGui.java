@@ -33,6 +33,9 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import javax.swing.DefaultListModel;
+import static javax.swing.JList.*;
+import static javax.swing.ListSelectionModel.SINGLE_SELECTION;
 
 /**
  * This is the gui class for the client Run this file to initialize gui
@@ -50,11 +53,12 @@ public final class ClientGui extends javax.swing.JFrame {
     protected BufferedReader inputLine = null;
 
     protected DialogHelper dialogHelper = null;
-    
+
     protected boolean isConnected = false;
     protected boolean hasWrittenMessage = false;
-    
-    protected String clientName;
+
+    protected String clientName, host;
+    protected int port;
 
     protected enum connectButtonText {
 
@@ -67,6 +71,8 @@ public final class ClientGui extends javax.swing.JFrame {
      */
     public ClientGui() {
         initComponents();
+        this.tbPort.setText("8000");
+        this.tbServer.setText("localhost");
         // Initialize a new DialogHelper
         this.dialogHelper = new DialogHelper(this);
         // Center JFrame
@@ -96,6 +102,10 @@ public final class ClientGui extends javax.swing.JFrame {
         sendPanel = new javax.swing.JPanel();
         bSendMessage = new javax.swing.JButton();
         tbMessage = new javax.swing.JTextField();
+        jPanel1 = new javax.swing.JPanel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        lbUsers = new javax.swing.JList();
+        jLabel4 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Chat-Client");
@@ -112,8 +122,6 @@ public final class ClientGui extends javax.swing.JFrame {
                 bConnectActionPerformed(evt);
             }
         });
-
-        tbPort.setText("8000");
 
         org.jdesktop.beansbinding.Binding binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, connectionPanel, org.jdesktop.beansbinding.ELProperty.create("${enabled}"), tbPort, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
         bindingGroup.addBinding(binding);
@@ -133,8 +141,6 @@ public final class ClientGui extends javax.swing.JFrame {
 
         binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, connectionPanel, org.jdesktop.beansbinding.ELProperty.create("${enabled}"), jLabel2, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
         bindingGroup.addBinding(binding);
-
-        tbServer.setText("mash-it.org");
 
         binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, connectionPanel, org.jdesktop.beansbinding.ELProperty.create("${enabled}"), tbServer, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
         bindingGroup.addBinding(binding);
@@ -170,13 +176,13 @@ public final class ClientGui extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(tbServer)
+                .addComponent(tbServer, javax.swing.GroupLayout.DEFAULT_SIZE, 88, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(tbPort, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(bConnect, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(bConnect, javax.swing.GroupLayout.PREFERRED_SIZE, 126, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
         connectionPanelLayout.setVerticalGroup(
             connectionPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -234,7 +240,7 @@ public final class ClientGui extends javax.swing.JFrame {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, sendPanelLayout.createSequentialGroup()
                 .addComponent(tbMessage)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(bSendMessage, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(bSendMessage, javax.swing.GroupLayout.PREFERRED_SIZE, 107, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
         sendPanelLayout.setVerticalGroup(
             sendPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -243,25 +249,64 @@ public final class ClientGui extends javax.swing.JFrame {
                 .addComponent(tbMessage))
         );
 
+        lbUsers.setModel(new DefaultListModel());
+        lbUsers.setLayoutOrientation(VERTICAL);
+        lbUsers.setSelectionMode(SINGLE_SELECTION);
+        lbUsers.setVisibleRowCount(-1);
+        lbUsers.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
+            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
+                lbUsersValueChanged(evt);
+            }
+        });
+        jScrollPane1.setViewportView(lbUsers);
+
+        jLabel4.setText("Userlist");
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGap(35, 35, 35)
+                .addComponent(jLabel4)
+                .addContainerGap(37, Short.MAX_VALUE))
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addGap(7, 7, 7)
+                .addComponent(jLabel4)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jScrollPane1))
+        );
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+            .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(serverPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 560, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(sendPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(connectionPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(connectionPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(serverPanel))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(connectionPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(serverPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 345, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(connectionPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(serverPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 346, Short.MAX_VALUE))
+                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(sendPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -271,6 +316,32 @@ public final class ClientGui extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
+        if (this.isConnected) {
+            if (this.hasWrittenMessage) {
+                this.disconnect();
+            }
+        }
+    }//GEN-LAST:event_formWindowClosing
+
+    private void tbMessageKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tbMessageKeyPressed
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            this.sendMessageBox();
+        }
+    }//GEN-LAST:event_tbMessageKeyPressed
+
+    private void tbNicknameKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tbNicknameKeyPressed
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            this.connect();
+        }
+    }//GEN-LAST:event_tbNicknameKeyPressed
+
+    private void tbServerKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tbServerKeyPressed
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            this.connect();
+        }
+    }//GEN-LAST:event_tbServerKeyPressed
 
     private void tbPortKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tbPortKeyPressed
         if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
@@ -286,35 +357,13 @@ public final class ClientGui extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_bConnectActionPerformed
 
-    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
-        if (this.isConnected) {
-            if (this.hasWrittenMessage) {
-                this.disconnect();
-            }
-        }
-    }//GEN-LAST:event_formWindowClosing
-
-    private void tbNicknameKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tbNicknameKeyPressed
-        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
-            this.connect();
-        }
-    }//GEN-LAST:event_tbNicknameKeyPressed
-
-    private void tbServerKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tbServerKeyPressed
-        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
-            this.connect();
-        }
-    }//GEN-LAST:event_tbServerKeyPressed
-
     private void bSendMessageActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bSendMessageActionPerformed
         this.sendMessageBox();
     }//GEN-LAST:event_bSendMessageActionPerformed
 
-    private void tbMessageKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tbMessageKeyPressed
-        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
-            this.sendMessageBox();
-        }
-    }//GEN-LAST:event_tbMessageKeyPressed
+    private void lbUsersValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_lbUsersValueChanged
+        int selected = evt.getFirstIndex();
+    }//GEN-LAST:event_lbUsersValueChanged
 
     /**
      * Connects the client to the server
@@ -326,8 +375,8 @@ public final class ClientGui extends javax.swing.JFrame {
         if (checkConnData()) {
 
             // Initiating variables
-            String host = this.tbServer.getText();
-            int port = Integer.parseInt(this.tbPort.getText());
+            this.host = this.tbServer.getText();
+            this.port = Integer.parseInt(this.tbPort.getText());
             this.clientName = this.tbNickname.getText().trim();
 
             // Open a socket on a given host and port. Open input and output streams.
@@ -345,12 +394,15 @@ public final class ClientGui extends javax.swing.JFrame {
                 new Thread(new ClientGuiThread(this)).start();
 
                 // Send clientName
-                this.send(new ConnectPacket(this.clientName));
+                if (this.send(new ConnectPacket(this.clientName))) {
 
-                this.switchGui(true);
-                this.isConnected = true;
-                return true;
+                    this.switchGui(true);
+                    this.isConnected = true;
 
+                    return true;
+                }
+                this.dialogHelper.showWarningDialog("Warning", "Could not send data to host \"" + host + "\" on Port " + port);
+                return false;
             } catch (UnknownHostException e) {
                 this.dialogHelper.showWarningDialog("Warning", "Don't know about host " + host);
             } catch (IOException e) {
@@ -366,6 +418,8 @@ public final class ClientGui extends javax.swing.JFrame {
      */
     protected void disconnect() {
         this.send(new DisconnectPacket());
+        DefaultListModel listModel = ((DefaultListModel) this.lbUsers.getModel());
+        listModel.removeAllElements();
     }
 
     protected boolean checkConnData() {
@@ -390,17 +444,19 @@ public final class ClientGui extends javax.swing.JFrame {
 
     /**
      * Sends a packet through the outStream to the server
-     * 
+     *
      * @param packet packet to send
      */
-    protected void send(Packet packet) {
+    protected boolean send(Packet packet) {
 
         try {
             this.outStream.writeObject(packet);
             this.tbMessage.setText("");
             this.hasWrittenMessage = true;
+            return true;
         } catch (IOException ex) {
             // TODO exception handling
+            return false;
         }
     }
 
@@ -417,7 +473,7 @@ public final class ClientGui extends javax.swing.JFrame {
                 String[] messageArray = message.split("\\s", 2);
                 if (messageArray.length > 1 && messageArray[1] != null) {
                     if (!messageArray[1].isEmpty()) {
-                        this.send(new PrivateMessagePacket(messageArray[1], this.clientName , messageArray[0].substring(1)));
+                        this.send(new PrivateMessagePacket(messageArray[1], this.clientName, messageArray[0].substring(1)));
                     }
                 } else {
                     this.outputLineOnGui("Format for PM: @<receiver> <message>");
@@ -477,9 +533,20 @@ public final class ClientGui extends javax.swing.JFrame {
         } else {
             this.bConnect.setText(connectButtonText.Connect.toString());
         }
-        this.pack();
         this.sendPanel.setEnabled(isEnabled);
+        this.lbUsers.setEnabled(isEnabled);
+        this.pack();
         this.connectionPanel.setEnabled(!isEnabled);
+    }
+
+    public void updateUserList(String[] users) {
+        DefaultListModel listModel = ((DefaultListModel) this.lbUsers.getModel());
+        listModel.removeAllElements();
+        for (String user : users) {
+            if (user != null) {
+                listModel.addElement(user);
+            }
+        }
     }
 
     /**
@@ -519,6 +586,10 @@ public final class ClientGui extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JList lbUsers;
     private javax.swing.JPanel sendPanel;
     private javax.swing.JScrollPane serverPanel;
     private javax.swing.JTextArea taChat;

@@ -29,6 +29,8 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -46,7 +48,7 @@ public final class ChatServer {
 
     // Setting up client
     protected static final int maxClientsCount = 10;
-    protected static final ClientThread[] threads = new ClientThread[maxClientsCount];
+    protected static final List<ClientThread> threads = new ArrayList<>();
 
     // Logging
     protected static Logger logConnection = null;
@@ -98,21 +100,16 @@ public final class ChatServer {
                         // Handle for new connection, put it into empty array-slot
                         clientSocket = serverSocket.accept();
                         Counters.connection();
-                        int i;
-                        for (i = 0; i < maxClientsCount; i++) {
-                            if (threads[i] == null) {
-                                (threads[i] = new ClientThread(clientSocket)).start();
-                                logControl.log(logConnection, Level.INFO, clientSocket.getRemoteSocketAddress() + ": accepted, thread started");
-                                Counters.login();
-                                break;
-                            }
-                        }
-
-                        // Only when maxclients is reached
-                        if (i == maxClientsCount) {
-                            
+                        if (threads.size() <= ChatServer.maxClientsCount) {
+                            ClientThread clientThread = new ClientThread(clientSocket);
+                            threads.add(clientThread);
+                            clientThread.start();
+                            logControl.log(logConnection, Level.INFO, clientSocket.getRemoteSocketAddress() + ": accepted, thread started");
+                            Counters.login();
+                        } else {
+                            // Only when maxclients is reached
                             try (ObjectOutputStream oos = new ObjectOutputStream(clientSocket.getOutputStream())) {
-                                  oos.writeObject(new KickPacket("Too many clients. Please try later."));
+                                oos.writeObject(new KickPacket("Too many clients. Please try later."));
                             }
                             Counters.connection();
                             logControl.log(logConnection, Level.INFO, clientSocket.getRemoteSocketAddress() + ": rejected, server is full");
@@ -151,9 +148,9 @@ class ShutdownHandle extends Thread {
         logControl.log(logConnection, Level.INFO, "*** SERVER IS GOING DOWN ***");
 
         // Send closing of server to all clients
-        for (int i = 0; i < maxClientsCount; i++) {
-            if (threads[i] != null && threads[i].clientName != null) {
-                send(threads[i], new KickPacket("SERVER IS GOING DOWN"));
+        for (ClientThread thread : threads) {
+            if (thread != null && thread.clientName != null) {
+                send(thread, new KickPacket("SERVER IS GOING DOWN"));
             }
         }
         // Close all loggers

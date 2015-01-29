@@ -134,9 +134,9 @@ public final class ClientThread extends Thread {
      * @param message message to send
      */
     protected synchronized void broadcast(String message) {
-        for (int i = 0; i < maxClientsCount; i++) {
-            if (threads[i] != null && threads[i].clientName != null) {
-                this.send(new GroupMessagePacket(message, this.clientName), threads[i]);
+        for (ClientThread thread : threads) {
+            if (thread.clientName != null) {
+                this.send(new GroupMessagePacket(message, this.clientName), thread);
             }
         }
         logControl.log(logGeneral, Level.INFO, "GM #" + Counters.Totals.Messages.gmTotal + " from " + this.clientName);
@@ -149,9 +149,9 @@ public final class ClientThread extends Thread {
      * @param packet Packet to send
      */
     protected synchronized void broadcast(Packet packet) {
-        for (int i = 0; i < maxClientsCount; i++) {
-            if (threads[i] != null && threads[i].clientName != null) {
-                this.send(packet, threads[i]);
+        for (ClientThread thread : threads) {
+            if (thread.clientName != null) {
+                this.send(packet, thread);
             }
         }
         logControl.log(logGeneral, Level.INFO, "GM #" + Counters.Totals.Messages.gmTotal + " from " + this.clientName);
@@ -164,12 +164,10 @@ public final class ClientThread extends Thread {
      * @param packet
      */
     protected synchronized void broadcastExceptMe(Packet packet) {
-        for (int i = 0; i < maxClientsCount; i++) {
+        for (ClientThread thread : threads) {
 
-            if (threads[i] != null
-                    && threads[i].clientName != null
-                    && threads[i] != this) {
-                ClientThread.this.send(packet, threads[i]);
+            if (thread.clientName != null && thread != this) {
+                ClientThread.this.send(packet, thread);
             }
         }
         // Counters.gm(); is normally no group but system shoutout
@@ -189,14 +187,13 @@ public final class ClientThread extends Thread {
             logControl.log(logGeneral, Level.INFO, this.clientName + " wanted to send himself a private message");
             return true;
         } else {
-            for (int i = 0; i < maxClientsCount; i++) {
-                if (threads[i] != null
-                        && threads[i] != this
-                        && threads[i].clientName != null
-                        && threads[i].clientName.equals(receiver)) {
+            for (ClientThread thread : threads) {
+                if (thread != this
+                        && thread.clientName != null
+                        && thread.clientName.equals(receiver)) {
 
                     // Send privatePacket to receiver
-                    this.send(privatePacket, threads[i]);
+                    this.send(privatePacket, thread);
 
                     // Send privatePacket to sender
                     this.send(privatePacket);
@@ -294,8 +291,8 @@ public final class ClientThread extends Thread {
      * @param name name of the client
      */
     protected void linkNameToThread(String name) {
-        for (int i = 0; i < maxClientsCount; i++) {
-            if (threads[i] != null && threads[i] == this) {
+        for (ClientThread thread : threads) {
+            if (thread == this) {
                 this.clientName = name;
                 logControl.log(logConnection, Level.INFO, this.ip + ": is now " + name);
                 break;
@@ -311,9 +308,9 @@ public final class ClientThread extends Thread {
      */
     protected synchronized void disconnect(boolean closeOnly) throws IOException {
         if (!closeOnly) {
-            for (int i = 0; i < maxClientsCount; i++) {
-                if (threads[i] == this) {
-                    threads[i] = null;
+            for (ClientThread thread : threads) {
+                if (thread == this) {
+                    thread = null;
                 }
             }
         }

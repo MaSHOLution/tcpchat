@@ -33,6 +33,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.List;
 import javax.swing.DefaultListModel;
 import static javax.swing.JList.*;
 import static javax.swing.ListSelectionModel.SINGLE_SELECTION;
@@ -539,13 +540,11 @@ public final class ClientGui extends javax.swing.JFrame {
         this.connectionPanel.setEnabled(!isEnabled);
     }
 
-    public void updateUserList(String[] users) {
+    public void updateUserList(List<String> users) {
         DefaultListModel listModel = ((DefaultListModel) this.lbUsers.getModel());
         listModel.removeAllElements();
         for (String user : users) {
-            if (user != null) {
-                listModel.addElement(user);
-            }
+            listModel.addElement(user);
         }
     }
 

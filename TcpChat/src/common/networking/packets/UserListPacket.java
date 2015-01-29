@@ -25,6 +25,7 @@ package common.networking.packets;
 
 import common.networking.Packet;
 import common.networking.PacketType;
+import java.util.List;
 
 /**
  * Class for a specific packet type
@@ -33,14 +34,14 @@ import common.networking.PacketType;
  */
 public class UserListPacket extends Packet {
     
-    protected String[] users;
+    protected List<String> users;
     
     /**
      * Constructor
      *
      * @param users
      */
-    public UserListPacket(String[] users) {
+    public UserListPacket(List<String> users) {
         this.users = users;
         this.packetIdentifier = PacketType.USERLIST;
     }
@@ -50,7 +51,7 @@ public class UserListPacket extends Packet {
      * 
      * @return users
      */
-    public String[] getUserList(){
+    public List<String> getUserList(){
         return this.users;
     }
 }

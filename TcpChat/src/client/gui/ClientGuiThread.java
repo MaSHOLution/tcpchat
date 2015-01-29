@@ -27,6 +27,7 @@ import common.networking.*;
 import common.networking.packets.*;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.util.List;
 
 /**
  * This class serves as an outsourced thread, as the gui can only handle one
@@ -84,7 +85,8 @@ public class ClientGuiThread implements Runnable {
                         exitWhile = true;
                         break;
                     case USERLIST:
-                        gui.updateUserList(((UserListPacket) responsePacket).getUserList());
+                        List<String> list = ((UserListPacket) responsePacket).getUserList();
+                        gui.updateUserList(list);
                         break;
                     case PM:
                         PrivateMessagePacket pm = ((PrivateMessagePacket) responsePacket);

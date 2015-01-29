@@ -32,6 +32,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.SocketAddress;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import logging.Counters;
 import security.cryptography.*;
@@ -328,14 +330,15 @@ public final class ClientThread extends Thread {
     }
 
     protected synchronized void broadcastUserList(boolean excludeMe) {
-        String[] users = new String[ChatServer.maxClientsCount];
+        List<String> users = new ArrayList<>();
         int i = 0;
         for (ClientThread client : ChatServer.threads) {
             if (client != null && client.clientName != null) {
-                users[i] = client.clientName;
+                users.add(client.clientName);
                 i++;
             }
         }
+
         if (excludeMe) {
             this.broadcastExceptMe(new UserListPacket(users));
         } else {

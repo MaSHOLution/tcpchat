@@ -1,0 +1,50 @@
+Paste the following code upon https://www.websequencediagrams.com/
+
+title Networking
+
+loop Accept Clients
+    Client->Server: Connect to socket
+    alt Server is full
+        Server->Client: KickPacket ("Too many clients")
+    else
+        Server->ClientThread: Create and start
+        Client->ClientThread: ConnectPacket
+        note over Client,ClientThread: Check if packet type is ConnectPacket 
+        alt Packet is not ConenctPacket
+            alt Packet is not DisconnectPacket
+                ClientThread->Client: KickPacket("Connection refused")
+            end
+            note over ClientThread: Close thread
+        else
+            note over ClientThread: Create UserListPacket
+            ClientThread->Client: UserListPacket
+            ClientThread->All other ClientThreads: UserListPacket
+            ClientThread->All other ClientThreads: InfoPacket ("User x has logged in")
+            loop Client can send messages now
+                opt Private Message
+                    Client->+ClientThread: PrivateMessagePacket
+                    alt Receiver is online
+                        ClientThread->One specific ClientThread: PrivateMessagePacket
+                        ClientThread->-Client: PrivateMessagePacket
+                    else
+                        ClientThread->Client: InfoPacket ("Message could not be delivered")
+                    end
+                end 
+                opt All other packets
+                    Client->+ClientThread: Packet
+                    ClientThread->-All other ClientThreads: GroupMessagePacket
+                end
+                opt Receive Packet
+                    One specific ClientThread->Client: Packet
+                end
+                opt Disconnect
+                    Client->+ClientThread: DisconnectPacket
+                end
+            end
+            ClientThread->-All other ClientThreads: InfoPacket ("User x has left")
+            ClientThread->Client: DisconnectPacket
+            ClientThread->All other ClientThreads: UserListPacket
+            note over ClientThread: Close thread
+        end
+    end
+end

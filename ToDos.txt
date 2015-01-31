@@ -3,11 +3,13 @@
 
 server.ChatServer
 	- Sperre bei Spam
+	- config-Datei + Doku
 	
 Allgemein:
+	- config-Datei + Doku
 	- Verschlüsselung der Daten
-	- Datenbankanbindung
 	- Dateien versenden
+	- Datenbankanbindung
 	- Benutzerkonten
 		- Nachrichten auf Server zwischenspeichern, wenn Empfänger offline ist
 		- Admin-Account

@@ -1,5 +1,3 @@
-Paste the following code upon https://www.websequencediagrams.com/
-
 title Networking
 
 loop Accept Clients
@@ -9,36 +7,39 @@ loop Accept Clients
     else
         Server->ClientThread: Create and start
         Client->ClientThread: ConnectPacket
-        note over Client,ClientThread: Check if packet type is ConnectPacket 
-        alt Packet is not ConenctPacket
+        alt Packet is not ConnectPacket
             alt Packet is not DisconnectPacket
-                ClientThread->Client: KickPacket("Connection refused")
+                ClientThread->Client: KickPacket("Please do not use a modified client")
             end
             note over ClientThread: Close thread
         else
-            note over ClientThread: Create UserListPacket
-            ClientThread->Client: UserListPacket
-            ClientThread->All other ClientThreads: UserListPacket
-            ClientThread->All other ClientThreads: InfoPacket ("User x has logged in")
-            loop Client can send messages now
-                opt Private Message
-                    Client->+ClientThread: PrivateMessagePacket
-                    alt Receiver is online
-                        ClientThread->One specific ClientThread: PrivateMessagePacket
-                        ClientThread->-Client: PrivateMessagePacket
-                    else
-                        ClientThread->Client: InfoPacket ("Message could not be delivered")
+            alt Nickname too long
+                ClientThread->Client: KickPacket("Nickname too long")
+            else
+                note over ClientThread: Create UserListPacket
+                ClientThread->Client: UserListPacket
+                ClientThread->All other ClientThreads: UserListPacket
+                ClientThread->All other ClientThreads: InfoPacket ("User x has logged in")
+                loop Client can send messages now
+                    opt Private Message
+                        Client->+ClientThread: PrivateMessagePacket
+                        alt Receiver is online
+                            ClientThread->One specific ClientThread: PrivateMessagePacket
+                            ClientThread->-Client: PrivateMessagePacket
+                        else
+                            ClientThread->Client: InfoPacket ("Message could not be delivered")
+                        end
+                    end 
+                    opt All other packets
+                        Client->+ClientThread: Packet
+                        ClientThread->-All other ClientThreads: GroupMessagePacket
                     end
-                end 
-                opt All other packets
-                    Client->+ClientThread: Packet
-                    ClientThread->-All other ClientThreads: GroupMessagePacket
-                end
-                opt Receive Packet
-                    One specific ClientThread->Client: Packet
-                end
-                opt Disconnect
-                    Client->+ClientThread: DisconnectPacket
+                    opt Receive Packet
+                        One specific ClientThread->Client: Packet
+                    end
+                    opt Disconnect
+                        Client->+ClientThread: DisconnectPacket
+                    end
                 end
             end
             ClientThread->-All other ClientThreads: InfoPacket ("User x has left")

@@ -289,11 +289,16 @@ public final class ClientThread extends Thread {
         PacketType pType = clientAnswer.getIdentifier();
 
         if (pType == PacketType.CONNECT) {
-            this.clientName = ((ConnectPacket) clientAnswer).getName();
+            String name = ((ConnectPacket) clientAnswer).getName();
+            if(name.length() > 20){
+                this.send(new KickPacket("Please make sure that your nickname has less than 20 letters"));
+                return null;
+            }
+            this.clientName = name;
             return (ConnectPacket) clientAnswer;
         } else {
             if (pType != PacketType.DISCONNECT) {
-                this.send(new KickPacket("Connection refused"));
+                this.send(new KickPacket("Security breach: Please do not use a modified client"));
             }
             return null;
         }

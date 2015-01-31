@@ -131,7 +131,6 @@ public final class ChatServer {
                 logging.Counters.exception();
             }
         }
-
     }
 
     /**

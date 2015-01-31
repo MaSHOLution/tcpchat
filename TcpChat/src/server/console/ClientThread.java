@@ -326,13 +326,7 @@ public final class ClientThread extends Thread {
      * @throws java.io.IOException
      */
     protected synchronized void disconnect(boolean closeOnly) throws IOException {
-        if (!closeOnly) {
-            for (ClientThread thread : threads) {
-                if (thread == this) {
-                    thread = null;
-                }
-            }
-        }
+        threads.remove(this);
 
         // Close streams and socket
         this.inStream.close();
@@ -348,7 +342,7 @@ public final class ClientThread extends Thread {
     protected synchronized void broadcastUserList(boolean excludeMe) {
         List<String> users = new ArrayList<>();
         int i = 0;
-        for (ClientThread client : ChatServer.threads) {
+        for (ClientThread client : threads) {
             if (client != null && client.clientName != null) {
                 users.add(client.clientName);
                 i++;

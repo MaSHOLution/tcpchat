@@ -21,35 +21,32 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package common.networking.packets;
+package networking.packets;
 
-import common.networking.MessagePacket;
-import common.networking.PacketType;
+import networking.general.MessagePacket;
+import networking.general.PacketType;
 
 /**
  * Class for a specific packet type
  *
  * @author Manuel Schmid, Fabian Fink
  */
-public class PrivateMessagePacket extends MessagePacket {
+public class GroupMessagePacket extends MessagePacket {
 
-    protected String sender;
-    protected String receiver;
+protected String sender;
 
     /**
      * Constructor
      *
      * @param message message to send
-     * @param sender sender
-     * @param receiver receiver
+     * @param sender name of sender
      */
-    public PrivateMessagePacket(String message, String sender, String receiver) {
+    public GroupMessagePacket(String message, String sender) {
         this.message = message;
         this.sender = sender;
-        this.receiver = receiver;
-        this.packetIdentifier = PacketType.PM;
+        this.packetIdentifier = PacketType.GM;
     }
-
+    
     /**
      * Getter for the sender
      *
@@ -57,14 +54,5 @@ public class PrivateMessagePacket extends MessagePacket {
      */
     public String getSender() {
         return this.sender;
-    }
-    
-    /**
-     * Getter for the receiver
-     *
-     * @return
-     */
-    public String getReceiver() {
-        return this.receiver;
     }
 }

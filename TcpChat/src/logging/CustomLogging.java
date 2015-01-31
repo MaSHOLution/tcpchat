@@ -67,8 +67,10 @@ public final class CustomLogging {
         SimpleDateFormat format = new SimpleDateFormat("M-d_HHmmss"); //just to make our log file nicer :)
         try {
             fh = new FileHandler(LogPath.LOGDIR.getPath() + "/" + logPath.getPath());
-        } catch (IOException | SecurityException e) {
+        } catch (IOException | SecurityException ex) {
             // TODO handle
+        } finally {
+            logging.Counters.exception();
         }
 
         // Set formatter for logger to get rid of ugly standard format

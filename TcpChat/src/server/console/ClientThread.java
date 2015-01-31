@@ -23,9 +23,15 @@
  */
 package server.console;
 
-import common.networking.Packet;
-import common.networking.PacketType;
-import common.networking.packets.*;
+import networking.packets.KickPacket;
+import networking.packets.PrivateMessagePacket;
+import networking.packets.ConnectPacket;
+import networking.packets.UserListPacket;
+import networking.packets.GroupMessagePacket;
+import networking.packets.DisconnectPacket;
+import networking.packets.InfoPacket;
+import networking.general.Packet;
+import networking.general.PacketType;
 import security.basics.CryptoBasics;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -113,8 +119,10 @@ public final class ClientThread extends Thread {
                 disconnect(true);
             }
 
-        } catch (IOException e) {
-            logControl.log(logException, Level.INFO, this.ip + "(" + this.clientName + "): " + e.getMessage());
+        } catch (IOException ex) {
+            logControl.log(logException, Level.INFO, this.ip + "(" + this.clientName + "): " + ex.getMessage());
+        } finally {
+            logging.Counters.exception();
         }
     }
 
@@ -223,10 +231,12 @@ public final class ClientThread extends Thread {
             Counters.connection();
             this.outStream.writeObject(packet);
             return true;
-        } catch (IOException e) {
-            logControl.log(logException, Level.INFO, this.ip + "(" + this.clientName + "): " + e.getMessage());
-            return false;
+        } catch (IOException ex) {
+            logControl.log(logException, Level.INFO, this.ip + "(" + this.clientName + "): " + ex.getMessage());
+        } finally {
+            logging.Counters.exception();
         }
+        return false;
     }
 
     /**
@@ -241,10 +251,12 @@ public final class ClientThread extends Thread {
             Counters.connection();
             thread.outStream.writeObject(packet);
             return true;
-        } catch (Exception e) {
-            logControl.log(logException, Level.INFO, this.ip + "(" + this.clientName + "): " + e.getMessage());
-            return false;
+        } catch (Exception ex) {
+            logControl.log(logException, Level.INFO, this.ip + "(" + this.clientName + "): " + ex.getMessage());
+        } finally {
+            logging.Counters.exception();
         }
+        return false;
     }
 
     /**
@@ -257,10 +269,12 @@ public final class ClientThread extends Thread {
             Packet readPacket = (Packet) this.inStream.readObject();
             Counters.connection();
             return readPacket;
-        } catch (IOException | ClassNotFoundException e) {
-            logControl.log(logException, Level.INFO, this.ip + "(" + this.clientName + "): " + e.getMessage());
-            return null;
+        } catch (IOException | ClassNotFoundException ex) {
+            logControl.log(logException, Level.INFO, this.ip + "(" + this.clientName + "): " + ex.getMessage());
+        } finally {
+            logging.Counters.exception();
         }
+        return null;
     }
 
     /**

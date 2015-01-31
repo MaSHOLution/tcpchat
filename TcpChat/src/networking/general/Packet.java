@@ -21,24 +21,58 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package common.networking;
+package networking.general;
+
+import java.io.Serializable;
 
 /**
  * Abstract class for packets
  *
  * @author Manuel Schmid
  */
-public abstract class MessagePacket extends Packet {
+public abstract class Packet implements Serializable {
 
-    //protected PacketType packetIdentifier = PacketType.MESSAGEPACKET;
-    protected String message;
-    
+    protected PacketType packetIdentifier = PacketType.PACKET;
+    protected String senderAlias = "Server";
+    protected boolean isPrepared = false;
     /**
-     * Getter for message
+     * Getter for identifier
      *
-     * @return mesage
+     * @return
      */
-    public String getMessage() {
-        return this.message;
+    public PacketType getIdentifier() {
+        return this.packetIdentifier;
+    }
+
+    /**
+     * Getter for senderAlias
+     *
+     * @return
+     */
+    public String getSenderAlias() {
+        return this.senderAlias;
+    }
+
+    /**
+     * Setter for senderAlias
+     * protected because of one time usage of packets
+     *
+     * @param senderAlias
+     */
+    protected void setSenderAlias(String senderAlias) {
+        this.senderAlias = senderAlias;
+    }
+    /**
+     * Setter for senderAlias protected because of one time usage of packets
+     *
+     */
+    public void prepare() {
+        if (this.isPrepared) {
+            // TODO Decrypt
+            this.isPrepared = false;
+        } else {
+            // TODO Encrypt
+            this.isPrepared = true;
+        }
     }
 }

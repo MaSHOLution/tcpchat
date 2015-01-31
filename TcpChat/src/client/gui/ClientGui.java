@@ -23,8 +23,11 @@
  */
 package client.gui;
 
-import common.networking.Packet;
-import common.networking.packets.*;
+import networking.packets.PrivateMessagePacket;
+import networking.packets.ConnectPacket;
+import networking.packets.GroupMessagePacket;
+import networking.packets.DisconnectPacket;
+import networking.general.Packet;
 import java.awt.event.KeyEvent;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -404,10 +407,12 @@ public final class ClientGui extends javax.swing.JFrame {
                 }
                 this.dialogHelper.showWarningDialog("Warning", "Could not send data to host \"" + host + "\" on Port " + port);
                 return false;
-            } catch (UnknownHostException e) {
+            } catch (UnknownHostException ex) {
                 this.dialogHelper.showWarningDialog("Warning", "Don't know about host " + host);
-            } catch (IOException e) {
+            } catch (IOException ex) {
                 this.dialogHelper.showWarningDialog("Connection failed", "Could not connect to host \"" + host + "\" on Port " + port);
+            } finally {
+                logging.Counters.exception();
             }
             return false;
         }
@@ -457,8 +462,10 @@ public final class ClientGui extends javax.swing.JFrame {
             return true;
         } catch (IOException ex) {
             // TODO exception handling
-            return false;
+        } finally {
+            logging.Counters.exception();
         }
+        return false;
     }
 
     /**
@@ -515,8 +522,10 @@ public final class ClientGui extends javax.swing.JFrame {
             this.clientSocket.close();
 
             this.switchGui(false);
-        } catch (IOException e) {
-            System.err.println("IOException:  " + e);
+        } catch (IOException ex) {
+            System.err.println("IOException:  " + ex);
+        } finally {
+            logging.Counters.exception();
         }
     }
 
@@ -567,6 +576,8 @@ public final class ClientGui extends javax.swing.JFrame {
             }
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | javax.swing.UnsupportedLookAndFeelException ex) {
             java.util.logging.Logger.getLogger(ClientGui.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } finally {
+            logging.Counters.exception();
         }
 
         /* Create and display the form */

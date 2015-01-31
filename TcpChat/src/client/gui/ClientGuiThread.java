@@ -23,8 +23,13 @@
  */
 package client.gui;
 
-import common.networking.*;
-import common.networking.packets.*;
+import networking.packets.KickPacket;
+import networking.packets.PrivateMessagePacket;
+import networking.packets.UserListPacket;
+import networking.packets.GroupMessagePacket;
+import networking.general.PacketType;
+import networking.general.MessagePacket;
+import networking.general.Packet;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.List;
@@ -93,24 +98,26 @@ public class ClientGuiThread implements Runnable {
                         message = pm.getMessage();
                         sender = pm.getSender();
                         receiver = pm.getReceiver();
-                        
+
                         gui.outputLineOnGui("<" + sender + " to " + receiver + "> " + message);
                         break;
                     case GM:
                         GroupMessagePacket gm = ((GroupMessagePacket) responsePacket);
                         message = gm.getMessage();
                         sender = gm.getSender();
-                        
+
                         gui.outputLineOnGui("<" + sender + "> " + message);
                         break;
                     default:
                         gui.outputLineOnGui(((MessagePacket) responsePacket).getMessage());
                 }
-            } while(!exitWhile);
+            } while (!exitWhile);
             // Close the connection as it is no longer needed
             gui.closeConnection();
-        } catch (IOException | ClassNotFoundException e) {
-            System.err.println("Exception:  " + e);
+        } catch (IOException | ClassNotFoundException ex) {
+            System.err.println("Exception:  " + ex);
+        } finally {
+            logging.Counters.exception();
         }
     }
 }

@@ -21,22 +21,35 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package common.networking.packets;
+package networking.packets;
 
-import common.networking.Packet;
-import common.networking.PacketType;
+import networking.general.MessagePacket;
+import networking.general.PacketType;
 
 /**
  * Class for a specific packet type
  *
  * @author Manuel Schmid, Fabian Fink
  */
-public class DisconnectPacket extends Packet {
-
+public class InfoPacket extends MessagePacket {
+    
     /**
      * Constructor
+     *
+     * @param message
      */
-    public DisconnectPacket() {
-        this.packetIdentifier = PacketType.DISCONNECT;
+    public InfoPacket(String message) {
+        this.message = message;
+        this.packetIdentifier = PacketType.INFO;
+    }
+    
+    /**
+     * Getter for message
+     * 
+     * @return mesage
+     */
+    @Override
+    public String getMessage(){
+        return this.message;
     }
 }

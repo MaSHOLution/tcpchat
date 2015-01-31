@@ -35,10 +35,20 @@ public enum LogName {
 
     private final String name;
 
+    /**
+     * Constructor
+     *
+     * @param name
+     */
     LogName(String name) {
         this.name = name;
     }
 
+    /**
+     * Getter for name
+     *
+     * @return
+     */
     public String getName() {
         return name;
     }

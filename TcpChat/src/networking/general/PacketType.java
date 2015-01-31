@@ -21,36 +21,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package common.networking.packets;
-
-import common.networking.Packet;
-import common.networking.PacketType;
+package networking.general;
 
 /**
- * Class for a specific packet type
+ * Enum for packet types
  *
  * @author Manuel Schmid, Fabian Fink
  */
-public class KickPacket extends Packet {
+public enum PacketType {
 
-    protected String message;
-
-    /**
-     * Constructor
-     *
-     * @param message
-     */
-    public KickPacket(String message) {
-        this.message = message;
-        this.packetIdentifier = PacketType.KICK;
-    }
-
-    /**
-     * Getter for the reason
-     *
-     * @return reason
-     */
-    public String getMessage() {
-        return "You have been kicked from the server, reason: " + this.message;
-    }
+    CONNECT,
+    DISCONNECT,
+    GM,
+    INFO,
+    MESSAGE,  // Abstract
+    USERLIST,
+    KICK,
+    PACKET,   // Abstract
+    PM, 
 }

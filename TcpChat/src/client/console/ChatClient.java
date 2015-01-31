@@ -66,10 +66,12 @@ public class ChatClient implements Runnable {
             inputLine = new BufferedReader(new InputStreamReader(System.in));
             outStream = new PrintStream(clientSocket.getOutputStream());
             inStream = new DataInputStream(clientSocket.getInputStream());
-        } catch (UnknownHostException e) {
+        } catch (UnknownHostException ex) {
             System.err.println("Don't know about host " + host);
-        } catch (IOException e) {
+        } catch (IOException ex) {
             System.err.println("Couldn't get connection to host \"" + host + "\"");
+        } finally {
+            logging.Counters.exception();
         }
 
         /*
@@ -94,8 +96,10 @@ public class ChatClient implements Runnable {
                 outStream.close();
                 inStream.close();
                 clientSocket.close();
-            } catch (IOException e) {
-                System.err.println("IOException:  " + e);
+            } catch (IOException ex) {
+                System.err.println("IOException:  " + ex);
+            } finally {
+                logging.Counters.exception();
             }
         }
     }
@@ -122,8 +126,10 @@ public class ChatClient implements Runnable {
             }
             closed = true;
             System.out.println("Press \"Enter\" to quit!");
-        } catch (IOException e) {
-            System.err.println("IOException:  " + e);
+        } catch (IOException ex) {
+            System.err.println("IOException:  " + ex);
+        } finally {
+            logging.Counters.exception();
         }
     }
 }

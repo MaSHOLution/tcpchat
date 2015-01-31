@@ -102,37 +102,61 @@ public final class Counters {
 
     }
 
+    /**
+     * Get login count
+     */
     public static void login() {
         Clients.inLoginProcess++;
     }
 
+    /**
+     * Get counter of currently logged in users
+     */
     public static void loggedIn() {
         Clients.inLoginProcess--;
         Clients.clients++;
         Totals.Clients.logins++;
     }
 
+    /**
+     * Get counter of written private messages
+     */
     public static void pm() {
         Totals.Messages.pmTotal++;
     }
     
+    /**
+     * Get counter of failed private messages
+     */
     public static void pmFailed() {
         Totals.Messages.pmFailed++;
     }
 
+    /**
+     * Get counter of written group messages
+     */
     public static void gm() {
         Totals.Messages.gmTotal++;
     }
 
+    /**
+     * Get counter of disconnects
+     */
     public static void disconnect() {
         Clients.clients--;
         Totals.Clients.disconnects++;
     }
 
+    /**
+     * Get counter of connections, which includes received and sent stuff 
+     */
     public static void connection() {
         Totals.Clients.connections++;
     }
 
+    /**
+     * Get counter of exceptions
+     */
     public static void exception() {
         Totals.exceptions++;
     }

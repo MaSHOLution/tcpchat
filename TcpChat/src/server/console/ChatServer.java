@@ -23,8 +23,8 @@
  */
 package server.console;
 
-import common.networking.Packet;
-import common.networking.packets.KickPacket;
+import networking.general.Packet;
+import networking.packets.KickPacket;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
@@ -115,16 +115,20 @@ public final class ChatServer {
                             logControl.log(logConnection, Level.INFO, clientSocket.getRemoteSocketAddress() + ": rejected, server is full");
                             clientSocket.close();
                         }
-                    } catch (IOException e) {
-                        System.out.println(e);
-                        logControl.log(logException, Level.SEVERE, clientSocket.getRemoteSocketAddress() + ": error while logging in (" + e.getMessage() + ")");
+                    } catch (IOException ex) {
+                        System.out.println(ex);
+                        logControl.log(logException, Level.SEVERE, clientSocket.getRemoteSocketAddress() + ": error while logging in (" + ex.getMessage() + ")");
+                    } finally {
+                        logging.Counters.exception();
                     }
                 }
-            } catch (IOException e) {
-                System.out.println(e);
+            } catch (IOException ex) {
+                System.out.println(ex);
                 logControl.log(logException, Level.SEVERE, "Could not open Server Socket");
                 logControl.log(logException, Level.SEVERE, "Exiting Server");
                 logControl.log(logGeneral, Level.SEVERE, "Exiting Server");
+            } finally {
+                logging.Counters.exception();
             }
         }
 
@@ -172,9 +176,11 @@ class ShutdownHandle extends Thread {
             Counters.connection();
             thread.outStream.writeObject(packet);
             return true;
-        } catch (Exception e) {
-            ChatServer.logControl.log(CustomLogging.get(LogName.SERVER, LogPath.EXCEPTION), Level.INFO, e.getMessage());
-            return false;
+        } catch (Exception ex) {
+            ChatServer.logControl.log(CustomLogging.get(LogName.SERVER, LogPath.EXCEPTION), Level.INFO, ex.getMessage());
+        } finally {
+            logging.Counters.exception();
         }
+        return false;
     }
 }

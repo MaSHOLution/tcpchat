@@ -21,37 +21,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package common.networking.packets;
-
-import common.networking.Packet;
-import common.networking.PacketType;
-import java.util.List;
+package networking.general;
 
 /**
- * Class for a specific packet type
+ * Abstract class for packets
  *
  * @author Manuel Schmid
  */
-public class UserListPacket extends Packet {
-    
-    protected List<String> users;
+public abstract class MessagePacket extends Packet {
+
+    //protected PacketType packetIdentifier = PacketType.MESSAGEPACKET;
+    protected String message;
     
     /**
-     * Constructor
+     * Getter for message
      *
-     * @param users
+     * @return mesage
      */
-    public UserListPacket(List<String> users) {
-        this.users = users;
-        this.packetIdentifier = PacketType.USERLIST;
-    }
-    
-    /**
-     * Getter for users
-     * 
-     * @return users
-     */
-    public List<String> getUserList(){
-        return this.users;
+    public String getMessage() {
+        return this.message;
     }
 }

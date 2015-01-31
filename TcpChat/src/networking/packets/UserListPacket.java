@@ -21,35 +21,37 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package common.networking.packets;
+package networking.packets;
 
-import common.networking.Packet;
-import common.networking.PacketType;
+import networking.general.Packet;
+import networking.general.PacketType;
+import java.util.List;
 
 /**
  * Class for a specific packet type
  *
- * @author Manuel Schmid, Fabian Fink
+ * @author Manuel Schmid
  */
-public class ConnectPacket extends Packet {
+public class UserListPacket extends Packet {
     
-    protected final String name;
-
+    protected List<String> users;
+    
     /**
      * Constructor
      *
-     * @param name
+     * @param users
      */
-    public ConnectPacket(String name) {
-        this.name = name;
-        this.packetIdentifier = PacketType.CONNECT;
+    public UserListPacket(List<String> users) {
+        this.users = users;
+        this.packetIdentifier = PacketType.USERLIST;
     }
     
     /**
-     * Getter for name
-     * @return name
+     * Getter for users
+     * 
+     * @return users
      */
-    public String getName(){
-        return this.name;
+    public List<String> getUserList(){
+        return this.users;
     }
 }

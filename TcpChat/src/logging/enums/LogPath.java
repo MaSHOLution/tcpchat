@@ -39,10 +39,20 @@ public enum LogPath {
 
     private final String path;
 
+    /**
+     * Constructor
+     *
+     * @param path
+     */
     LogPath(String path) {
         this.path = path;
     }
 
+    /**
+     * Getter for path
+     *
+     * @return
+     */
     public String getPath() {
         return path;
     }

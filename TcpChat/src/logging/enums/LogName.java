@@ -31,7 +31,7 @@ package logging.enums;
 public enum LogName {
 
     SERVER(server.console.ChatServer.class.getName()),
-    CLIENT(client.console.ChatClient.class.getName());
+    CLIENT(client.gui.ClientGui.class.getName());
 
     private final String name;
 

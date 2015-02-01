@@ -425,8 +425,6 @@ public final class ClientGui extends javax.swing.JFrame {
      */
     protected void disconnect() {
         this.send(new DisconnectPacket());
-        DefaultListModel listModel = ((DefaultListModel) this.lbUsers.getModel());
-        listModel.removeAllElements();
     }
 
     protected boolean checkConnData() {
@@ -546,13 +544,30 @@ public final class ClientGui extends javax.swing.JFrame {
         }
         this.sendPanel.setEnabled(isEnabled);
         this.lbUsers.setEnabled(isEnabled);
+
+        if (!isEnabled) {
+            DefaultListModel listModel = this.getListModel();
+            listModel.removeAllElements();
+        }
+
         this.pack();
         this.connectionPanel.setEnabled(!isEnabled);
     }
 
-    public void updateUserList(List<String> users) {
+    /**
+     * Getter of the user list - list model
+     *
+     * @return
+     */
+    protected DefaultListModel getListModel() {
         DefaultListModel listModel = ((DefaultListModel) this.lbUsers.getModel());
+        return listModel;
+    }
+
+    public void updateUserList(List<String> users) {
+        DefaultListModel listModel = this.getListModel();
         listModel.removeAllElements();
+        // TODO sort users
         for (String user : users) {
             listModel.addElement(user);
         }

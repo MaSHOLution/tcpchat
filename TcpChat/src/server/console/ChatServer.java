@@ -26,6 +26,7 @@ package server.console;
 import networking.general.Packet;
 import networking.packets.KickPacket;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -47,7 +48,8 @@ import static server.console.ChatServer.*;
 public final class ChatServer {
 
     // Setting up client
-    protected static final int maxClientsCount = 10;
+    // maxClientsCount = 0 means infinite clients
+    protected static final int maxClientsCount = 0;
     protected static final List<ClientThread> threads = new ArrayList<>();
 
     // Logging
@@ -96,29 +98,20 @@ public final class ChatServer {
 
                 // Create client socket for each connection
                 while (true) {
-                    try {
-                        // Handle for new connection, put it into empty array-slot
-                        clientSocket = serverSocket.accept();
-                        Counters.connection();
-                        if (threads.size() <= ChatServer.maxClientsCount) {
-                            ClientThread clientThread = new ClientThread(clientSocket);
-                            threads.add(clientThread);
-                            clientThread.start();
-                            logControl.log(logConnection, Level.INFO, clientSocket.getRemoteSocketAddress() + ": accepted, thread started");
-                            Counters.login();
-                        } else {
-                            // Only when maxclients is reached
-                            try (ObjectOutputStream oos = new ObjectOutputStream(clientSocket.getOutputStream())) {
-                                oos.writeObject(new KickPacket("Too many clients. Please try later."));
-                            }
-                            Counters.connection();
-                            logControl.log(logConnection, Level.INFO, clientSocket.getRemoteSocketAddress() + ": rejected, server is full");
-                            clientSocket.close();
-                        }
-                    } catch (IOException ex) {
-                        System.out.println(ex);
-                        logControl.log(logException, Level.SEVERE, clientSocket.getRemoteSocketAddress() + ": error while logging in (" + ex.getMessage() + ")");
-                        logging.Counters.exception();
+                    // Handle for new connection, put it into empty array-slot
+                    clientSocket = serverSocket.accept();
+                    Counters.connection();
+                    // maxClientsCount = 0 means infinite clients
+                    if (threads.size() < maxClientsCount || maxClientsCount == 0) {
+                        ClientThread clientThread = new ClientThread(clientSocket);
+                        threads.add(clientThread);
+                        clientThread.start();
+                        logControl.log(logConnection, Level.INFO, clientSocket.getRemoteSocketAddress() + ": accepted, thread started");
+                        Counters.login();
+                    } else {
+                        // Only when maxclients is reached        
+                        FullThread fThread = new FullThread(clientSocket);
+                        fThread.start();
                     }
                 }
             } catch (IOException ex) {

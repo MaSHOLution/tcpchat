@@ -1,4 +1,6 @@
+# Ide and OS files
 *.class
+*.idea
 
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/

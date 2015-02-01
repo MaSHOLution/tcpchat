@@ -3,7 +3,9 @@ title Networking
 loop Accept Clients
     Client->Server: Connect to socket
     alt Server is full
-        Server->Client: KickPacket ("Too many clients")
+        Server->RecectionThread: Start
+        RecectionThread->Client: KickPacket ("Too many clients")
+        note over RecectionThread: Close RejectionThread
     else
         Server->ClientThread: Create and start
         Client->ClientThread: ConnectPacket

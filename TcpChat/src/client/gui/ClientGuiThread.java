@@ -84,16 +84,18 @@ public class ClientGuiThread implements Runnable {
 
             switch (ptype) {
                 case DISCONNECT:
+                    // TODO dialog?
                     gui.outputLineOnGui("*** Disconnected ***");
-                    exitListening = true;
-                    break;
-                case KICK:
-                    gui.outputLineOnGui(((KickPacket) responsePacket).getMessage());
                     exitListening = true;
                     break;
                 case USERLIST:
                     List<String> list = ((UserListPacket) responsePacket).getUserList();
                     gui.updateUserList(list);
+                    break;
+                case KICK:
+                    // TODO dialog?
+                    gui.outputLineOnGui(((KickPacket) responsePacket).getMessage());
+                    exitListening = true;
                     break;
                 case PM:
                     PrivateMessagePacket pm = ((PrivateMessagePacket) responsePacket);
@@ -101,16 +103,18 @@ public class ClientGuiThread implements Runnable {
                     sender = pm.getSender();
                     receiver = pm.getReceiver();
 
-                    gui.outputLineOnGui("<" + sender + " to " + receiver + "> " + message);
+                    // TODO fix bug where sender is this client
+                    gui.outputLineOnGui("<" + sender + " to " + receiver + "> " + message, receiver);
                     break;
                 case GM:
                     GroupMessagePacket gm = ((GroupMessagePacket) responsePacket);
                     message = gm.getMessage();
                     sender = gm.getSender();
 
-                    gui.outputLineOnGui("<" + sender + "> " + message);
+                    gui.outputLineOnGui("<" + sender + "> " + message, 0);
                     break;
                 default:
+                    // TODO implement secure packet selection !!!!!!!!!!!!!!!
                     gui.outputLineOnGui(((MessagePacket) responsePacket).getMessage());
             }
         } while (!exitListening);
@@ -131,6 +135,7 @@ public class ClientGuiThread implements Runnable {
                 return readPacket;
             }
         } catch (IOException | ClassNotFoundException ex) {
+            // TODO dialog?
             gui.outputLineOnGui("*** SERVER IS GOING DOWN ***");
             exitListening = true;
         }

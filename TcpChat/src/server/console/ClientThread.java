@@ -88,31 +88,49 @@ public final class ClientThread extends Thread {
                 // Broadcasts welcome message to all clients
                 this.broadcastUserList(false);
                 this.broadcastExceptMe(new InfoPacket("*** User \"" + this.clientName + "\" joined ***"));
-                this.send(new InfoPacket("Welcome \"" + this.clientName + "\" to our chat room.\n"));
+                this.send(new InfoPacket("Welcome \"" + this.clientName + "\" to our chat room."));
                 logControl.log(logGeneral, Level.INFO, this.clientName + " joined");
+
+                boolean isKicked = false;
 
                 // Start conversation
                 while (true) {
-                    // TODO handle null return
-                    Packet packet = this.read();
-                    PacketType ptype = packet.getIdentifier();
-                    if (ptype == PacketType.DISCONNECT) {
+                    try {
+                        // TODO handle null return
+                        Packet packet = this.read();
+                        PacketType ptype = packet.getIdentifier();
+                        if (ptype == PacketType.DISCONNECT) {
+                            break;
+                        } else if (ptype == PacketType.PM) {
+                            // Send private message
+                            this.forwardPrivateMessage((PrivateMessagePacket) packet);
+                        } else {
+                            // Broadcast message to all other clients
+                            this.broadcast((GroupMessagePacket) packet);
+                        }
+                    } catch (NullPointerException ex) {
+                        logControl.log(logException, Level.SEVERE, this.ip + "(" + this.clientName + ") while receiving packet: " + ex.getMessage());
+                        logging.Counters.exception();
+                        this.send(new KickPacket("Security breach: Please do not use a modified client"));
+                        isKicked = true;
                         break;
-                    } else if (ptype == PacketType.PM) {
-                        // Send private message
-                        this.forwardPrivateMessage((PrivateMessagePacket) packet);
-                    } else {
-                        // Broadcast message to all other clients
-                        this.broadcast((GroupMessagePacket) packet);
                     }
                 }
 
-                // Tell every client, that the current client is going offline
-                this.broadcastExceptMe(new InfoPacket("*** User \"" + this.clientName + "\" has left ***"));
-                this.send(new DisconnectPacket());
+                if (isKicked) {
+                    // Tell every client, that the current client has been kicked
+                    this.broadcastExceptMe(new InfoPacket("*** User \"" + this.clientName + "\" has been kicked ***"));
 
-                // Remove client from threads array and close connections
-                disconnect(false);
+                    // Remove client from threads array and close connections
+                    disconnect(true);
+                } else {
+                    // Tell every client, that the current client is going offline
+                    this.broadcastExceptMe(new InfoPacket("*** User \"" + this.clientName + "\" has left ***"));
+                    this.send(new DisconnectPacket());
+
+                    // Remove client from threads array and close connections
+                    disconnect(false);
+                }
 
                 this.broadcastUserList(true);
             } else {
@@ -187,36 +205,47 @@ public final class ClientThread extends Thread {
      * @return message send status
      */
     protected synchronized boolean forwardPrivateMessage(PrivateMessagePacket privatePacket) {
-        String receiver = privatePacket.getReceiver();
-        // Check if sender wants to send privatePacket to himself
-        if (receiver.equals(this.clientName)) {
-            this.send(new InfoPacket("You can't send private messages to yourself"));
-            logControl.log(logGeneral, Level.INFO, this.clientName + " wanted to send himself a private message");
-            return true;
-        } else {
-            for (ClientThread thread : threads) {
-                if (thread != this
-                        && thread.clientName != null
-                        && thread.clientName.equals(receiver)) {
+        try {
+            String receiver = privatePacket.getReceiver();
+            // Check if sender wants to send privatePacket to himself
+            if (receiver.equals(this.clientName)) {
+                this.send(new InfoPacket("You can't send private messages to yourself"));
+                logControl.log(logGeneral, Level.INFO, this.clientName + " wanted to send himself a private message");
+                return true;
+            } else {
+                for (ClientThread thread : threads) {
+                    if (thread != this
+                            && thread.clientName != null
+                            && thread.clientName.equals(receiver)) {
 
-                    // Send privatePacket to receiver
-                    this.send(privatePacket, thread);
+                        // Send privatePacket to receiver
+                        this.send(privatePacket, thread);
 
-                    // Send privatePacket to sender
-                    this.send(privatePacket);
-                    Counters.pm();
-                    logControl.log(logGeneral, Level.INFO, "PM #" + Counters.Totals.Messages.pmTotal + " from " + this.clientName + " to " + receiver);
-                    return true;
+                        // Send privatePacket to sender
+                        this.send(privatePacket);
+                        Counters.pm();
+                        logControl.log(logGeneral, Level.INFO, "PM #" + Counters.Totals.Messages.pmTotal + " from " + this.clientName + " to " + receiver);
+                        return true;
+                    }
                 }
             }
+
+            // Receiver has not been found / is not online
+            // TODO Handle asynchronous messages/connections
+            this.send(new InfoPacket("Message could not be delivered, reason: \"" + receiver + "\" is not online"));
+            Counters.pm();
+            Counters.pmFailed();
+            logControl.log(logGeneral, Level.INFO, "PM #" + Counters.Totals.Messages.pmTotal + " from " + this.clientName + " failed: " + receiver + " is not online");
+            return false;
+        } catch (Exception ex) {
+            logControl.log(logException, Level.INFO, this.ip + "(" + this.clientName + ") while sending PM: " + ex.getMessage());
+            logging.Counters.exception();
+            this.send(new InfoPacket("Message could not be delivered, reason: Internal Server Error"));
+            Counters.pm();
+            Counters.pmFailed();
+            return false;
         }
-        // Receiver has not been found / is not online
-        // TODO Handle asynchronous messages/connections
-        this.send(new InfoPacket("Message could not be delivered, reason: \"" + receiver + "\" is not online"));
-        Counters.pm();
-        Counters.pmFailed();
-        logControl.log(logGeneral, Level.INFO, "PM #" + Counters.Totals.Messages.pmTotal + " from " + this.clientName + " failed: " + receiver + " is not online");
-        return false;
+
     }
 
     /**

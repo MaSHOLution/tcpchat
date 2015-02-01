@@ -38,6 +38,7 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.List;
 import javax.swing.DefaultListModel;
+import javax.swing.JList;
 import static javax.swing.JList.*;
 import static javax.swing.ListSelectionModel.SINGLE_SELECTION;
 
@@ -366,7 +367,19 @@ public final class ClientGui extends javax.swing.JFrame {
     }//GEN-LAST:event_bSendMessageActionPerformed
 
     private void lbUsersValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_lbUsersValueChanged
-        int selected = evt.getFirstIndex();
+        List<String> selectedElements = this.lbUsers.getSelectedValuesList();
+
+        DefaultListModel listModel = getListModel();
+
+        for (String selectedElement : selectedElements) {
+
+            if (selectedElement.equals(tbNickname.getText())) {
+                dialogHelper.showInfoDialog("Info", "This is you. You can't send messages to yourself!");
+            } else {
+                this.tbMessage.setText('@' + selectedElement + ' ');
+            }
+        }
+        this.tbMessage.requestFocus();
     }//GEN-LAST:event_lbUsersValueChanged
 
     /**

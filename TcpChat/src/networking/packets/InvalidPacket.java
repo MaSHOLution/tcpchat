@@ -21,23 +21,23 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package networking.general;
+package networking.packets;
+
+import networking.general.Packet;
+import networking.general.PacketType;
 
 /**
- * Enum for packet types
+ * Class for a specific packet type
  *
- * @author Manuel Schmid, Fabian Fink
+ * @author Manuel Schmid
  */
-public enum PacketType {
-
-    CONNECT,
-    DISCONNECT,
-    GM,
-    INFO,
-    INVALID,
-    MESSAGE,  // Abstract
-    USERLIST,
-    KICK,
-    PACKET,   // Abstract
-    PM, 
+public class InvalidPacket extends Packet {
+    
+    /**
+     * Constructor
+     */
+    public InvalidPacket() {
+        this.packetIdentifier = PacketType.INVALID;
+        this.prepare();
+    }
 }

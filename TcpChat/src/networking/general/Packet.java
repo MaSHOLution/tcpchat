@@ -63,7 +63,7 @@ public abstract class Packet implements Serializable {
         this.senderAlias = senderAlias;
     }
     /**
-     * Setter for senderAlias protected because of one time usage of packets
+     * Prepares the packet for sending
      *
      */
     public void prepare() {

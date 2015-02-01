@@ -62,17 +62,17 @@ public final class Counters {
              * private messages total
              */
             public static int pmTotal = 0;
-            
+
             /**
              * private messages failure total
              */
             public static int pmFailed = 0;
-            
+
             /**
              * group messages total
              */
             public static int gmTotal = 0;
-            
+
             /**
              * group messages failure total
              */
@@ -98,19 +98,24 @@ public final class Counters {
              * total disconnects
              */
             public static int connections = 0;
+
+            /**
+             * total disconnects
+             */
+            public static int rejected = 0;
         }
 
     }
 
     /**
-     * Get login count
+     * Increase login count
      */
     public static void login() {
         Clients.inLoginProcess++;
     }
 
     /**
-     * Get counter of currently logged in users
+     * Increase counter of currently logged in users
      */
     public static void loggedIn() {
         Clients.inLoginProcess--;
@@ -119,28 +124,28 @@ public final class Counters {
     }
 
     /**
-     * Get counter of written private messages
+     * Increase counter of written private messages
      */
     public static void pm() {
         Totals.Messages.pmTotal++;
     }
-    
+
     /**
-     * Get counter of failed private messages
+     * Increase counter of failed private messages
      */
     public static void pmFailed() {
         Totals.Messages.pmFailed++;
     }
 
     /**
-     * Get counter of written group messages
+     * Increase counter of written group messages
      */
     public static void gm() {
         Totals.Messages.gmTotal++;
     }
 
     /**
-     * Get counter of disconnects
+     * Increase counter of disconnects
      */
     public static void disconnect() {
         Clients.clients--;
@@ -148,14 +153,21 @@ public final class Counters {
     }
 
     /**
-     * Get counter of connections, which includes received and sent stuff 
+     * Increase counter of connections, which includes received and sent stuff
      */
     public static void connection() {
         Totals.Clients.connections++;
     }
+    
+    /**
+     * Increase counter of rejected clients
+     */
+    public static void rejected() {
+        Totals.Clients.rejected++;
+    }
 
     /**
-     * Get counter of exceptions
+     * Increase counter of exceptions
      */
     public static void exception() {
         Totals.exceptions++;

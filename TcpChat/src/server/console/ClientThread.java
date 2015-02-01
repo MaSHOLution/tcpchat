@@ -88,7 +88,7 @@ public final class ClientThread extends Thread {
                 // Broadcasts welcome message to all clients
                 this.broadcastUserList(false);
                 this.broadcastExceptMe(new InfoPacket("*** User \"" + this.clientName + "\" joined ***"));
-                this.send(new InfoPacket("Welcome " + this.clientName + " to our chat room.\n")); //To leave, enter \"" + this.quitString + "\" in a new line.");
+                this.send(new InfoPacket("Welcome \"" + this.clientName + "\" to our chat room.\n"));
                 logControl.log(logGeneral, Level.INFO, this.clientName + " joined");
 
                 // Start conversation
@@ -286,8 +286,8 @@ public final class ClientThread extends Thread {
 
         if (pType == PacketType.CONNECT) {
             String name = ((ConnectPacket) clientAnswer).getName();
-            if (name.length() > 20) {
-                this.send(new KickPacket("Please make sure that your nickname has less than 20 letters"));
+            if (name.length() > 15) {
+                this.send(new KickPacket("Please make sure that your nickname has less than 15 letters"));
                 return null;
             }
             this.clientName = name;

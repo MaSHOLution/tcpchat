@@ -121,7 +121,6 @@ public final class ClientThread extends Thread {
 
         } catch (IOException ex) {
             logControl.log(logException, Level.INFO, this.ip + "(" + this.clientName + "): " + ex.getMessage());
-        } finally {
             logging.Counters.exception();
         }
     }
@@ -233,7 +232,6 @@ public final class ClientThread extends Thread {
             return true;
         } catch (IOException ex) {
             logControl.log(logException, Level.INFO, this.ip + "(" + this.clientName + "): " + ex.getMessage());
-        } finally {
             logging.Counters.exception();
         }
         return false;
@@ -253,7 +251,6 @@ public final class ClientThread extends Thread {
             return true;
         } catch (Exception ex) {
             logControl.log(logException, Level.INFO, this.ip + "(" + this.clientName + "): " + ex.getMessage());
-        } finally {
             logging.Counters.exception();
         }
         return false;
@@ -271,7 +268,6 @@ public final class ClientThread extends Thread {
             return readPacket;
         } catch (IOException | ClassNotFoundException ex) {
             logControl.log(logException, Level.INFO, this.ip + "(" + this.clientName + "): " + ex.getMessage());
-        } finally {
             logging.Counters.exception();
         }
         return null;
@@ -290,7 +286,7 @@ public final class ClientThread extends Thread {
 
         if (pType == PacketType.CONNECT) {
             String name = ((ConnectPacket) clientAnswer).getName();
-            if(name.length() > 20){
+            if (name.length() > 20) {
                 this.send(new KickPacket("Please make sure that your nickname has less than 20 letters"));
                 return null;
             }

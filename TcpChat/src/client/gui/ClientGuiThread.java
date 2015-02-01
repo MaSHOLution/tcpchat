@@ -116,7 +116,6 @@ public class ClientGuiThread implements Runnable {
             gui.closeConnection();
         } catch (IOException | ClassNotFoundException ex) {
             System.err.println("Exception:  " + ex);
-        } finally {
             logging.Counters.exception();
         }
     }

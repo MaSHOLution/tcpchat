@@ -118,7 +118,6 @@ public final class ChatServer {
                     } catch (IOException ex) {
                         System.out.println(ex);
                         logControl.log(logException, Level.SEVERE, clientSocket.getRemoteSocketAddress() + ": error while logging in (" + ex.getMessage() + ")");
-                    } finally {
                         logging.Counters.exception();
                     }
                 }
@@ -127,7 +126,6 @@ public final class ChatServer {
                 logControl.log(logException, Level.SEVERE, "Could not open Server Socket");
                 logControl.log(logException, Level.SEVERE, "Exiting Server");
                 logControl.log(logGeneral, Level.SEVERE, "Exiting Server");
-            } finally {
                 logging.Counters.exception();
             }
         }
@@ -176,8 +174,7 @@ class ShutdownHandle extends Thread {
             thread.outStream.writeObject(packet);
             return true;
         } catch (Exception ex) {
-            ChatServer.logControl.log(CustomLogging.get(LogName.SERVER, LogPath.EXCEPTION), Level.INFO, ex.getMessage());
-        } finally {
+            logControl.log(CustomLogging.get(LogName.SERVER, LogPath.EXCEPTION), Level.INFO, ex.getMessage());
             logging.Counters.exception();
         }
         return false;

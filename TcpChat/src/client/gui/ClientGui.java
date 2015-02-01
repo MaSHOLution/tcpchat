@@ -405,15 +405,16 @@ public final class ClientGui extends javax.swing.JFrame {
 
                     return true;
                 }
+
                 this.dialogHelper.showWarningDialog("Warning", "Could not send data to host \"" + host + "\" on Port " + port);
                 return false;
             } catch (UnknownHostException ex) {
                 this.dialogHelper.showWarningDialog("Warning", "Don't know about host " + host);
             } catch (IOException ex) {
                 this.dialogHelper.showWarningDialog("Connection failed", "Could not connect to host \"" + host + "\" on Port " + port);
-            } finally {
-                logging.Counters.exception();
             }
+
+            logging.Counters.exception();
             return false;
         }
         return false;

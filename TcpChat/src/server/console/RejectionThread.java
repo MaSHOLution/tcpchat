@@ -45,7 +45,7 @@ import static server.console.ChatServer.logException;
  *
  * @author Manuel Schmid
  */
-public final class FullThread extends Thread {
+public final class RejectionThread extends Thread {
 
     protected ObjectInputStream inStream = null;
     protected ObjectOutputStream outStream = null;
@@ -59,7 +59,7 @@ public final class FullThread extends Thread {
      *
      * @param clientSocket Sochet where the connection was accepted
      */
-    public FullThread(Socket clientSocket) {
+    public RejectionThread(Socket clientSocket) {
         this.clientSocket = clientSocket;
         this.ip = clientSocket.getRemoteSocketAddress();
     }

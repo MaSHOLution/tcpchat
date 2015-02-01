@@ -110,7 +110,7 @@ public final class ChatServer {
                         Counters.login();
                     } else {
                         // Only when maxclients is reached        
-                        FullThread fThread = new FullThread(clientSocket);
+                        RejectionThread fThread = new RejectionThread(clientSocket);
                         fThread.start();
                     }
                 }

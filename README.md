@@ -1,6 +1,6 @@
 # TCPChat
 
-TCPChat is an educational, server-based open source chat, which is equipped with the following features:
+TCPChat is a server-based open source chat, which is equipped with the following features:
 
   - Multi client chat server
   - Group and private chat
@@ -20,8 +20,8 @@ TCPChat uses a self-developed packet-framework, which allows an easy transfer of
 Currently there is no installer. You can just pull the repository.
 ```sh
 $ git clone [git-repo-url] tcpchat
-$ cd tcpchat
-$ chmod 777 TcpChat/ #for logging-files
+$ cd tcpchat/
+$ chmod 777 TcpChat/ #for log-files
 ```
 You can execute the .jar-Files in the way as you can do it with .exe files. You can find stable builds under "*stable_builds*"
 

@@ -33,6 +33,7 @@ import networking.general.Packet;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.List;
+import networking.packets.InvalidPacket;
 
 /**
  * This class serves as an outsourced thread, as the gui can only handle one
@@ -47,6 +48,8 @@ public class ClientGuiThread implements Runnable {
 
     // Current gui thread
     protected ClientGui gui = null;
+
+    protected boolean exitListening = false;
 
     /**
      * Constructor
@@ -72,51 +75,65 @@ public class ClientGuiThread implements Runnable {
          */
         Packet responsePacket;
         PacketType ptype;
-        boolean exitWhile = false;
+
         String message, sender, receiver;
+        do {
+
+            responsePacket = read();
+            ptype = responsePacket.getIdentifier();
+
+            switch (ptype) {
+                case DISCONNECT:
+                    gui.outputLineOnGui("*** Disconnected ***");
+                    exitListening = true;
+                    break;
+                case KICK:
+                    gui.outputLineOnGui(((KickPacket) responsePacket).getMessage());
+                    exitListening = true;
+                    break;
+                case USERLIST:
+                    List<String> list = ((UserListPacket) responsePacket).getUserList();
+                    gui.updateUserList(list);
+                    break;
+                case PM:
+                    PrivateMessagePacket pm = ((PrivateMessagePacket) responsePacket);
+                    message = pm.getMessage();
+                    sender = pm.getSender();
+                    receiver = pm.getReceiver();
+
+                    gui.outputLineOnGui("<" + sender + " to " + receiver + "> " + message);
+                    break;
+                case GM:
+                    GroupMessagePacket gm = ((GroupMessagePacket) responsePacket);
+                    message = gm.getMessage();
+                    sender = gm.getSender();
+
+                    gui.outputLineOnGui("<" + sender + "> " + message);
+                    break;
+                default:
+                    gui.outputLineOnGui(((MessagePacket) responsePacket).getMessage());
+            }
+        } while (!exitListening);
+        // Close the connection as it is no longer needed
+        gui.closeConnection();
+    }
+
+    /**
+     * Reads a message from a specific inStream
+     *
+     * @return read packet
+     */
+    protected synchronized Packet read() {
         try {
-            do {
-
-                responsePacket = (Packet) inStream.readObject();
-                ptype = responsePacket.getIdentifier();
-
-                switch (ptype) {
-                    case DISCONNECT:
-                        gui.outputLineOnGui("*** Disconnected ***");
-                        exitWhile = true;
-                        break;
-                    case KICK:
-                        gui.outputLineOnGui(((KickPacket) responsePacket).getMessage());
-                        exitWhile = true;
-                        break;
-                    case USERLIST:
-                        List<String> list = ((UserListPacket) responsePacket).getUserList();
-                        gui.updateUserList(list);
-                        break;
-                    case PM:
-                        PrivateMessagePacket pm = ((PrivateMessagePacket) responsePacket);
-                        message = pm.getMessage();
-                        sender = pm.getSender();
-                        receiver = pm.getReceiver();
-
-                        gui.outputLineOnGui("<" + sender + " to " + receiver + "> " + message);
-                        break;
-                    case GM:
-                        GroupMessagePacket gm = ((GroupMessagePacket) responsePacket);
-                        message = gm.getMessage();
-                        sender = gm.getSender();
-
-                        gui.outputLineOnGui("<" + sender + "> " + message);
-                        break;
-                    default:
-                        gui.outputLineOnGui(((MessagePacket) responsePacket).getMessage());
-                }
-            } while (!exitWhile);
-            // Close the connection as it is no longer needed
-            gui.closeConnection();
+            Object temp = this.inStream.readObject();
+            if (temp instanceof Packet) {
+                Packet readPacket = (Packet) temp;
+                return readPacket;
+            }
         } catch (IOException | ClassNotFoundException ex) {
-            System.err.println("Exception:  " + ex);
-            logging.Counters.exception();
+            gui.outputLineOnGui("*** SERVER IS GOING DOWN ***");
+            exitListening = true;
         }
+        return new InvalidPacket();
     }
 }

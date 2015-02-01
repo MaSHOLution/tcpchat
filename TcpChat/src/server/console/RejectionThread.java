@@ -33,6 +33,7 @@ import logging.Counters;
 import networking.general.Packet;
 import networking.general.PacketType;
 import networking.packets.ConnectPacket;
+import networking.packets.InvalidPacket;
 import networking.packets.KickPacket;
 import security.basics.CryptoBasics;
 import security.cryptography.EncryptionMethod;
@@ -73,8 +74,8 @@ public final class RejectionThread extends Thread {
         try {
             // Setting up streams
             initStreams();
-            
-            Packet clientAnswer = (Packet) read();
+
+            Packet clientAnswer = read();
             PacketType pType = clientAnswer.getIdentifier();
 
             if (pType == PacketType.CONNECT) {
@@ -88,7 +89,6 @@ public final class RejectionThread extends Thread {
 
             logControl.log(logConnection, Level.INFO, clientSocket.getRemoteSocketAddress() + ": rejected, server is full");
             clientSocket.close();
-            
 
         } catch (IOException ex) {
             logControl.log(logException, Level.INFO, ip + "(Rejected client): " + ex.getMessage());
@@ -132,13 +132,16 @@ public final class RejectionThread extends Thread {
      */
     protected synchronized Packet read() {
         try {
-            Packet readPacket = (Packet) this.inStream.readObject();
+            Object temp = this.inStream.readObject();
             Counters.connection();
-            return readPacket;
+            if (temp instanceof Packet) {
+                Packet readPacket = (Packet) temp;
+                return readPacket;
+            }
         } catch (IOException | ClassNotFoundException ex) {
-            logControl.log(logException, Level.INFO, this.ip + "(Rejected client): " + ex.getMessage());
+            logControl.log(logException, Level.INFO, this.ip + "(Rejected client) while reading packet: " + ex.getMessage());
             logging.Counters.exception();
         }
-        return null;
+        return new InvalidPacket();
     }
 }

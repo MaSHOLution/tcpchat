@@ -23,16 +23,6 @@
  */
 package server.console;
 
-import networking.packets.KickPacket;
-import networking.packets.PrivateMessagePacket;
-import networking.packets.ConnectPacket;
-import networking.packets.UserListPacket;
-import networking.packets.GroupMessagePacket;
-import networking.packets.DisconnectPacket;
-import networking.packets.InfoPacket;
-import networking.general.Packet;
-import networking.general.PacketType;
-import security.basics.CryptoBasics;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -42,7 +32,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import logging.Counters;
-import security.cryptography.*;
+import networking.packets.*;
+import networking.general.*;
+import security.basics.CryptoBasics;
+import security.cryptography.EncryptionMethod;
 import static server.console.ChatServer.*;
 
 /**
@@ -94,7 +87,7 @@ public final class ClientThread extends Thread {
                 boolean isKicked = false;
 
                 // Start conversation
-                while (true) {
+                while (!isKicked) {
                     try {
                         // TODO handle null return
                         Packet packet = this.read();
@@ -104,6 +97,9 @@ public final class ClientThread extends Thread {
                         } else if (ptype == PacketType.PM) {
                             // Send private message
                             this.forwardPrivateMessage((PrivateMessagePacket) packet);
+                        } else if (ptype == PacketType.INVALID) {
+                            this.send(new KickPacket("Security breach: Please do not use a modified client"));
+                            isKicked = true;
                         } else {
                             // Broadcast message to all other clients
                             this.broadcast((GroupMessagePacket) packet);
@@ -292,14 +288,17 @@ public final class ClientThread extends Thread {
      */
     protected synchronized Packet read() {
         try {
-            Packet readPacket = (Packet) this.inStream.readObject();
+            Object temp = this.inStream.readObject();
             Counters.connection();
-            return readPacket;
+            if (temp instanceof Packet) {
+                Packet readPacket = (Packet) temp;
+                return readPacket;
+            }
         } catch (IOException | ClassNotFoundException ex) {
-            logControl.log(logException, Level.INFO, this.ip + "(" + this.clientName + "): " + ex.getMessage());
+            logControl.log(logException, Level.INFO, this.ip + "(" + this.clientName + ") while reading packet: " + ex.getMessage());
             logging.Counters.exception();
         }
-        return null;
+        return new InvalidPacket();
     }
 
     /**
@@ -315,10 +314,19 @@ public final class ClientThread extends Thread {
 
         if (pType == PacketType.CONNECT) {
             String name = ((ConnectPacket) clientAnswer).getName();
-            if (name.length() > 15) {
-                this.send(new KickPacket("Please make sure that your nickname has less than 15 letters"));
+            if (name == null || name.length() < 4 || name.length() > 15) {
+                this.send(new KickPacket("Please make sure that your nickname has between 4 and 15 letters"));
                 return null;
             }
+
+            // Check if name is already in use, if yes return null
+            for (ClientThread client : threads) {
+                if (client != null && client.clientName != null && client.clientName.equals(name)) {
+                    this.send(new KickPacket("The nickname \"" + name + "\" is already in use"));
+                    return null;
+                }
+            }
+
             this.clientName = name;
             return (ConnectPacket) clientAnswer;
         } else {

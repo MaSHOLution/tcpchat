@@ -85,25 +85,31 @@ public final class ClientThread extends Thread {
                 logControl.log(logGeneral, Level.INFO, this.clientName + " joined");
 
                 boolean isKicked = false;
+                boolean isDisconnected = false;
 
                 // Start conversation
-                while (!isKicked) {
+                while (!isKicked && !isDisconnected) {
                     try {
                         // TODO handle null return
                         Packet packet = this.read();
                         PacketType ptype = packet.getIdentifier();
-                        if (ptype == PacketType.DISCONNECT) {
-                            break;
-                        } else if (ptype == PacketType.PM) {
-                            // Send private message
-                            this.forwardPrivateMessage((PrivateMessagePacket) packet);
-                        } else if (ptype == PacketType.INVALID) {
-                            this.send(new KickPacket("Security breach: Please do not use a modified client"));
-                            isKicked = true;
-                        } else {
-                            // Broadcast message to all other clients
-                            this.broadcast((GroupMessagePacket) packet);
+
+                        switch (ptype) {
+                            case DISCONNECT:
+                                isDisconnected = true;
+                                break;
+                            case PM:
+                                this.forwardPrivateMessage((PrivateMessagePacket) packet);
+                                break;
+                            case INVALID:
+                                this.send(new KickPacket("Security breach: Please do not use a modified client"));
+                                isKicked = true;
+                                break;
+                            case GM:
+                                // Broadcast message to all other clients
+                                this.broadcast((GroupMessagePacket) packet);
                         }
+
                     } catch (NullPointerException ex) {
                         logControl.log(logException, Level.SEVERE, this.ip + "(" + this.clientName + ") while receiving packet: " + ex.getMessage());
                         logging.Counters.exception();

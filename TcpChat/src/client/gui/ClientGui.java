@@ -38,7 +38,7 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.List;
 import javax.swing.DefaultListModel;
-import javax.swing.JLabel;
+import javax.swing.JEditorPane;
 import static javax.swing.JList.*;
 import javax.swing.JTextArea;
 import static javax.swing.ListSelectionModel.SINGLE_SELECTION;
@@ -67,7 +67,8 @@ public final class ClientGui extends javax.swing.JFrame {
     protected int port;
 
     protected TabController tabController;
-
+    protected UserListController userListController;
+    
     protected enum connectButtonText {
 
         Connect,
@@ -81,6 +82,7 @@ public final class ClientGui extends javax.swing.JFrame {
         initComponents();
 
         this.tabController = new TabController(this.tabPane);
+        this.userListController = new UserListController(this.lbUsers);
 
         // Set fields to default value
         tbPort.setText("8000");
@@ -360,14 +362,13 @@ public final class ClientGui extends javax.swing.JFrame {
         this.sendMessageBox();
     }//GEN-LAST:event_bSendMessageActionPerformed
 
+    // TODO Add userlist programmatically
     private void lbUsersValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_lbUsersValueChanged
         List<String> selectedElements = this.lbUsers.getSelectedValuesList();
 
-        DefaultListModel listModel = getListModel();
-
         for (String selectedElement : selectedElements) {
 
-            if (selectedElement.equals(tbNickname.getText())) {
+            if (selectedElement.equals(this.clientName)) {
                 dialogHelper.showInfoDialog("Info", "This is you. You can't send messages to yourself!");
             } else {
                 this.tbMessage.setText('@' + selectedElement + ' ');
@@ -397,9 +398,6 @@ public final class ClientGui extends javax.swing.JFrame {
                 inputLine = new BufferedReader(new InputStreamReader(System.in));
                 outStream = new ObjectOutputStream(clientSocket.getOutputStream());
                 inStream = new ObjectInputStream(clientSocket.getInputStream());
-
-                // Initial clear of the chat text area
-                this.clearChatArea();
 
                 // Create a thread to read from the server
                 new Thread(new ClientGuiThread(this)).start();
@@ -490,65 +488,12 @@ public final class ClientGui extends javax.swing.JFrame {
                         this.send(new PrivateMessagePacket(messageArray[1], this.clientName, messageArray[0].substring(1)));
                     }
                 } else {
-                    this.outputLineOnGui("Format for PM: @<receiver> <message>");
+                    this.tabController.outputLineOnGui("Format for PM: @<receiver> <message>");
                 }
             } else {
                 this.send(new GroupMessagePacket(message, this.clientName));
             }
         }
-    }
-
-    /**
-     * Output a message on the currently selected tab
-     *
-     * @param message message to show on gui
-     */
-    public synchronized void outputLineOnGui(String message) {
-        if (!message.trim().equals("")) {
-            JTextArea taChat = tabController.getTextAreaOnTab(this.tabPane.getSelectedIndex());
-            taChat.append("\n" + message);
-            taChat.setCaretPosition(taChat.getDocument().getLength());
-        }
-    }
-
-    /**
-     * Output a message on the chat text area
-     *
-     * @param message message to show on gui
-     * @param sender sender of the message
-     */
-    public synchronized void outputLineOnGui(String message, String sender) {
-        if (!message.trim().equals("")) {
-            int tabIndex = this.tabController.getTabByTitle(sender);
-            if(tabIndex == -1){
-                tabIndex = this.tabController.addTab(sender, true);
-            }
-            JTextArea taChat = tabController.getTextAreaOnTab(tabIndex);
-            taChat.append("\n" + message);
-            taChat.setCaretPosition(taChat.getDocument().getLength());
-        }
-    }
-
-    /**
-     * Output a message on a tab with given index
-     *
-     * @param message message to show on gui
-     * @param tabIndex index of tab to show message in
-     */
-    public synchronized void outputLineOnGui(String message, int tabIndex) {
-        if (!message.trim().equals("")) {
-            JTextArea taChat = tabController.getTextAreaOnTab(tabIndex);
-            taChat.append("\n" + message);
-            taChat.setCaretPosition(taChat.getDocument().getLength());
-        }
-    }
-
-    /**
-     * Clears the chat text area
-     */
-    protected void clearChatArea() {
-        // TODO CHANGE!!!!!!!!!!!!!!!!!!!
-//        this.taChat.setText("");
     }
 
     /**
@@ -582,42 +527,16 @@ public final class ClientGui extends javax.swing.JFrame {
             this.bConnect.setText(connectButtonText.Disconnect.toString());
             this.tbMessage.requestFocus();
         } else {
+            tabController.terminate();
+            this.userListController.clearList();
             this.bConnect.setText(connectButtonText.Connect.toString());
         }
+        
         this.sendPanel.setEnabled(isEnabled);
         this.lbUsers.setEnabled(isEnabled);
-
-        if (!isEnabled) {
-            DefaultListModel listModel = this.getListModel();
-            listModel.removeAllElements();
-        }
+        this.connectionPanel.setEnabled(!isEnabled);
 
         //this.pack();
-        this.connectionPanel.setEnabled(!isEnabled);
-    }
-
-    /**
-     * Getter of the user list - list model
-     *
-     * @return
-     */
-    protected DefaultListModel getListModel() {
-        DefaultListModel listModel = ((DefaultListModel) this.lbUsers.getModel());
-        return listModel;
-    }
-
-    /**
-     * Updates the user list
-     *
-     * @param users
-     */
-    public void updateUserList(List<String> users) {
-        DefaultListModel listModel = this.getListModel();
-        listModel.removeAllElements();
-        // TODO sort users
-        for (String user : users) {
-            listModel.addElement(user);
-        }
     }
 
     /**

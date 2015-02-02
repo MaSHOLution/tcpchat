@@ -69,6 +69,13 @@ public class ClientGuiThread implements Runnable {
     @Override
     public void run() {
 
+        try {
+            while (!gui.tabController.isInitialized()) {
+                Thread.sleep(100);
+            }
+        } catch (InterruptedException ex) {
+        }
+
         /*
          * Keep on reading from the socket untill "Bye" is received from the
          * server
@@ -84,17 +91,19 @@ public class ClientGuiThread implements Runnable {
 
             switch (ptype) {
                 case DISCONNECT:
-                    // TODO dialog?
-                    gui.outputLineOnGui("*** Disconnected ***");
                     exitListening = true;
                     break;
-                case USERLIST:
-                    List<String> list = ((UserListPacket) responsePacket).getUserList();
-                    gui.updateUserList(list);
+                case GM:
+                    GroupMessagePacket gm = ((GroupMessagePacket) responsePacket);
+                    message = gm.getMessage();
+                    sender = gm.getSender();
+
+                    // Always output groupmessage on first tab ("Group Chat")
+                    gui.tabController.outputLineOnGui("<" + sender + "> " + message, 0);
                     break;
                 case KICK:
                     // TODO dialog?
-                    gui.outputLineOnGui(((KickPacket) responsePacket).getMessage());
+                    gui.tabController.outputLineOnGui(((KickPacket) responsePacket).getMessage());
                     exitListening = true;
                     break;
                 case PM:
@@ -103,19 +112,24 @@ public class ClientGuiThread implements Runnable {
                     sender = pm.getSender();
                     receiver = pm.getReceiver();
 
-                    // TODO fix bug where sender is this client
-                    gui.outputLineOnGui("<" + sender + " to " + receiver + "> " + message, receiver);
-                    break;
-                case GM:
-                    GroupMessagePacket gm = ((GroupMessagePacket) responsePacket);
-                    message = gm.getMessage();
-                    sender = gm.getSender();
+                    // Get name of other person
+                    String person = (gui.clientName.equals(receiver)) ? sender : receiver;
 
-                    gui.outputLineOnGui("<" + sender + "> " + message, 0);
+                    // TODO fix bug where sender is this client
+                    if (gui.tabController.outputLineOnGui("<" + sender + "> " + message, receiver)) {
+                        if (gui.clientName.equals(sender)) {
+                            gui.tabController.setFocusAt(receiver);
+                        }
+                    }
+
                     break;
-                default:
-                    // TODO implement secure packet selection !!!!!!!!!!!!!!!
-                    gui.outputLineOnGui(((MessagePacket) responsePacket).getMessage());
+
+                case USERLIST:
+                    List<String> list = ((UserListPacket) responsePacket).getUserList();
+                    gui.userListController.updateUserList(list);
+                    break;
+                case INFO:
+                    gui.tabController.outputLineOnGui(((MessagePacket) responsePacket).getMessage());
             }
         } while (!exitListening);
         // Close the connection as it is no longer needed
@@ -136,7 +150,7 @@ public class ClientGuiThread implements Runnable {
             }
         } catch (IOException | ClassNotFoundException ex) {
             // TODO dialog?
-            gui.outputLineOnGui("*** SERVER IS GOING DOWN ***");
+            gui.tabController.outputLineOnGui("*** SERVER IS GOING DOWN ***");
             exitListening = true;
         }
         return new InvalidPacket();

@@ -25,7 +25,6 @@ package client.gui;
 
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
-import javax.swing.JTextArea;
 
 /**
  *
@@ -34,6 +33,7 @@ import javax.swing.JTextArea;
 public final class TabController {
 
     private JTabbedPane tabPane;
+    private boolean isInitialized = false;
 
     /**
      * Constructor
@@ -48,23 +48,41 @@ public final class TabController {
      * Initialize components
      */
     public void init() {
+        tabPane.setEnabled(true);
         tabPane.removeAll();
         addTab("Group Chat", false);
         tabPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
         // tabPane.setTabLayoutPolicy(JTabbedPane.WRAP_TAB_LAYOUT);
+        isInitialized = true;
+    }
+
+    /**
+     * Terminates components
+     */
+    public void terminate() {
+        isInitialized = false;
+        tabPane.setEnabled(false);
+    }
+
+    /**
+     * Getter for isInitialized
+     *
+     * @return isInitialized
+     */
+    public boolean isInitialized() {
+        return isInitialized;
     }
 
     public int addTab(String name, boolean addCloseElement) {
-        JTextArea taChat = new JTextArea();
-        taChat.setRows(5);
-        taChat.setColumns(20);
+        ChatArea chatText = new ChatArea();
+        chatText.setEditable(false);
         int counter = getTabCountForIndex();
-        tabPane.add(name, new JScrollPane(taChat));
+        tabPane.add(name, new JScrollPane(chatText));
         if (addCloseElement) {
             int counter2 = getTabCountForIndex();
             initTabComponent(counter);
         }
-        return getTabCountForIndex() -1;
+        return getTabCountForIndex() - 1;
     }
 
     public boolean removeTab(String title) {
@@ -78,7 +96,7 @@ public final class TabController {
         return false;
     }
 
-    public int getTabByTitle(String title) {
+    public int getTabIndexByTitle(String title) {
         for (int i = 1; i < getTabCountForIndex(); i++) {
             String tabTitle = tabPane.getTitleAt(i);
             if (title.equals(tabTitle)) {
@@ -88,12 +106,72 @@ public final class TabController {
         return -1;
     }
 
+    public boolean setFocusAt(String title) {
+        int index = getTabIndexByTitle(title);
+        if(index == -1){
+            return false;
+        } else {
+            tabPane.setSelectedIndex(index);
+            return true;
+        }
+    }
+
     private void initTabComponent(int i) {
         tabPane.setTabComponentAt(i, new ButtonTabComponent(tabPane));
     }
+    
+      /**
+     * Output a message on the currently selected tab
+     *
+     * @param message message to show on gui
+     */
+    public synchronized void outputLineOnGui(String message) {
+        if (!message.trim().equals("")) {
+            appendTextToChat(message, tabPane.getSelectedIndex());
+        }
+    }
 
-    public JTextArea getTextAreaOnTab(int tabIndex) {
-        return (JTextArea) ((JScrollPane) tabPane.getComponentAt(tabIndex)).getViewport().getView();
+    /**
+     * Output a message on the chat text area
+     *
+     * @param message message to show on gui
+     * @param person person of the message
+     * @return tab was created
+     */
+    public synchronized boolean outputLineOnGui(String message, String person) {
+        boolean tabCreated = false;
+        if (!message.trim().equals("")) {
+            int tabIndex = getTabIndexByTitle(person);
+            if(tabIndex == -1){
+                tabIndex = addTab(person, true);
+                tabCreated = true;
+            }
+            appendTextToChat(message, tabIndex);
+        }
+        return tabCreated;
+    }
+
+    /**
+     * Output a message on a tab with given index
+     *
+     * @param message message to show on gui
+     * @param tabIndex index of tab to show message in
+     */
+    public synchronized void outputLineOnGui(String message, int tabIndex) {
+        if (!message.trim().equals("")) {
+            appendTextToChat(message, tabIndex);
+        }
+    }
+
+    /**
+     * Appends a String to the ChatArea at the given index
+     *
+     * @param message message to append
+     */
+    public void appendTextToChat(String message, int tabIndex) {
+        ChatArea chatArea = (ChatArea) ((JScrollPane) tabPane.getComponentAt(tabIndex)).getViewport().getView();
+        chatArea.append("\n" + message);
+        chatArea.setCaretPosition(chatArea.getDocument().getLength());
     }
 
     private int getTabCountForIndex() {

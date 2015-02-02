@@ -60,8 +60,12 @@ public final class TabController {
      * Terminates components
      */
     public void terminate() {
+        // Set isInitialized false
         isInitialized = false;
+        // Disable TabbedPane
         tabPane.setEnabled(false);
+        // Disable ChatArea at curreltny viewed tab
+        getChat(tabPane.getSelectedIndex()).setEnabled(false);
     }
 
     /**
@@ -108,7 +112,7 @@ public final class TabController {
 
     public boolean setFocusAt(String title) {
         int index = getTabIndexByTitle(title);
-        if(index == -1){
+        if (index == -1) {
             return false;
         } else {
             tabPane.setSelectedIndex(index);
@@ -119,8 +123,8 @@ public final class TabController {
     private void initTabComponent(int i) {
         tabPane.setTabComponentAt(i, new ButtonTabComponent(tabPane));
     }
-    
-      /**
+
+    /**
      * Output a message on the currently selected tab
      *
      * @param message message to show on gui
@@ -142,7 +146,7 @@ public final class TabController {
         boolean tabCreated = false;
         if (!message.trim().equals("")) {
             int tabIndex = getTabIndexByTitle(person);
-            if(tabIndex == -1){
+            if (tabIndex == -1) {
                 tabIndex = addTab(person, true);
                 tabCreated = true;
             }
@@ -169,9 +173,19 @@ public final class TabController {
      * @param message message to append
      */
     public void appendTextToChat(String message, int tabIndex) {
-        ChatArea chatArea = (ChatArea) ((JScrollPane) tabPane.getComponentAt(tabIndex)).getViewport().getView();
+        ChatArea chatArea = getChat(tabIndex);
         chatArea.append("\n" + message);
         chatArea.setCaretPosition(chatArea.getDocument().getLength());
+    }
+
+    /**
+     * Returns the ChatArea at tabIndex
+     *
+     * @param index index of tab
+     * @return
+     */
+    private ChatArea getChat(int tabIndex) {
+        return (ChatArea) ((JScrollPane) tabPane.getComponentAt(tabIndex)).getViewport().getView();
     }
 
     private int getTabCountForIndex() {

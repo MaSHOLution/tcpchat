@@ -77,20 +77,33 @@ public final class TabController {
         return isInitialized;
     }
 
-    public int addTab(String name, boolean addCloseElement) {
+    /**
+     * Adds a new tab with ScrollPane and ChatArea to TabbedPane
+     *
+     * @param title title of the tab
+     * @param addCloseElement add cross to close tab
+     * @return
+     */
+    public int addTab(String title, boolean addCloseElement) {
         ChatArea chatText = new ChatArea();
         chatText.setEditable(false);
-        int counter = getTabCountForIndex();
-        tabPane.add(name, new JScrollPane(chatText));
+        int counter = tabPane.getTabCount();
+        tabPane.add(title, new JScrollPane(chatText));
         if (addCloseElement) {
-            int counter2 = getTabCountForIndex();
+            int counter2 = tabPane.getTabCount();
             initTabComponent(counter);
         }
-        return getTabCountForIndex() - 1;
+        return tabPane.getTabCount() - 1;
     }
 
+    /**
+     * Removes the tab with the given title
+     *
+     * @param title title of the tab
+     * @return boolean if tab was removed
+     */
     public boolean removeTab(String title) {
-        for (int i = 1; i < getTabCountForIndex(); i++) {
+        for (int i = 1; i < tabPane.getTabCount(); i++) {
             String tabTitle = tabPane.getTitleAt(i);
             if (title.equals(tabTitle)) {
                 tabPane.remove(i);
@@ -100,8 +113,14 @@ public final class TabController {
         return false;
     }
 
+    /**
+     * Getter for index of tab by title
+     *
+     * @param title title of the tab
+     * @return index of tab or -1 if not found
+     */
     public int getTabIndexByTitle(String title) {
-        for (int i = 1; i < getTabCountForIndex(); i++) {
+        for (int i = 1; i < tabPane.getTabCount(); i++) {
             String tabTitle = tabPane.getTitleAt(i);
             if (title.equals(tabTitle)) {
                 return i;
@@ -110,6 +129,12 @@ public final class TabController {
         return -1;
     }
 
+    /**
+     * Sets focus on a specific tab by title
+     *
+     * @param title title of the tab
+     * @return
+     */
     public boolean setFocusAt(String title) {
         int index = getTabIndexByTitle(title);
         if (index == -1) {
@@ -120,8 +145,31 @@ public final class TabController {
         }
     }
 
-    private void initTabComponent(int i) {
-        tabPane.setTabComponentAt(i, new ButtonTabComponent(tabPane));
+    /**
+     * Sets focus on a specific tab by index
+     *
+     * @param title title of the tab
+     * @return
+     */
+    public boolean setFocusAt(int index) {
+        // Check if tab index is valid
+        if (index >= tabPane.getTabCount()) {
+            // Tab index can not be bigger than countof tabs, because index is max count -1
+            return false;
+        } else {
+            // Select tab at index
+            tabPane.setSelectedIndex(index);
+            return true;
+        }
+    }
+
+    /**
+     * Initializes a new closing element for the tab (the cross)
+     *
+     * @param index index of the tab where cross should be displayed
+     */
+    private void initTabComponent(int index) {
+        tabPane.setTabComponentAt(index, new ButtonTabComponent(tabPane));
     }
 
     /**
@@ -186,9 +234,5 @@ public final class TabController {
      */
     private ChatArea getChat(int tabIndex) {
         return (ChatArea) ((JScrollPane) tabPane.getComponentAt(tabIndex)).getViewport().getView();
-    }
-
-    private int getTabCountForIndex() {
-        return tabPane.getTabCount();
     }
 }

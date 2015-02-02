@@ -89,40 +89,33 @@ public final class ClientThread extends Thread {
 
                 // Start conversation
                 while (!isKicked && !isDisconnected) {
-                    try {
-                        // TODO handle null return
-                        Packet packet = this.read();
-                        PacketType ptype = packet.getIdentifier();
+                    Packet packet = this.read();
+                    PacketType ptype = packet.getIdentifier();
 
-                        switch (ptype) {
-                            case DISCONNECT:
-                                isDisconnected = true;
-                                break;
-                            case PM:
-                                this.forwardPrivateMessage((PrivateMessagePacket) packet);
-                                break;
-                            case INVALID:
-                                this.send(new KickPacket("Security breach: Please do not use a modified client"));
-                                isKicked = true;
-                                break;
-                            case GM:
-                                // Broadcast message to all other clients
-                                this.broadcast((GroupMessagePacket) packet);
-                        }
-
-                    } catch (NullPointerException ex) {
-                        logControl.log(logException, Level.SEVERE, this.ip + "(" + this.clientName + ") while receiving packet: " + ex.getMessage());
-                        logging.Counters.exception();
-                        this.send(new KickPacket("Security breach: Please do not use a modified client"));
-                        isKicked = true;
-                        break;
+                    switch (ptype) {
+                        case DISCONNECT:
+                            // Client disconnected
+                            isDisconnected = true;
+                            break;
+                        case PM:
+                            // Private message
+                            this.forwardPrivateMessage((PrivateMessagePacket) packet);
+                            break;
+                        case INVALID:
+                            // Invalid packet or data received
+                            this.send(new KickPacket("Security breach: Please do not use a modified client"));
+                            isKicked = true;
+                            break;
+                        case GM:
+                            // Broadcast group message to all other clients
+                            this.broadcast((GroupMessagePacket) packet);
                     }
                 }
 
                 if (isKicked) {
                     // Tell every client, that the current client has been kicked
                     this.broadcastExceptMe(new InfoPacket("*** User \"" + this.clientName + "\" has been kicked ***"));
-
+                    
                     // Remove client from threads array and close connections
                     disconnect(true);
                 } else {
@@ -139,7 +132,7 @@ public final class ClientThread extends Thread {
                 disconnect(true);
             }
 
-        } catch (IOException ex) {
+        } catch (Exception ex) {
             logControl.log(logException, Level.INFO, this.ip + "(" + this.clientName + "): " + ex.getMessage());
             logging.Counters.exception();
         }
@@ -311,9 +304,8 @@ public final class ClientThread extends Thread {
      * Let the user choose a nickname
      *
      * @return name
-     * @throws java.io.IOException
      */
-    protected ConnectPacket setName() throws IOException {
+    protected ConnectPacket setName() {
 
         Packet clientAnswer = (Packet) this.read();
         PacketType pType = clientAnswer.getIdentifier();
@@ -364,18 +356,25 @@ public final class ClientThread extends Thread {
      * @param closeOnly close streams without deleting client from threads
      * @throws java.io.IOException
      */
-    protected synchronized void disconnect(boolean closeOnly) throws IOException {
-        threads.remove(this);
+    protected synchronized void disconnect(boolean closeOnly) {
+        try {
+            threads.remove(this);
 
-        // Close streams and socket
-        this.inStream.close();
-        this.outStream.close();
-        this.clientSocket.close();
+            // Close streams and socket
+            this.inStream.close();
+            this.outStream.close();
+            this.clientSocket.close();
 
-        if (!closeOnly) {
-            logControl.log(logConnection, Level.INFO, this.ip + ": " + this.clientName + " has disconnected");
+            if (!closeOnly) {
+                logControl.log(logConnection, Level.INFO, this.ip + ": " + this.clientName + " has disconnected");
+            } else {
+                logControl.log(logConnection, Level.INFO, this.ip + ": " + this.clientName + " has been kicked");
+            }
+            Counters.disconnect();
+        } catch (IOException ex) {
+            logControl.log(logException, Level.INFO, this.ip + "(" + this.clientName + ") while disconnecting: " + ex.getMessage());
+            logging.Counters.exception();
         }
-        Counters.disconnect();
     }
 
     protected synchronized void broadcastUserList(boolean excludeMe) {

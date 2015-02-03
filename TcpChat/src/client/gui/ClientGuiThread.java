@@ -116,7 +116,7 @@ public class ClientGuiThread implements Runnable {
                     String person = (gui.clientName.equals(receiver)) ? sender : receiver;
 
                     // TODO fix bug where sender is this client
-                    if (gui.tabController.outputLineOnGui("<" + sender + "> " + message, receiver)) {
+                    if (gui.tabController.outputLineOnGui("<" + sender + "> " + message, person)) {
                         if (gui.clientName.equals(sender)) {
                             gui.tabController.setFocusAt(receiver);
                         }

@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package client.gui;
+package client.gui.userlist;
 
 import java.util.List;
 import javax.swing.DefaultListModel;

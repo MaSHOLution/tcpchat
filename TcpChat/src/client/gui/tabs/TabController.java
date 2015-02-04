@@ -21,8 +21,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package client.gui;
+package client.gui.tabs;
 
+import java.util.ArrayList;
+import java.util.List;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 
@@ -32,8 +34,12 @@ import javax.swing.JTabbedPane;
  */
 public final class TabController {
 
-    private JTabbedPane tabPane;
+    private final JTabbedPane tabbedPane;
     private boolean isInitialized = false;
+    // List which contains all ChatTabs
+    private final List<ChatTab> chatTabs = new ArrayList<>();
+    // Counter for persistent tabs which can't be closed by user during runtime (such as group chat)
+    private final int persistentTabs = 1;
 
     /**
      * Constructor
@@ -41,18 +47,22 @@ public final class TabController {
      * @param tabPane
      */
     public TabController(JTabbedPane tabPane) {
-        this.tabPane = tabPane;
+        this.tabbedPane = tabPane;
     }
 
     /**
      * Initialize components
      */
     public void init() {
-        tabPane.setEnabled(true);
-        tabPane.removeAll();
-        addTab("Group Chat", false);
-        tabPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
-        // tabPane.setTabLayoutPolicy(JTabbedPane.WRAP_TAB_LAYOUT);
+        tabbedPane.setEnabled(true);
+        // Remove all old entries
+        tabbedPane.removeAll();
+        chatTabs.clear();
+        // Set up group chat (index 0)
+        int tabIndex = addTab("Group Chat", ChatType.Group);
+        tabbedPane.setSelectedIndex(tabIndex);
+        tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
+        // tabbedPane.setTabLayoutPolicy(JTabbedPane.WRAP_TAB_LAYOUT);
         isInitialized = true;
     }
 
@@ -63,9 +73,9 @@ public final class TabController {
         // Set isInitialized false
         isInitialized = false;
         // Disable TabbedPane
-        tabPane.setEnabled(false);
+        tabbedPane.setEnabled(false);
         // Disable ChatArea at curreltny viewed tab
-        getChat(tabPane.getSelectedIndex()).setEnabled(false);
+        getChat(tabbedPane.getSelectedIndex()).setEnabled(false);
     }
 
     /**
@@ -78,22 +88,24 @@ public final class TabController {
     }
 
     /**
-     * Adds a new tab with ScrollPane and ChatArea to TabbedPane
+     * Adds a new ChatTab
      *
      * @param title title of the tab
-     * @param addCloseElement add cross to close tab
+     * @param chatType type of the chat tab
      * @return
      */
-    public int addTab(String title, boolean addCloseElement) {
-        ChatArea chatText = new ChatArea();
-        chatText.setEditable(false);
-        int counter = tabPane.getTabCount();
-        tabPane.add(title, new JScrollPane(chatText));
-        if (addCloseElement) {
-            int counter2 = tabPane.getTabCount();
-            initTabComponent(counter);
+    public int addTab(String title, ChatType chatType) {
+        // Create new ChatTab
+        ChatTab chatTab = new ChatTab(chatType, tabbedPane, title);
+        // Add ChatTab to tabbedPane
+        tabbedPane.add(title, chatTab.getScrollPane());
+        if (chatType.hasCloseElement()) {
+            // Initialize new closing element for the tab if set in the type
+            tabbedPane.setTabComponentAt(chatTab.getIndex(), new ButtonTabComponent(chatTab));
         }
-        return tabPane.getTabCount() - 1;
+
+        this.chatTabs.add(chatTab);
+        return chatTab.getIndex();
     }
 
     /**
@@ -103,14 +115,39 @@ public final class TabController {
      * @return boolean if tab was removed
      */
     public boolean removeTab(String title) {
-        for (int i = 1; i < tabPane.getTabCount(); i++) {
-            String tabTitle = tabPane.getTitleAt(i);
+        for (int i = persistentTabs; i < tabbedPane.getTabCount(); i++) {
+            String tabTitle = tabbedPane.getTitleAt(i);
             if (title.equals(tabTitle)) {
-                tabPane.remove(i);
+                tabbedPane.remove(i);
+                this.chatTabs.remove(i);
                 return true;
             }
         }
         return false;
+    }
+
+    /**
+     * Removes the tab with the given index
+     *
+     * @param index index of the tab
+     */
+    public void removeTab(int index) {
+        tabbedPane.remove(index);
+        this.chatTabs.remove(index);
+
+    }
+
+    /**
+     * Getter for the ChatTab at the given index
+     * @param index index for tab to return
+     * @return ChatTab at given index
+     */
+    public ChatTab getTabAt(int index) {
+        ChatTab chatTab = chatTabs.get(index);
+        if(chatTab != null){
+            return chatTab;
+        }
+        return null;
     }
 
     /**
@@ -120,8 +157,8 @@ public final class TabController {
      * @return index of tab or -1 if not found
      */
     public int getTabIndexByTitle(String title) {
-        for (int i = 1; i < tabPane.getTabCount(); i++) {
-            String tabTitle = tabPane.getTitleAt(i);
+        for (int i = persistentTabs; i < tabbedPane.getTabCount(); i++) {
+            String tabTitle = tabbedPane.getTitleAt(i);
             if (title.equals(tabTitle)) {
                 return i;
             }
@@ -140,7 +177,7 @@ public final class TabController {
         if (index == -1) {
             return false;
         } else {
-            tabPane.setSelectedIndex(index);
+            tabbedPane.setSelectedIndex(index);
             return true;
         }
     }
@@ -148,28 +185,19 @@ public final class TabController {
     /**
      * Sets focus on a specific tab by index
      *
-     * @param title title of the tab
+     * @param index
      * @return
      */
     public boolean setFocusAt(int index) {
         // Check if tab index is valid
-        if (index >= tabPane.getTabCount()) {
+        if (index >= tabbedPane.getTabCount()) {
             // Tab index can not be bigger than countof tabs, because index is max count -1
             return false;
         } else {
             // Select tab at index
-            tabPane.setSelectedIndex(index);
+            tabbedPane.setSelectedIndex(index);
             return true;
         }
-    }
-
-    /**
-     * Initializes a new closing element for the tab (the cross)
-     *
-     * @param index index of the tab where cross should be displayed
-     */
-    private void initTabComponent(int index) {
-        tabPane.setTabComponentAt(index, new ButtonTabComponent(tabPane));
     }
 
     /**
@@ -179,7 +207,7 @@ public final class TabController {
      */
     public synchronized void outputLineOnGui(String message) {
         if (!message.trim().equals("")) {
-            appendTextToChat(message, tabPane.getSelectedIndex());
+            appendTextToChat(message, tabbedPane.getSelectedIndex());
         }
     }
 
@@ -195,7 +223,7 @@ public final class TabController {
         if (!message.trim().equals("")) {
             int tabIndex = getTabIndexByTitle(person);
             if (tabIndex == -1) {
-                tabIndex = addTab(person, true);
+                tabIndex = addTab(person, ChatType.Private);
                 tabCreated = true;
             }
             appendTextToChat(message, tabIndex);
@@ -219,9 +247,10 @@ public final class TabController {
      * Appends a String to the ChatArea at the given index
      *
      * @param message message to append
+     * @param index
      */
-    public void appendTextToChat(String message, int tabIndex) {
-        ChatArea chatArea = getChat(tabIndex);
+    public void appendTextToChat(String message, int index) {
+        ChatArea chatArea = getChat(index);
         chatArea.append("\n" + message);
         chatArea.setCaretPosition(chatArea.getDocument().getLength());
     }
@@ -233,6 +262,6 @@ public final class TabController {
      * @return
      */
     private ChatArea getChat(int tabIndex) {
-        return (ChatArea) ((JScrollPane) tabPane.getComponentAt(tabIndex)).getViewport().getView();
+        return (ChatArea) ((JScrollPane) tabbedPane.getComponentAt(tabIndex)).getViewport().getView();
     }
 }

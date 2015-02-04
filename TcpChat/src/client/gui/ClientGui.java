@@ -23,6 +23,8 @@
  */
 package client.gui;
 
+import client.gui.userlist.UserListController;
+import client.gui.tabs.TabController;
 import networking.packets.PrivateMessagePacket;
 import networking.packets.ConnectPacket;
 import networking.packets.GroupMessagePacket;
@@ -456,6 +458,7 @@ public final class ClientGui extends javax.swing.JFrame {
      * Sends a packet through the outStream to the server
      *
      * @param packet packet to send
+     * @return 
      */
     protected boolean send(Packet packet) {
 

@@ -27,9 +27,8 @@
  * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */ 
-
-package client.gui;
+ */
+package client.gui.tabs;
 
 import javax.swing.*;
 import javax.swing.plaf.basic.BasicButtonUI;
@@ -37,34 +36,39 @@ import java.awt.*;
 import java.awt.event.*;
 
 /**
- * Component to be used as tabComponent;
- * Contains a JLabel to show the text and 
- * a JButton to close the tab it belongs to 
- */ 
+ * Component to be used as tabComponent; Contains a JLabel to show the text and a JButton to close the tab it belongs to
+ */
 public class ButtonTabComponent extends JPanel {
-    private final JTabbedPane pane;
 
-    public ButtonTabComponent(final JTabbedPane pane) {
+    private final ChatTab chatTab;
+
+    /**
+     *
+     * @param chatTab
+     */
+    public ButtonTabComponent(final ChatTab chatTab) {
+        
         //unset default FlowLayout' gaps
         super(new FlowLayout(FlowLayout.LEFT, 0, 0));
-        if (pane == null) {
+        // Set up chatTab
+        this.chatTab = chatTab;
+        if (chatTab.getTabbedPane() == null) {
             throw new NullPointerException("TabbedPane is null");
         }
-        this.pane = pane;
         setOpaque(false);
-        
+
         //make JLabel read titles from JTabbedPane
         JLabel label = new JLabel() {
             @Override
             public String getText() {
-                int i = pane.indexOfTabComponent(ButtonTabComponent.this);
+                int i = chatTab.getTabbedPane().indexOfTabComponent(ButtonTabComponent.this);
                 if (i != -1) {
-                    return pane.getTitleAt(i);
+                    return chatTab.getTabbedPane().getTitleAt(i);
                 }
                 return null;
             }
         };
-        
+
         add(label);
         //add more space between the label and the button
         label.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 5));
@@ -76,6 +80,7 @@ public class ButtonTabComponent extends JPanel {
     }
 
     private class TabButton extends JButton implements ActionListener {
+
         public TabButton() {
             int size = 17;
             setPreferredSize(new Dimension(size, size));
@@ -98,10 +103,7 @@ public class ButtonTabComponent extends JPanel {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            int i = pane.indexOfTabComponent(ButtonTabComponent.this);
-            if (i != -1) {
-                pane.remove(i);
-            }
+            chatTab.remove();
         }
 
         //we don't want to update UI for this button
@@ -150,5 +152,3 @@ public class ButtonTabComponent extends JPanel {
         }
     };
 }
-
-

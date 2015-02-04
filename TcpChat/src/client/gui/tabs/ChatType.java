@@ -23,32 +23,34 @@
  */
 package client.gui.tabs;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.swing.JTextPane;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.Document;
-
 /**
- * Class for a chat area
- *
+ * Enum for different chat types
+ * 
  * @author Manuel Schmid
  */
-public class ChatArea extends JTextPane {
+public enum ChatType {
+
+    Group(false),
+    Private(true);
+    
+    // Set true if close button should be displayed on specific chat type
+    private final boolean hasCloseElement;
 
     /**
-     * Appends a string at th4e end of the document
+     * Constructor
      *
-     * @param s
+     * @param path
      */
-    public void append(String s) {
+    ChatType(boolean hasCloseElement) {
+        this.hasCloseElement = hasCloseElement;
+    }
 
-        Document doc = this.getDocument();
-        try {
-            doc.insertString(doc.getLength(), s, null);
-        } catch (BadLocationException ex) {
-            // TODO remove logger
-            Logger.getLogger(ChatArea.class.getName()).log(Level.SEVERE, null, ex);
-        }
+    /**
+     * Getter for close button existance
+     *
+     * @return existance of close button
+     */
+    public boolean hasCloseElement() {
+        return hasCloseElement;
     }
 }

@@ -31,6 +31,7 @@ package client.gui.tabs;
 public enum ChatType {
 
     Group(false),
+    Invalid(false),
     Private(true);
     
     // Set true if close button should be displayed on specific chat type

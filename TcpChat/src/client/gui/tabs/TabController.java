@@ -25,11 +25,11 @@ package client.gui.tabs;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 
 /**
- *
+ * Controller for chat tabs
+ * 
  * @author Manuel Schmid
  */
 public final class TabController {
@@ -40,6 +40,8 @@ public final class TabController {
     private final List<ChatTab> chatTabs = new ArrayList<>();
     // Counter for persistent tabs which can't be closed by user during runtime (such as group chat)
     private final int persistentTabs = 1;
+
+    private int activeChatTab = 0;
 
     /**
      * Constructor
@@ -75,7 +77,7 @@ public final class TabController {
         // Disable TabbedPane
         tabbedPane.setEnabled(false);
         // Disable ChatArea at curreltny viewed tab
-        getChat(tabbedPane.getSelectedIndex()).setEnabled(false);
+        getCurrentChatTab().disableAll();
     }
 
     /**
@@ -104,7 +106,8 @@ public final class TabController {
             tabbedPane.setTabComponentAt(chatTab.getIndex(), new ButtonTabComponent(chatTab));
         }
 
-        this.chatTabs.add(chatTab);
+        chatTabs.add(chatTab);
+
         return chatTab.getIndex();
     }
 
@@ -119,7 +122,7 @@ public final class TabController {
             String tabTitle = tabbedPane.getTitleAt(i);
             if (title.equals(tabTitle)) {
                 tabbedPane.remove(i);
-                this.chatTabs.remove(i);
+                chatTabs.remove(i);
                 return true;
             }
         }
@@ -133,18 +136,36 @@ public final class TabController {
      */
     public void removeTab(int index) {
         tabbedPane.remove(index);
-        this.chatTabs.remove(index);
+        chatTabs.remove(index);
 
     }
 
     /**
+     * Getter for the currently selected ChatTab
+     *
+     * @return ChatTab current ChatTab
+     */
+    public ChatTab getCurrentChatTab() {
+        int i = tabbedPane.getSelectedIndex();
+        if (i != -1) {
+
+            ChatTab chatTab = chatTabs.get(i);
+            if (chatTab != null) {
+                return chatTab;
+            }
+        }
+        return null;
+    }
+
+    /**
      * Getter for the ChatTab at the given index
+     *
      * @param index index for tab to return
      * @return ChatTab at given index
      */
     public ChatTab getTabAt(int index) {
         ChatTab chatTab = chatTabs.get(index);
-        if(chatTab != null){
+        if (chatTab != null) {
             return chatTab;
         }
         return null;
@@ -167,6 +188,19 @@ public final class TabController {
     }
 
     /**
+     * Getter for the ChatType of the currently selected ChatTab
+     *
+     * @return ChatType current ChatType
+     */
+    public ChatType getCurrentChatType() {
+        ChatTab currentChatTab = getCurrentChatTab();
+        if (currentChatTab != null) {
+            return currentChatTab.getChatType();
+        }
+        return ChatType.Invalid;
+    }
+
+    /**
      * Sets focus on a specific tab by title
      *
      * @param title title of the tab
@@ -178,6 +212,7 @@ public final class TabController {
             return false;
         } else {
             tabbedPane.setSelectedIndex(index);
+            activeChatTab = index;
             return true;
         }
     }
@@ -196,6 +231,7 @@ public final class TabController {
         } else {
             // Select tab at index
             tabbedPane.setSelectedIndex(index);
+            activeChatTab = index;
             return true;
         }
     }
@@ -250,18 +286,29 @@ public final class TabController {
      * @param index
      */
     public void appendTextToChat(String message, int index) {
-        ChatArea chatArea = getChat(index);
-        chatArea.append("\n" + message);
-        chatArea.setCaretPosition(chatArea.getDocument().getLength());
+        getTabAt(index).appendOnChatArea("\n" + message);
     }
 
     /**
-     * Returns the ChatArea at tabIndex
+     * Sets internal variable activeChatTab to chat tab
      *
-     * @param index index of tab
+     * @param index index of ChatTab
+     */
+    public void setActiveChatTab(int index) {
+        activeChatTab = index;
+    }
+
+    /**
+     * Getter for internal variable activeChatTab
+     *
      * @return
      */
-    private ChatArea getChat(int tabIndex) {
-        return (ChatArea) ((JScrollPane) tabbedPane.getComponentAt(tabIndex)).getViewport().getView();
+    public ChatTab getActiveChatTab() {
+        if (isInitialized) {
+            return this.getTabAt(activeChatTab);
+        } else {
+            return null;
+        }
     }
+
 }

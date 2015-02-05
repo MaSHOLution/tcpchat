@@ -66,9 +66,11 @@ public final class ChatTab {
      * Appends a message on the chat area
      *
      * @param message
+     * @return
      */
-    public void appendOnChatArea(String message) {
+    public ChatTab appendOnChatArea(String message) {
         chatArea.append(message);
+        return this;
     }
 
     /**
@@ -108,10 +110,42 @@ public final class ChatTab {
     }
 
     /**
+     * Getter of the ChatArea
+     *
+     * @return
+     */
+    public ChatArea getChatArea() {
+        return chatArea;
+    }
+
+    /**
+     * Scrolls to the bottom of the chatArea
+     */
+    public void scrollToBottom() {
+        chatArea.setCaretPosition(chatArea.getDocument().getLength());
+    }
+
+    /**
      * Removes this ChatTab from the tabbedPane
      */
     public void remove() {
         tabbedPane.remove(index);
+    }
+
+    /**
+     * Disables this tab
+     */
+    public void disable() {
+        chatArea.setEnabled(false);
+        scrollPane.setEnabled(false);
+    }
+
+    /**
+     * Disables this tab and the TabbedPane
+     */
+    public void disableAll() {
+        disable();
+        this.tabbedPane.setEnabled(false);
     }
 
 }

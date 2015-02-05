@@ -70,7 +70,7 @@ public class ClientGuiThread implements Runnable {
     public void run() {
 
         try {
-            while (!gui.tabController.isInitialized()) {
+            while (!gui.tabController.isInitialized) {
                 Thread.sleep(100);
             }
         } catch (InterruptedException ex) {

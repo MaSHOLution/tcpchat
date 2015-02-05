@@ -35,7 +35,7 @@ import javax.swing.JTabbedPane;
 public final class TabController {
 
     private final JTabbedPane tabbedPane;
-    private boolean isInitialized = false;
+    public static boolean isInitialized = false;
     // List which contains all ChatTabs
     private final List<ChatTab> chatTabs = new ArrayList<>();
     // Counter for persistent tabs which can't be closed by user during runtime (such as group chat)
@@ -80,15 +80,6 @@ public final class TabController {
         tabbedPane.setEnabled(false);
         // Disable ChatArea at curreltny viewed tab
         getCurrentChatTab().disableAll();
-    }
-
-    /**
-     * Getter for isInitialized
-     *
-     * @return isInitialized
-     */
-    public boolean isInitialized() {
-        return isInitialized;
     }
 
     /**

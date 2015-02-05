@@ -47,7 +47,7 @@ public class ButtonTabComponent extends JPanel {
      * @param chatTab
      */
     public ButtonTabComponent(final ChatTab chatTab) {
-        
+
         //unset default FlowLayout' gaps
         super(new FlowLayout(FlowLayout.LEFT, 0, 0));
         // Set up chatTab
@@ -103,7 +103,9 @@ public class ButtonTabComponent extends JPanel {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            chatTab.remove();
+            if (TabController.isInitialized) {
+                chatTab.remove();
+            }
         }
 
         //we don't want to update UI for this button
@@ -114,40 +116,46 @@ public class ButtonTabComponent extends JPanel {
         //paint the cross
         @Override
         protected void paintComponent(Graphics g) {
-            super.paintComponent(g);
-            Graphics2D g2 = (Graphics2D) g.create();
-            //shift the image for pressed buttons
-            if (getModel().isPressed()) {
-                g2.translate(1, 1);
+            if (TabController.isInitialized) {
+                super.paintComponent(g);
+                Graphics2D g2 = (Graphics2D) g.create();
+                //shift the image for pressed buttons
+                if (getModel().isPressed()) {
+                    g2.translate(1, 1);
+                }
+                g2.setStroke(new BasicStroke(2));
+                g2.setColor(Color.BLACK);
+                if (getModel().isRollover()) {
+                    g2.setColor(Color.RED);
+                }
+                int delta = 6;
+                g2.drawLine(delta, delta, getWidth() - delta - 1, getHeight() - delta - 1);
+                g2.drawLine(getWidth() - delta - 1, delta, delta, getHeight() - delta - 1);
+                g2.dispose();
             }
-            g2.setStroke(new BasicStroke(2));
-            g2.setColor(Color.BLACK);
-            if (getModel().isRollover()) {
-                g2.setColor(Color.RED);
-            }
-            int delta = 6;
-            g2.drawLine(delta, delta, getWidth() - delta - 1, getHeight() - delta - 1);
-            g2.drawLine(getWidth() - delta - 1, delta, delta, getHeight() - delta - 1);
-            g2.dispose();
         }
     }
 
     private final static MouseListener buttonMouseListener = new MouseAdapter() {
         @Override
         public void mouseEntered(MouseEvent e) {
-            Component component = e.getComponent();
-            if (component instanceof AbstractButton) {
-                AbstractButton button = (AbstractButton) component;
-                button.setBorderPainted(true);
+            if (TabController.isInitialized) {
+                Component component = e.getComponent();
+                if (component instanceof AbstractButton) {
+                    AbstractButton button = (AbstractButton) component;
+                    button.setBorderPainted(true);
+                }
             }
         }
 
         @Override
         public void mouseExited(MouseEvent e) {
-            Component component = e.getComponent();
-            if (component instanceof AbstractButton) {
-                AbstractButton button = (AbstractButton) component;
-                button.setBorderPainted(false);
+            if (TabController.isInitialized) {
+                Component component = e.getComponent();
+                if (component instanceof AbstractButton) {
+                    AbstractButton button = (AbstractButton) component;
+                    button.setBorderPainted(false);
+                }
             }
         }
     };

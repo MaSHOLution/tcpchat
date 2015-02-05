@@ -23,6 +23,8 @@
  */
 package client.gui.tabs;
 
+import java.util.ArrayList;
+import java.util.List;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 
@@ -44,22 +46,24 @@ public final class ChatTab {
     // Params
     private final int index;
     private final String title;
+    private final List<String> persons;
 
     /**
      * Constructor
      *
      * @param chatType Type declared in enum ChatType
      * @param tabbedPane Pane which the ChatTab is associated with
-     * @param title title of the tab
+     * @param persons persons of the tab
      */
-    public ChatTab(ChatType chatType, JTabbedPane tabbedPane, String title) {
+    public ChatTab(ChatType chatType, JTabbedPane tabbedPane, List<String> persons) {
         this.chatType = chatType;
         this.chatArea = new ChatArea();
         this.chatArea.setEditable(false);
         this.scrollPane = new JScrollPane(chatArea);
         this.index = tabbedPane.getTabCount();
         this.tabbedPane = tabbedPane;
-        this.title = title;
+        this.persons = persons;
+        this.title = persons.get(0);
     }
 
     /**
@@ -116,6 +120,15 @@ public final class ChatTab {
      */
     public ChatArea getChatArea() {
         return chatArea;
+    }
+    
+    /**
+     * Getter of the persons associated to the chat
+     *
+     * @return
+     */
+    public List<String> getPersons() {
+        return persons;
     }
 
     /**

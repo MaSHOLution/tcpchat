@@ -23,6 +23,8 @@
  */
 package client.gui;
 
+import client.gui.tabs.ChatTab;
+import client.gui.tabs.ChatType;
 import client.gui.userlist.UserListController;
 import client.gui.tabs.TabController;
 import networking.packets.PrivateMessagePacket;
@@ -368,17 +370,35 @@ public final class ClientGui extends javax.swing.JFrame {
 
     // TODO Add userlist programmatically
     private void lbUsersValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_lbUsersValueChanged
-        List<String> selectedElements = this.lbUsers.getSelectedValuesList();
+        if (!evt.getValueIsAdjusting()) {
+            boolean addTab = true;
+            int index = -1;
+            List<String> selectedElements = this.lbUsers.getSelectedValuesList();
 
-        for (String selectedElement : selectedElements) {
+            for (String selectedElement : selectedElements) {
 
-            if (selectedElement.equals(this.clientName)) {
-                dialogHelper.showInfoDialog("Info", "This is you. You can't send messages to yourself!");
-            } else {
-                this.tbMessage.setText('@' + selectedElement + ' ');
+                index = this.tabController.getTabIndexByTitle(selectedElement);
+                // Check if client has selected himself or chat already exists
+                if (selectedElement.equals(this.clientName) || index != -1) {
+                    addTab = false;
+                    break;
+                }
             }
+
+            if (!addTab) {
+                if (index != -1) {
+                    tabController.setFocusAt(index);
+                } else {
+                    dialogHelper.showInfoDialog("Info", "This is you. You can't send messages to yourself!");
+                }
+            } else {
+
+                tabController.addTab(selectedElements, ChatType.Private);
+                tabController.setFocusAt(selectedElements.get(0));
+            }
+
+            this.tbMessage.requestFocus();
         }
-        this.tbMessage.requestFocus();
     }//GEN-LAST:event_lbUsersValueChanged
 
     private void tabbedPaneStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_tabbedPaneStateChanged
@@ -488,18 +508,12 @@ public final class ClientGui extends javax.swing.JFrame {
         String message = this.tbMessage.getText().trim();
         //Check if line is empty
         if (!message.equals("")) {
-            if (message.startsWith("@")) {
-                // messageArray[0] == clientName of receiver
-                // messageArray[1] == message
-                String[] messageArray = message.split("\\s", 2);
-                if (messageArray.length > 1 && messageArray[1] != null) {
-                    if (!messageArray[1].isEmpty()) {
-                        this.send(new PrivateMessagePacket(messageArray[1], this.clientName, messageArray[0].substring(1)));
-                    }
-                } else {
-                    this.tabController.outputLineOnGui("Format for PM: @<receiver> <message>");
+            ChatTab currentChatTab = this.tabController.getCurrentChatTab();
+            if (currentChatTab.getChatType() == ChatType.Private) {
+                for (String person : currentChatTab.getPersons()) {
+                    this.send(new PrivateMessagePacket(message, this.clientName, person));
                 }
-            } else {
+            } else if (currentChatTab.getChatType() == ChatType.Group) {
                 this.send(new GroupMessagePacket(message, this.clientName));
             }
         }

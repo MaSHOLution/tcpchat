@@ -61,7 +61,9 @@ public final class TabController {
         tabbedPane.removeAll();
         chatTabs.clear();
         // Set up group chat (index 0)
-        int tabIndex = addTab("Group Chat", ChatType.Group);
+        List<String> groupChat = new ArrayList<>();
+        groupChat.add("Group Chat");
+        int tabIndex = addTab(groupChat, ChatType.Group);
         tabbedPane.setSelectedIndex(tabIndex);
         tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
         // tabbedPane.setTabLayoutPolicy(JTabbedPane.WRAP_TAB_LAYOUT);
@@ -92,15 +94,21 @@ public final class TabController {
     /**
      * Adds a new ChatTab
      *
-     * @param title title of the tab
+     * @param persons persons of the tab
      * @param chatType type of the chat tab
      * @return
      */
-    public int addTab(String title, ChatType chatType) {
+    public int addTab(List<String> persons, ChatType chatType) {
         // Create new ChatTab
-        ChatTab chatTab = new ChatTab(chatType, tabbedPane, title);
+        ChatTab chatTab = new ChatTab(chatType, tabbedPane, persons);
         // Add ChatTab to tabbedPane
-        tabbedPane.add(title, chatTab.getScrollPane());
+        if(persons.size() > 1){
+            // TODO possible group chats
+            //tabbedPane.add(persons[0] + ", ...", chatTab.getScrollPane());
+        } else {
+            tabbedPane.add(persons.get(0), chatTab.getScrollPane());
+        }
+
         if (chatType.hasCloseElement()) {
             // Initialize new closing element for the tab if set in the type
             tabbedPane.setTabComponentAt(chatTab.getIndex(), new ButtonTabComponent(chatTab));
@@ -259,7 +267,9 @@ public final class TabController {
         if (!message.trim().equals("")) {
             int tabIndex = getTabIndexByTitle(person);
             if (tabIndex == -1) {
-                tabIndex = addTab(person, ChatType.Private);
+                List<String> chat = new ArrayList<>();
+                chat.add(person);
+                tabIndex = addTab(chat, ChatType.Private);
                 tabCreated = true;
             }
             appendTextToChat(message, tabIndex);

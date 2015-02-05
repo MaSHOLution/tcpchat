@@ -34,8 +34,8 @@ import javax.swing.JList;
  */
 public final class UserListController {
 
-    private JList lbUsers;
-    private DefaultListModel listModel;
+    private final JList lbUsers;
+    private final DefaultListModel listModel;
 
     /**
      * Constructor

@@ -370,10 +370,11 @@ public final class ClientGui extends javax.swing.JFrame {
 
     // TODO Add userlist programmatically
     private void lbUsersValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_lbUsersValueChanged
-        if (!evt.getValueIsAdjusting()) {
+        List<String> selectedElements = this.lbUsers.getSelectedValuesList();
+        if (!evt.getValueIsAdjusting() && selectedElements.size() > 0) {
             boolean addTab = true;
             int index = -1;
-            List<String> selectedElements = this.lbUsers.getSelectedValuesList();
+            
 
             for (String selectedElement : selectedElements) {
 

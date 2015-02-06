@@ -29,13 +29,13 @@ import javax.swing.JTabbedPane;
 
 /**
  * Controller for chat tabs
- * 
+ *
  * @author Manuel Schmid
  */
 public final class TabController {
 
     private final JTabbedPane tabbedPane;
-    public static boolean isInitialized = false;
+    private static boolean isInitialized = false;
     // List which contains all ChatTabs
     private final List<ChatTab> chatTabs = new ArrayList<>();
     // Counter for persistent tabs which can't be closed by user during runtime (such as group chat)
@@ -310,6 +310,15 @@ public final class TabController {
         } else {
             return null;
         }
+    }
+
+    /**
+     * Getter for boolean isInitialized
+     *
+     * @return
+     */
+    public static boolean isInitialized() {
+        return isInitialized;
     }
 
 }

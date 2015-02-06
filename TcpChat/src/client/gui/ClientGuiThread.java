@@ -23,6 +23,7 @@
  */
 package client.gui;
 
+import client.gui.tabs.TabController;
 import networking.packets.KickPacket;
 import networking.packets.PrivateMessagePacket;
 import networking.packets.UserListPacket;
@@ -70,7 +71,7 @@ public class ClientGuiThread implements Runnable {
     public void run() {
 
         try {
-            while (!gui.tabController.isInitialized) {
+            while (!TabController.isInitialized()) {
                 Thread.sleep(100);
             }
         } catch (InterruptedException ex) {

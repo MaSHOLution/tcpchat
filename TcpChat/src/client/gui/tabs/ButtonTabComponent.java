@@ -103,7 +103,7 @@ public class ButtonTabComponent extends JPanel {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            if (TabController.isInitialized) {
+            if (TabController.isInitialized()) {
                 chatTab.remove();
             }
         }
@@ -116,7 +116,7 @@ public class ButtonTabComponent extends JPanel {
         //paint the cross
         @Override
         protected void paintComponent(Graphics g) {
-            if (TabController.isInitialized) {
+            if (TabController.isInitialized()) {
                 super.paintComponent(g);
                 Graphics2D g2 = (Graphics2D) g.create();
                 //shift the image for pressed buttons
@@ -139,7 +139,7 @@ public class ButtonTabComponent extends JPanel {
     private final static MouseListener buttonMouseListener = new MouseAdapter() {
         @Override
         public void mouseEntered(MouseEvent e) {
-            if (TabController.isInitialized) {
+            if (TabController.isInitialized()) {
                 Component component = e.getComponent();
                 if (component instanceof AbstractButton) {
                     AbstractButton button = (AbstractButton) component;
@@ -150,7 +150,7 @@ public class ButtonTabComponent extends JPanel {
 
         @Override
         public void mouseExited(MouseEvent e) {
-            if (TabController.isInitialized) {
+            if (TabController.isInitialized()) {
                 Component component = e.getComponent();
                 if (component instanceof AbstractButton) {
                     AbstractButton button = (AbstractButton) component;

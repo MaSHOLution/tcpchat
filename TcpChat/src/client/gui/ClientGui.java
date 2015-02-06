@@ -531,6 +531,7 @@ public final class ClientGui extends javax.swing.JFrame {
                 this.send(new GroupMessagePacket(message, this.clientName));
             }
         }
+        this.tbMessage.requestFocus();
     }
 
     /**

@@ -23,7 +23,6 @@
  */
 package client.gui.tabs;
 
-import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
@@ -59,7 +58,12 @@ public final class ChatTab {
         this.chatType = chatType;
         this.chatArea = new ChatArea();
         this.chatArea.setEditable(false);
-        this.scrollPane = new JScrollPane(chatArea);
+        this.scrollPane = new JScrollPane(
+                chatArea,
+                JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                JScrollPane.HORIZONTAL_SCROLLBAR_NEVER
+        );
+        this.scrollPane.setSize(tabbedPane.getSize());
         this.index = tabbedPane.getTabCount();
         this.tabbedPane = tabbedPane;
         this.persons = persons;
@@ -73,7 +77,8 @@ public final class ChatTab {
      * @return
      */
     public ChatTab appendOnChatArea(String message) {
-        chatArea.append(message);
+        chatArea.append(message + "\n");
+        scrollToBottom();
         return this;
     }
 
@@ -121,7 +126,7 @@ public final class ChatTab {
     public ChatArea getChatArea() {
         return chatArea;
     }
-    
+
     /**
      * Getter of the persons associated to the chat
      *

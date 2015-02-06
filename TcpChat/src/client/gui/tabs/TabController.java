@@ -93,7 +93,7 @@ public final class TabController {
         // Create new ChatTab
         ChatTab chatTab = new ChatTab(chatType, tabbedPane, persons);
         // Add ChatTab to tabbedPane
-        if(persons.size() > 1){
+        if (persons.size() > 1) {
             // TODO possible group chats
             //tabbedPane.add(persons[0] + ", ...", chatTab.getScrollPane());
         } else {
@@ -287,7 +287,7 @@ public final class TabController {
      * @param index
      */
     public void appendTextToChat(String message, int index) {
-        getTabAt(index).appendOnChatArea("\n" + message);
+        getTabAt(index).appendOnChatArea(message);
     }
 
     /**

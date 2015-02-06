@@ -70,7 +70,7 @@ public final class ClientGui extends javax.swing.JFrame {
 
     protected TabController tabController;
     protected UserListController userListController;
-    
+
     private enum connectButtonText {
 
         Connect,
@@ -123,7 +123,7 @@ public final class ClientGui extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Chat-Client");
-        setMinimumSize(new java.awt.Dimension(580, 400));
+        setMinimumSize(new java.awt.Dimension(700, 400));
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent evt) {
                 formWindowClosing(evt);
@@ -155,6 +155,9 @@ public final class ClientGui extends javax.swing.JFrame {
 
         binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, connectionPanel, org.jdesktop.beansbinding.ELProperty.create("${enabled}"), jLabel2, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
         bindingGroup.addBinding(binding);
+
+        tbServer.setMinimumSize(new java.awt.Dimension(50, 20));
+        tbServer.setName(""); // NOI18N
 
         binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, connectionPanel, org.jdesktop.beansbinding.ELProperty.create("${enabled}"), tbServer, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
         bindingGroup.addBinding(binding);
@@ -190,7 +193,7 @@ public final class ClientGui extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(tbServer, javax.swing.GroupLayout.DEFAULT_SIZE, 154, Short.MAX_VALUE)
+                .addComponent(tbServer, javax.swing.GroupLayout.DEFAULT_SIZE, 153, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -374,7 +377,6 @@ public final class ClientGui extends javax.swing.JFrame {
         if (!evt.getValueIsAdjusting() && selectedElements.size() > 0) {
             boolean addTab = true;
             int index = -1;
-            
 
             for (String selectedElement : selectedElements) {
 
@@ -461,31 +463,41 @@ public final class ClientGui extends javax.swing.JFrame {
         this.send(new DisconnectPacket());
     }
 
+    /**
+     * Checks if given data is valid
+     *
+     * @return
+     */
     protected boolean checkConnData() {
         String nickname = this.tbNickname.getText();
         String server = this.tbServer.getText();
         String portText = this.tbPort.getText();
         int connectionPort = Integer.parseInt(portText);
 
-        if (nickname.trim().equals("")) {
-            this.dialogHelper.showInfoDialog("Info", "Nickname darf nicht leer sein");
-        } else if (server.trim().equals("")) {
-            this.dialogHelper.showInfoDialog("Info", "Server darf nicht leer sein");
-        } else if (portText.trim().equals("")) {
-            this.dialogHelper.showInfoDialog("Info", "Server darf nicht leer sein");
-        } else if (connectionPort < 1 || connectionPort > 65555) {
-            this.dialogHelper.showInfoDialog("Info", "Port muss zwischen 1 und 65555 liegen");
-        } else {
-            return true;
+        try {
+            if (nickname.trim().equals("")) {
+                this.dialogHelper.showInfoDialog("Info", "Please set a nickname");
+            } else if (server.trim().equals("")) {
+                this.dialogHelper.showInfoDialog("Info", "Please set a server to connect to");
+            } else if (portText.trim().equals("")) {
+                this.dialogHelper.showInfoDialog("Info", "Please set a port to which to connect to on the server");
+            } else if (connectionPort < 1 || connectionPort > 65555) {
+                this.dialogHelper.showInfoDialog("Info", "The given port has to be an integer in the range from 1 to 65535");
+            } else {
+                return true;
+            }
+            return false;
+        } catch (Exception ex) {
+            this.dialogHelper.showInfoDialog("ERROR", "An error occured, message: " + ex.getMessage());
+            return false;
         }
-        return false;
     }
 
     /**
      * Sends a packet through the outStream to the server
      *
      * @param packet packet to send
-     * @return 
+     * @return
      */
     protected boolean send(Packet packet) {
 
@@ -511,6 +523,7 @@ public final class ClientGui extends javax.swing.JFrame {
         if (!message.equals("")) {
             ChatTab currentChatTab = this.tabController.getCurrentChatTab();
             if (currentChatTab.getChatType() == ChatType.Private) {
+                // TODO Implement group messages
                 for (String person : currentChatTab.getPersons()) {
                     this.send(new PrivateMessagePacket(message, this.clientName, person));
                 }
@@ -554,7 +567,7 @@ public final class ClientGui extends javax.swing.JFrame {
             userListController.clearList();
             bConnect.setText(connectButtonText.Connect.toString());
         }
-        
+
         sendPanel.setEnabled(isEnabled);
         lbUsers.setEnabled(isEnabled);
         connectionPanel.setEnabled(!isEnabled);

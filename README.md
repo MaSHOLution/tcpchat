@@ -6,7 +6,6 @@ TCPChat is a server-based open source chat, which is equipped with the following
   - Group and private chat
   - Userlist
   - Communication with packets
-  - AES-256-Encryption
 
 ### Version
 
@@ -47,13 +46,13 @@ If you have any questions or feature requests, don't hesitate to contact me at [
 
 ### Current Todo's
 
- - Show private messages in tabs
- - Add configuration file for server
- - Add feature to send files
- - Properly add description
- - Implement Database
- - Implement user accounts
- - Better prevention of spam
+ - [x] Show private messages in tabs
+ - [ ] AES-256-Encryption
+ - [ ] Add configuration file for server
+ - [ ] Add feature to send files
+ - [ ] Implement Database
+ - [ ] Implement user accounts
+ - [ ] Better prevention of spam
 
 License
 ----

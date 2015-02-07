@@ -39,7 +39,7 @@ import security.cryptography.EncryptionMethod;
 import static server.console.ChatServer.*;
 
 /**
- * Class for a seperate thread for a client
+ * Class for a seperate thread for a thread
  *
  * @author Manuel Schmid
  */
@@ -52,6 +52,7 @@ public final class ClientThread extends Thread {
     protected SocketAddress ip;
     protected EncryptionMethod encMethod = CryptoBasics.makeEncryptionObject();
     protected final String sessionId = encMethod.sessionId;
+    protected ConnectionState state;
 
     /**
      * Constructor
@@ -69,6 +70,8 @@ public final class ClientThread extends Thread {
     @Override
     public void run() {
 
+        state = ConnectionState.InLogin;
+
         try {
             // Setting up streams
             this.initStreams();
@@ -84,18 +87,17 @@ public final class ClientThread extends Thread {
                 this.send(new InfoPacket("Welcome \"" + this.clientName + "\" to our chat room."));
                 logControl.log(logGeneral, Level.INFO, this.clientName + " joined");
 
-                boolean isKicked = false;
-                boolean isDisconnected = false;
+                state = ConnectionState.Online;
 
                 // Start conversation
-                while (!isKicked && !isDisconnected) {
+                while (state != ConnectionState.Kicked && state != ConnectionState.RequestedDisconnect) {
                     Packet packet = this.read();
                     PacketType ptype = packet.getIdentifier();
 
                     switch (ptype) {
                         case DISCONNECT:
                             // Client disconnected
-                            isDisconnected = true;
+                            state = ConnectionState.RequestedDisconnect;
                             break;
                         case PM:
                             // Private message
@@ -104,7 +106,7 @@ public final class ClientThread extends Thread {
                         case INVALID:
                             // Invalid packet or data received
                             this.send(new KickPacket("Security breach: Please do not use a modified client"));
-                            isKicked = true;
+                            state = ConnectionState.Kicked;
                             break;
                         case GM:
                             // Broadcast group message to all other clients
@@ -112,24 +114,24 @@ public final class ClientThread extends Thread {
                     }
                 }
 
-                if (isKicked) {
-                    // Tell every client, that the current client has been kicked
+                if (state == ConnectionState.Kicked) {
+                    // Tell every thread, that the current thread has been kicked
                     this.broadcastExceptMe(new InfoPacket("*** User \"" + this.clientName + "\" has been kicked ***"));
-                    
-                    // Remove client from threads array and close connections
-                    disconnect(true);
+
+                    // Remove thread from threads array and close connections
+                    disconnect();
                 } else {
-                    // Tell every client, that the current client is going offline
+                    // Tell every thread, that the current thread is going offline
                     this.broadcastExceptMe(new InfoPacket("*** User \"" + this.clientName + "\" has left ***"));
                     this.send(new DisconnectPacket());
 
-                    // Remove client from threads array and close connections
-                    disconnect(false);
+                    // Remove thread from threads array and close connections
+                    disconnect();
                 }
 
                 this.broadcastUserList(true);
             } else {
-                disconnect(true);
+                disconnect();
             }
 
         } catch (Exception ex) {
@@ -139,7 +141,7 @@ public final class ClientThread extends Thread {
     }
 
     /**
-     * Creates input and output streams for this client
+     * Creates input and output streams for this thread
      *
      * @throws IOException
      */
@@ -155,7 +157,7 @@ public final class ClientThread extends Thread {
      */
     protected synchronized void broadcast(String message) {
         for (ClientThread thread : threads) {
-            if (thread.clientName != null) {
+            if (state == ConnectionState.Online) {
                 this.send(new GroupMessagePacket(message, this.clientName), thread);
             }
         }
@@ -170,7 +172,7 @@ public final class ClientThread extends Thread {
      */
     protected synchronized void broadcast(Packet packet) {
         for (ClientThread thread : threads) {
-            if (thread.clientName != null) {
+            if (thread.state == ConnectionState.Online) {
                 this.send(packet, thread);
             }
         }
@@ -179,14 +181,14 @@ public final class ClientThread extends Thread {
     }
 
     /**
-     * Sends a message to all other clients except the current client (this)
+     * Sends a message to all other clients except the current thread (this)
      *
      * @param packet
      */
     protected synchronized void broadcastExceptMe(Packet packet) {
         for (ClientThread thread : threads) {
 
-            if (thread.clientName != null && thread != this) {
+            if (thread.state == ConnectionState.Online && thread != this) {
                 ClientThread.this.send(packet, thread);
             }
         }
@@ -194,7 +196,7 @@ public final class ClientThread extends Thread {
     }
 
     /**
-     * Sends a private privatePacket to one client
+     * Sends a private privatePacket to one thread
      *
      * @param privatePacket privatePacket to send
      * @return message send status
@@ -210,7 +212,7 @@ public final class ClientThread extends Thread {
             } else {
                 for (ClientThread thread : threads) {
                     if (thread != this
-                            && thread.clientName != null
+                            && thread.state == ConnectionState.Online
                             && thread.clientName.equals(receiver)) {
 
                         // Send privatePacket to receiver
@@ -319,7 +321,7 @@ public final class ClientThread extends Thread {
 
             // Check if name is already in use, if yes return null
             for (ClientThread client : threads) {
-                if (client != null && client.clientName != null && client.clientName.equals(name)) {
+                if (client != null && client.state == ConnectionState.Online && client.clientName.equals(name)) {
                     this.send(new KickPacket("The nickname \"" + name + "\" is already in use"));
                     return null;
                 }
@@ -336,9 +338,9 @@ public final class ClientThread extends Thread {
     }
 
     /**
-     * Adds name to clientThread at index of this client
+     * Adds name to clientThread at index of this thread
      *
-     * @param name name of the client
+     * @param name name of the thread
      */
     protected void linkNameToThread(String name) {
         for (ClientThread thread : threads) {
@@ -351,12 +353,9 @@ public final class ClientThread extends Thread {
     }
 
     /**
-     * Disconnects the client
-     *
-     * @param closeOnly close streams without deleting client from threads
-     * @throws java.io.IOException
+     * Disconnects the thread
      */
-    protected synchronized void disconnect(boolean closeOnly) {
+    protected synchronized void disconnect() {
         try {
             threads.remove(this);
 
@@ -365,7 +364,7 @@ public final class ClientThread extends Thread {
             this.outStream.close();
             this.clientSocket.close();
 
-            if (!closeOnly) {
+            if (state == ConnectionState.Kicked) {
                 logControl.log(logConnection, Level.INFO, this.ip + ": " + this.clientName + " has disconnected");
             } else {
                 logControl.log(logConnection, Level.INFO, this.ip + ": " + this.clientName + " has been kicked");
@@ -379,11 +378,9 @@ public final class ClientThread extends Thread {
 
     protected synchronized void broadcastUserList(boolean excludeMe) {
         List<String> users = new ArrayList<>();
-        int i = 0;
-        for (ClientThread client : threads) {
-            if (client != null && client.clientName != null) {
-                users.add(client.clientName);
-                i++;
+        for (ClientThread thread : threads) {
+            if (thread != null && thread.state == ConnectionState.Online) {
+                users.add(thread.clientName);
             }
         }
 

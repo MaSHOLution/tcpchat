@@ -141,7 +141,7 @@ class ShutdownHandle extends Thread {
 
         // Send closing of server to all clients
         for (ClientThread thread : threads) {
-            if (thread != null && thread.clientName != null) {
+            if (thread != null && thread.state == ConnectionState.Online) {
                 thread.send(new KickPacket("*** SERVER IS GOING DOWN ***"), thread);
             }
         }

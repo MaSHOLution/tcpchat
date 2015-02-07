@@ -31,7 +31,7 @@ import java.net.SocketAddress;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
-import logging.Counters;
+import logging.general.Counters;
 import networking.packets.*;
 import networking.general.*;
 import security.basics.CryptoBasics;
@@ -234,7 +234,7 @@ public final class ClientThread extends Thread {
             return false;
         } catch (Exception ex) {
             logControl.log(logException, Level.INFO, this.ip + "(" + this.clientName + ") while sending PM: " + ex.getMessage());
-            logging.Counters.exception();
+            logging.general.Counters.exception();
             this.send(new InfoPacket("Message could not be delivered, reason: Internal Server Error"));
             Counters.pm();
             Counters.pmFailed();
@@ -256,7 +256,7 @@ public final class ClientThread extends Thread {
             return true;
         } catch (IOException ex) {
             logControl.log(logException, Level.INFO, this.ip + "(" + this.clientName + "): " + ex.getMessage());
-            logging.Counters.exception();
+            logging.general.Counters.exception();
         }
         return false;
     }
@@ -275,7 +275,7 @@ public final class ClientThread extends Thread {
             return true;
         } catch (Exception ex) {
             logControl.log(logException, Level.INFO, this.ip + "(" + this.clientName + "): " + ex.getMessage());
-            logging.Counters.exception();
+            logging.general.Counters.exception();
         }
         return false;
     }
@@ -295,7 +295,7 @@ public final class ClientThread extends Thread {
             }
         } catch (IOException | ClassNotFoundException ex) {
             logControl.log(logException, Level.INFO, this.ip + "(" + this.clientName + ") while reading packet: " + ex.getMessage());
-            logging.Counters.exception();
+            logging.general.Counters.exception();
         }
         return new InvalidPacket();
     }
@@ -373,7 +373,7 @@ public final class ClientThread extends Thread {
             Counters.disconnect();
         } catch (IOException ex) {
             logControl.log(logException, Level.INFO, this.ip + "(" + this.clientName + ") while disconnecting: " + ex.getMessage());
-            logging.Counters.exception();
+            logging.general.Counters.exception();
         }
     }
 

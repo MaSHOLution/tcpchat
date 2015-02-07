@@ -450,7 +450,7 @@ public final class ClientGui extends javax.swing.JFrame {
                 this.dialogHelper.showWarningDialog("Connection failed", "Could not connect to host \"" + host + "\" on Port " + port);
             }
 
-            logging.Counters.exception();
+            logging.general.Counters.exception();
             return false;
         }
         return false;
@@ -509,7 +509,7 @@ public final class ClientGui extends javax.swing.JFrame {
         } catch (IOException ex) {
             // TODO exception handling
         } finally {
-            logging.Counters.exception();
+            logging.general.Counters.exception();
         }
         return false;
     }
@@ -548,7 +548,7 @@ public final class ClientGui extends javax.swing.JFrame {
         } catch (IOException ex) {
             System.err.println("IOException:  " + ex);
         } finally {
-            logging.Counters.exception();
+            logging.general.Counters.exception();
         }
     }
 
@@ -605,7 +605,7 @@ public final class ClientGui extends javax.swing.JFrame {
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | javax.swing.UnsupportedLookAndFeelException ex) {
             java.util.logging.Logger.getLogger(ClientGui.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } finally {
-            logging.Counters.exception();
+            logging.general.Counters.exception();
         }
 
         /* Create and display the form */

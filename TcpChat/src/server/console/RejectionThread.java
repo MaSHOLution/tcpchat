@@ -29,7 +29,7 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.SocketAddress;
 import java.util.logging.Level;
-import logging.Counters;
+import logging.general.Counters;
 import networking.general.Packet;
 import networking.general.PacketType;
 import networking.packets.ConnectPacket;
@@ -92,7 +92,7 @@ public final class RejectionThread extends Thread {
 
         } catch (IOException ex) {
             logControl.log(logException, Level.INFO, ip + "(Rejected client): " + ex.getMessage());
-            logging.Counters.exception();
+            logging.general.Counters.exception();
         }
         Counters.rejected();
     }
@@ -120,7 +120,7 @@ public final class RejectionThread extends Thread {
             return true;
         } catch (IOException ex) {
             logControl.log(logException, Level.INFO, this.ip + "(Rejected client): " + ex.getMessage());
-            logging.Counters.exception();
+            logging.general.Counters.exception();
         }
         return false;
     }
@@ -140,7 +140,7 @@ public final class RejectionThread extends Thread {
             }
         } catch (IOException | ClassNotFoundException ex) {
             logControl.log(logException, Level.INFO, this.ip + "(Rejected client) while reading packet: " + ex.getMessage());
-            logging.Counters.exception();
+            logging.general.Counters.exception();
         }
         return new InvalidPacket();
     }

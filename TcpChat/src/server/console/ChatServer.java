@@ -33,9 +33,9 @@ import java.util.List;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import logging.Counters;
-import logging.CustomLogging;
-import logging.LoggingController;
+import logging.general.Counters;
+import logging.general.CustomLogging;
+import logging.general.LoggingController;
 import logging.enums.LogName;
 import logging.enums.LogPath;
 import static server.console.ChatServer.*;
@@ -117,7 +117,7 @@ public final class ChatServer {
                 logControl.log(logException, Level.SEVERE, "Could not open Server Socket");
                 logControl.log(logException, Level.SEVERE, "Exiting Server");
                 logControl.log(logGeneral, Level.SEVERE, "Exiting Server");
-                logging.Counters.exception();
+                logging.general.Counters.exception();
             }
         }
     }
@@ -166,7 +166,7 @@ class ShutdownHandle extends Thread {
             return true;
         } catch (Exception ex) {
             logControl.log(CustomLogging.get(LogName.SERVER, LogPath.EXCEPTION), Level.INFO, ex.getMessage());
-            logging.Counters.exception();
+            logging.general.Counters.exception();
         }
         return false;
     }

@@ -75,7 +75,7 @@ public final class Aes extends EncryptionMethod implements crypter {
         } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException ex) {
             // TODO handle exceptions
         } finally {
-            logging.Counters.exception();
+            logging.general.Counters.exception();
         }
         return null;
     }
@@ -99,7 +99,7 @@ public final class Aes extends EncryptionMethod implements crypter {
         } catch (IOException | NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException ex) {
             // TODO handle exceptions
         } finally {
-            logging.Counters.exception();
+            logging.general.Counters.exception();
         }
         return null;
     }
@@ -118,7 +118,7 @@ public final class Aes extends EncryptionMethod implements crypter {
         } catch (UnsupportedEncodingException | NoSuchAlgorithmException ex) {
             // TODO handle exceptions
         } finally {
-            logging.Counters.exception();
+            logging.general.Counters.exception();
         }
     }
 }

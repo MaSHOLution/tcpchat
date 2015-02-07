@@ -24,20 +24,12 @@
 package networking.general;
 
 /**
- * Enum for packet types
  *
- * @author Manuel Schmid, Fabian Fink
+ * @author Manuel Schmid
  */
-public enum PacketType {
+public enum UserListPacketType {
 
-    Connect,
-    Disconnect,
-    GM,
-    Info,
-    Invalid,
-    Message,  // Abstract
-    Userlist,
-    Kick,
-    Packet,   // Abstract
-    PM, 
+    Full,
+    Connected,
+    Disconnected;
 }

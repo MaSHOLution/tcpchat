@@ -84,7 +84,7 @@ public final class ClientGui extends javax.swing.JFrame {
         initComponents();
 
         this.tabController = new TabController(this.tabbedPane);
-        this.userListController = new UserListController(this.lbUsers);
+        this.userListController = new UserListController(this.lbUsers, tabController);
 
         // Set fields to default value
         tbPort.setText("8000");

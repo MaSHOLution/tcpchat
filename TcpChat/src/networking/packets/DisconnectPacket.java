@@ -37,6 +37,6 @@ public class DisconnectPacket extends Packet {
      * Constructor
      */
     public DisconnectPacket() {
-        this.packetIdentifier = PacketType.DISCONNECT;
+        this.packetIdentifier = PacketType.Disconnect;
     }
 }

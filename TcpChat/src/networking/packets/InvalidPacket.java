@@ -37,7 +37,7 @@ public class InvalidPacket extends Packet {
      * Constructor
      */
     public InvalidPacket() {
-        this.packetIdentifier = PacketType.INVALID;
+        this.packetIdentifier = PacketType.Invalid;
         this.prepare();
     }
 }

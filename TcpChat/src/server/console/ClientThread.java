@@ -81,13 +81,13 @@ public final class ClientThread extends Thread {
             if (cPacket != null) {
                 this.linkNameToThread(cPacket.getName());
 
+                state = ConnectionState.Online;
+
                 // Broadcasts welcome message to all clients
-                this.broadcastUserList(false);
-                this.broadcastExceptMe(new InfoPacket("*** User \"" + this.clientName + "\" joined ***"));
+                this.broadcastUserList(UserListPacketType.Connected);
+                //this.broadcastExceptMe(new InfoPacket("*** User \"" + this.clientName + "\" joined ***"));
                 this.send(new InfoPacket("Welcome \"" + this.clientName + "\" to our chat room."));
                 logControl.log(logGeneral, Level.INFO, this.clientName + " joined");
-
-                state = ConnectionState.Online;
 
                 // Start conversation
                 while (state != ConnectionState.Kicked && state != ConnectionState.RequestedDisconnect) {
@@ -95,7 +95,7 @@ public final class ClientThread extends Thread {
                     PacketType ptype = packet.getIdentifier();
 
                     switch (ptype) {
-                        case DISCONNECT:
+                        case Disconnect:
                             // Client disconnected
                             state = ConnectionState.RequestedDisconnect;
                             break;
@@ -103,8 +103,8 @@ public final class ClientThread extends Thread {
                             // Private message
                             this.forwardPrivateMessage((PrivateMessagePacket) packet);
                             break;
-                        case INVALID:
-                            // Invalid packet or data received
+                        case Invalid:
+                            // Invalid obj or obj received
                             this.send(new KickPacket("Security breach: Please do not use a modified client"));
                             state = ConnectionState.Kicked;
                             break;
@@ -116,20 +116,20 @@ public final class ClientThread extends Thread {
 
                 if (state == ConnectionState.Kicked) {
                     // Tell every thread, that the current thread has been kicked
-                    this.broadcastExceptMe(new InfoPacket("*** User \"" + this.clientName + "\" has been kicked ***"));
+                    //this.broadcastExceptMe(new InfoPacket("*** User \"" + this.clientName + "\" has been kicked ***"));
 
                     // Remove thread from threads array and close connections
                     disconnect();
                 } else {
                     // Tell every thread, that the current thread is going offline
-                    this.broadcastExceptMe(new InfoPacket("*** User \"" + this.clientName + "\" has left ***"));
+                    //this.broadcastExceptMe(new InfoPacket("*** User \"" + this.clientName + "\" has left ***"));
                     this.send(new DisconnectPacket());
 
                     // Remove thread from threads array and close connections
                     disconnect();
                 }
 
-                this.broadcastUserList(true);
+                this.broadcastUserList(UserListPacketType.Disconnected);
             } else {
                 disconnect();
             }
@@ -187,9 +187,8 @@ public final class ClientThread extends Thread {
      */
     protected synchronized void broadcastExceptMe(Packet packet) {
         for (ClientThread thread : threads) {
-
             if (thread.state == ConnectionState.Online && thread != this) {
-                ClientThread.this.send(packet, thread);
+                this.send(packet, thread);
             }
         }
         // Counters.gm(); is normally no group but system shoutout
@@ -246,7 +245,7 @@ public final class ClientThread extends Thread {
     }
 
     /**
-     * Writes a packet to a specific PrintStream
+     * Writes a obj to a specific PrintStream
      *
      * @param packet stands for itself
      * @return result of sending
@@ -264,10 +263,10 @@ public final class ClientThread extends Thread {
     }
 
     /**
-     * Writes a packet to a specific PrintStream
+     * Writes a obj to a specific PrintStream
      *
      * @param packet stands for itself
-     * @param thread ClientThread to send packet to
+     * @param thread ClientThread to send obj to
      * @return result of sending
      */
     protected synchronized boolean send(Packet packet, ClientThread thread) {
@@ -285,14 +284,14 @@ public final class ClientThread extends Thread {
     /**
      * Reads a message from a specific inStream
      *
-     * @return read packet
+     * @return read obj
      */
     protected synchronized Packet read() {
         try {
-            Object temp = this.inStream.readObject();
+            Object obj = this.inStream.readObject();
             Counters.connection();
-            if (temp instanceof Packet) {
-                Packet readPacket = (Packet) temp;
+            if (obj instanceof Packet) {
+                Packet readPacket = (Packet) obj;
                 return readPacket;
             }
         } catch (IOException | ClassNotFoundException ex) {
@@ -312,7 +311,7 @@ public final class ClientThread extends Thread {
         Packet clientAnswer = (Packet) this.read();
         PacketType pType = clientAnswer.getIdentifier();
 
-        if (pType == PacketType.CONNECT) {
+        if (pType == PacketType.Connect) {
             String name = ((ConnectPacket) clientAnswer).getName();
             if (name == null || name.length() < 4 || name.length() > 15) {
                 this.send(new KickPacket("Please make sure that your nickname has between 4 and 15 letters"));
@@ -330,7 +329,7 @@ public final class ClientThread extends Thread {
             this.clientName = name;
             return (ConnectPacket) clientAnswer;
         } else {
-            if (pType != PacketType.DISCONNECT) {
+            if (pType != PacketType.Disconnect) {
                 this.send(new KickPacket("Security breach: Please do not use a modified client"));
             }
             return null;
@@ -347,6 +346,7 @@ public final class ClientThread extends Thread {
             if (thread == this) {
                 this.clientName = name;
                 logControl.log(logConnection, Level.INFO, this.ip + ": is now " + name);
+                userList.add(name);
                 break;
             }
         }
@@ -363,6 +363,7 @@ public final class ClientThread extends Thread {
             this.inStream.close();
             this.outStream.close();
             this.clientSocket.close();
+            userList.remove(clientName);
 
             if (state == ConnectionState.Kicked) {
                 logControl.log(logConnection, Level.INFO, this.ip + ": " + this.clientName + " has disconnected");
@@ -376,18 +377,19 @@ public final class ClientThread extends Thread {
         }
     }
 
-    protected synchronized void broadcastUserList(boolean excludeMe) {
-        List<String> users = new ArrayList<>();
-        for (ClientThread thread : threads) {
-            if (thread != null && thread.state == ConnectionState.Online) {
-                users.add(thread.clientName);
-            }
-        }
-
-        if (excludeMe) {
-            this.broadcastExceptMe(new UserListPacket(users));
-        } else {
-            this.broadcast(new UserListPacket(users));
+    /**
+     * Broadcasts the userlist
+     *
+     * @param ulPacketType
+     */
+    protected synchronized void broadcastUserList(UserListPacketType ulPacketType) {
+        if (ulPacketType == UserListPacketType.Connected) {
+            // Broadcast changes to all and a full list to hte new client
+            this.broadcastExceptMe(new UserListPacket(this.clientName, ulPacketType));
+            this.send(new UserListPacket());
+        } else if(ulPacketType == UserListPacketType.Disconnected){
+            // Broadcast changes only
+            this.broadcastExceptMe(new UserListPacket(this.clientName, ulPacketType));
         }
     }
 }

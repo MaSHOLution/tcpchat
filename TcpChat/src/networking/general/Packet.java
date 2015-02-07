@@ -32,7 +32,7 @@ import java.io.Serializable;
  */
 public abstract class Packet implements Serializable {
 
-    protected PacketType packetIdentifier = PacketType.PACKET;
+    protected PacketType packetIdentifier = PacketType.Packet;
     protected String senderAlias = "Server";
     protected boolean isPrepared = false;
     /**

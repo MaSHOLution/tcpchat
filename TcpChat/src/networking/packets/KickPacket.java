@@ -42,7 +42,7 @@ public class KickPacket extends Packet {
      */
     public KickPacket(String message) {
         this.message = message;
-        this.packetIdentifier = PacketType.KICK;
+        this.packetIdentifier = PacketType.Kick;
     }
 
     /**

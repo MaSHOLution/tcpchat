@@ -23,7 +23,6 @@
  */
 package server.console;
 
-import networking.general.Packet;
 import networking.packets.KickPacket;
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -34,7 +33,6 @@ import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import logging.general.Counters;
-import logging.general.CustomLogging;
 import logging.general.LoggingController;
 import logging.enums.LogName;
 import logging.enums.LogPath;
@@ -49,6 +47,7 @@ public final class ChatServer {
     // maxClientsCount = 0 means infinite clients
     protected static final int maxClientsCount = 0;
     protected static final List<ClientThread> threads = new ArrayList<>();
+    protected static List<String> userList = new ArrayList<>();
 
     // Logging
     protected static Logger logConnection = null;
@@ -129,6 +128,14 @@ public final class ChatServer {
         logConnection = logControl.create(LogName.SERVER, LogPath.CONNECTION);
         logException = logControl.create(LogName.SERVER, LogPath.EXCEPTION);
         logGeneral = logControl.create(LogName.SERVER, LogPath.GENERAL);
+    }
+    
+    /**
+     * Getter for the userlist
+     * @return 
+     */
+    public static List<String> getUserList(){
+        return userList;
     }
 }
 

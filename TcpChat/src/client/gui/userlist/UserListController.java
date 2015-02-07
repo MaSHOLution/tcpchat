@@ -23,27 +23,32 @@
  */
 package client.gui.userlist;
 
-import java.util.List;
+import client.gui.ClientGui;
+import client.gui.tabs.TabController;
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
+import networking.packets.UserListPacket;
 
 /**
  * Controller for the userlist
- * 
+ *
  * @author Manuel Schmid
  */
 public final class UserListController {
 
     private final JList lbUsers;
     private final DefaultListModel listModel;
+    private final TabController tabController;
 
     /**
      * Constructor
      *
      * @param lbUsers userlist on gui
+     * @param tabController
      */
-    public UserListController(JList lbUsers) {
+    public UserListController(JList lbUsers, TabController tabController) {
         this.lbUsers = lbUsers;
+        this.tabController = tabController;
         this.listModel = ((DefaultListModel) lbUsers.getModel());
     }
 
@@ -55,15 +60,41 @@ public final class UserListController {
     }
 
     /**
-     * Updates the user list
+     * Updates userlist and existing private message tabs
      *
-     * @param users
+     * @param ulPacket
      */
-    public void updateUserList(List<String> users) {
-        clearList();
-        // TODO sort users
-        for (String user : users) {
-            listModel.addElement(user);
+    public void updateUserList(UserListPacket ulPacket) {
+        String name = ulPacket.getUser();
+        switch (ulPacket.getUserListType()) {
+            case Connected:
+                listModel.addElement(name);
+                appendInfoMessage("*** User \"" + name + "\" joined ***", name);
+                break;
+            case Disconnected:
+                listModel.removeElement(name);
+                appendInfoMessage("*** User \"" + name + "\" left ***", name);
+                break;
+
+            case Full:
+                clearList();
+                // TODO sort users
+                for (String user : ulPacket.getUserList()) {
+                    listModel.addElement(user);
+                }
+                break;
+        }
+    }
+
+    /**
+     * Writes a line to an existing private message tab
+     * @param message
+     * @param name 
+     */
+    private void appendInfoMessage(String message, String name) {
+        int index = tabController.getTabIndexByTitle(name);
+        if (index != -1) {
+            tabController.appendTextToChat(message, index);
         }
     }
 }

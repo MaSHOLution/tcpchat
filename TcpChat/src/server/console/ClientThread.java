@@ -134,7 +134,7 @@ public final class ClientThread extends Thread {
 
         } catch (Exception ex) {
             logControl.log(logException, Level.INFO, this.ip + "(" + this.clientName + "): " + ex.getMessage());
-            logging.Counters.exception();
+            Counters.exception();
         }
     }
 

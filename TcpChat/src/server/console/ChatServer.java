@@ -142,7 +142,7 @@ class ShutdownHandle extends Thread {
         // Send closing of server to all clients
         for (ClientThread thread : threads) {
             if (thread != null && thread.clientName != null) {
-                send(thread, new KickPacket("*** SERVER IS GOING DOWN ***"));
+                thread.send(new KickPacket("*** SERVER IS GOING DOWN ***"), thread);
             }
         }
         // Close all loggers
@@ -151,23 +151,5 @@ class ShutdownHandle extends Thread {
                 handler.close();
             }
         }
-    }
-
-    /**
-     * Writes a packet to a specific PrintStream
-     *
-     * @param printStream stream to write packet to
-     * @param packet stands for itself
-     */
-    private boolean send(ClientThread thread, Packet packet) {
-        try {
-            Counters.connection();
-            thread.outStream.writeObject(packet);
-            return true;
-        } catch (Exception ex) {
-            logControl.log(CustomLogging.get(LogName.SERVER, LogPath.EXCEPTION), Level.INFO, ex.getMessage());
-            logging.general.Counters.exception();
-        }
-        return false;
     }
 }

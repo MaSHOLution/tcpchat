@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package logging;
+package logging.general;
 
 import java.io.File;
 import java.io.IOException;
@@ -70,7 +70,7 @@ public final class CustomLogging {
         } catch (IOException | SecurityException ex) {
             // TODO handle
         } finally {
-            logging.Counters.exception();
+            logging.general.Counters.exception();
         }
 
         // Set formatter for logger to get rid of ugly standard format

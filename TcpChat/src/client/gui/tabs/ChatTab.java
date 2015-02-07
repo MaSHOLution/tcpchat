@@ -42,6 +42,7 @@ public final class ChatTab {
     // Parent
     private final JScrollPane scrollPane;
     private final JTabbedPane tabbedPane;
+    private final TabController tabController;
 
     // Params
     private final int index;
@@ -53,9 +54,11 @@ public final class ChatTab {
      *
      * @param chatType Type declared in enum ChatType
      * @param tabbedPane Pane which the ChatTab is associated with
+     * @param tabController Controller of the tabs for ButtonTabComponent
      * @param persons persons of the tab
      */
-    public ChatTab(ChatType chatType, JTabbedPane tabbedPane, List<String> persons) {
+    public ChatTab(ChatType chatType, JTabbedPane tabbedPane, TabController tabController, List<String> persons) {
+        this.tabController = tabController;
         this.chatType = chatType;
         this.chatArea = new ChatArea();
         this.chatArea.setEditable(false);
@@ -142,7 +145,7 @@ public final class ChatTab {
      * Removes this ChatTab from the tabbedPane
      */
     public void remove() {
-        tabbedPane.remove(index);
+        tabController.removeTab(index);
     }
 
     /**
@@ -160,5 +163,4 @@ public final class ChatTab {
         disable();
         this.tabbedPane.setEnabled(false);
     }
-
 }

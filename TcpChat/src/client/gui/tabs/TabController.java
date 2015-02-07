@@ -91,7 +91,7 @@ public final class TabController {
      */
     public int addTab(List<String> persons, ChatType chatType) {
         // Create new ChatTab
-        ChatTab chatTab = new ChatTab(chatType, tabbedPane, persons);
+        ChatTab chatTab = new ChatTab(chatType, tabbedPane, this, persons);
         // Add ChatTab to tabbedPane
         if(persons.size() > 1){
             // TODO possible group chats

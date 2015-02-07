@@ -26,6 +26,7 @@ package networking.packets;
 import networking.general.Packet;
 import networking.general.PacketType;
 import java.util.List;
+import networking.general.UserListPacketType;
 
 /**
  * Class for a specific packet type
@@ -33,25 +34,56 @@ import java.util.List;
  * @author Manuel Schmid
  */
 public class UserListPacket extends Packet {
-    
+
     protected List<String> users;
-    
+    protected String user;
+    private UserListPacketType ulPacketType = UserListPacketType.Full;
+
     /**
      * Constructor
-     *
-     * @param users
      */
-    public UserListPacket(List<String> users) {
-        this.users = users;
-        this.packetIdentifier = PacketType.USERLIST;
+    public UserListPacket() {
+        this.users = server.console.ChatServer.getUserList();
+        this.ulPacketType = UserListPacketType.Full;
+        this.packetIdentifier = PacketType.Userlist;
+    }
+
+    /**
+     * Constructor for transmitting only changes
+     *
+     * @param user
+     * @param ulPacketType
+     */
+    public UserListPacket(String user, UserListPacketType ulPacketType) {
+        this.user = user;
+        this.ulPacketType = ulPacketType;
+        this.packetIdentifier = PacketType.Userlist;
+    }
+
+    /**
+     * Getter for users
+     *
+     * @return users
+     */
+    public List<String> getUserList() {
+        return this.users;
     }
     
     /**
-     * Getter for users
-     * 
-     * @return users
+     * Getter for user
+     *
+     * @return user
      */
-    public List<String> getUserList(){
-        return this.users;
+    public String getUser() {
+        return this.user;
+    }
+    
+    /**
+     * Getter for UserListType
+     *
+     * @return userlist packet type
+     */
+    public UserListPacketType getUserListType() {
+        return this.ulPacketType;
     }
 }

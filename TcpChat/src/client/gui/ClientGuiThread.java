@@ -91,7 +91,7 @@ public class ClientGuiThread implements Runnable {
             ptype = responsePacket.getIdentifier();
 
             switch (ptype) {
-                case DISCONNECT:
+                case Disconnect:
                     exitListening = true;
                     break;
                 case GM:
@@ -102,7 +102,7 @@ public class ClientGuiThread implements Runnable {
                     // Always output groupmessage on first tab ("Group Chat")
                     gui.tabController.outputLineOnGui("<" + sender + "> " + message, 0);
                     break;
-                case KICK:
+                case Kick:
                     // TODO dialog?
                     gui.tabController.outputLineOnGui(((KickPacket) responsePacket).getMessage());
                     exitListening = true;
@@ -125,11 +125,11 @@ public class ClientGuiThread implements Runnable {
 
                     break;
 
-                case USERLIST:
-                    List<String> list = ((UserListPacket) responsePacket).getUserList();
-                    gui.userListController.updateUserList(list);
+                case Userlist:
+                    UserListPacket ulPacket = (UserListPacket) responsePacket;
+                    gui.userListController.updateUserList(ulPacket);
                     break;
-                case INFO:
+                case Info:
                     gui.tabController.outputLineOnGui(((MessagePacket) responsePacket).getMessage());
             }
         } while (!exitListening);

@@ -78,11 +78,11 @@ public final class RejectionThread extends Thread {
             Packet clientAnswer = read();
             PacketType pType = clientAnswer.getIdentifier();
 
-            if (pType == PacketType.CONNECT) {
+            if (pType == PacketType.Connect) {
                 String name = ((ConnectPacket) clientAnswer).getName();
                 send(new KickPacket("Sorry \"" + name + "\", too many clients. Please try later."));
             } else {
-                if (pType != PacketType.DISCONNECT) {
+                if (pType != PacketType.Disconnect) {
                     send(new KickPacket("Security breach: Please do not use a modified client"));
                 }
             }

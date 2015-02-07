@@ -42,7 +42,7 @@ public class ConnectPacket extends Packet {
      */
     public ConnectPacket(String name) {
         this.name = name;
-        this.packetIdentifier = PacketType.CONNECT;
+        this.packetIdentifier = PacketType.Connect;
     }
     
     /**

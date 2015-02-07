@@ -30,14 +30,14 @@ package networking.general;
  */
 public enum PacketType {
 
-    CONNECT,
-    DISCONNECT,
+    Connect,
+    Disconnect,
     GM,
-    INFO,
-    INVALID,
-    MESSAGE,  // Abstract
-    USERLIST,
-    KICK,
-    PACKET,   // Abstract
+    Info,
+    Invalid,
+    Message,  // Abstract
+    Userlist,
+    Kick,
+    Packet,   // Abstract
     PM, 
 }

@@ -40,7 +40,7 @@ public class InfoPacket extends MessagePacket {
      */
     public InfoPacket(String message) {
         this.message = message;
-        this.packetIdentifier = PacketType.INFO;
+        this.packetIdentifier = PacketType.Info;
     }
     
     /**

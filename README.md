@@ -9,7 +9,7 @@ TCPChat is a server-based open source chat, which is equipped with the following
 
 ### Version
 
-0.3.0
+0.3.1
 
 ### Technology
 
@@ -29,7 +29,7 @@ Open your favorite Terminal and run this command:
 
 ```sh
 $ cd stable_builds/
-$ java -jar TCPChat_Server.jar
+$ java -jar TCPChat_Server.jar <port> <logging yes/no>
 ```
 
 ### Starting stable Client

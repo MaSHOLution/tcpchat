@@ -51,7 +51,7 @@ public final class CryptoBasics {
 
     /**
      * Makes an encryption object of type encMethod
-     * 
+     *
      * @param <T>
      * @return
      */

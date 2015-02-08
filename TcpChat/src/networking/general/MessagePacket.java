@@ -32,7 +32,7 @@ public abstract class MessagePacket extends Packet {
 
     //protected PacketType packetIdentifier = PacketType.MESSAGEPACKET;
     protected String message;
-    
+
     /**
      * Getter for message
      *

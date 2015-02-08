@@ -58,7 +58,7 @@ public class PrivateMessagePacket extends MessagePacket {
     public String getSender() {
         return this.sender;
     }
-    
+
     /**
      * Getter for the receiver
      *

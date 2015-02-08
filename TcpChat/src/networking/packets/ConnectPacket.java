@@ -32,7 +32,7 @@ import networking.general.PacketType;
  * @author Manuel Schmid, Fabian Fink
  */
 public class ConnectPacket extends Packet {
-    
+
     protected final String name;
 
     /**
@@ -44,12 +44,13 @@ public class ConnectPacket extends Packet {
         this.name = name;
         this.packetIdentifier = PacketType.Connect;
     }
-    
+
     /**
      * Getter for name
+     *
      * @return name
      */
-    public String getName(){
+    public String getName() {
         return this.name;
     }
 }

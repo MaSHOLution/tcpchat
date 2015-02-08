@@ -35,6 +35,7 @@ public abstract class Packet implements Serializable {
     protected PacketType packetIdentifier = PacketType.Packet;
     protected String senderAlias = "Server";
     protected boolean isPrepared = false;
+
     /**
      * Getter for identifier
      *
@@ -54,14 +55,14 @@ public abstract class Packet implements Serializable {
     }
 
     /**
-     * Setter for senderAlias
-     * protected because of one time usage of packets
+     * Setter for senderAlias protected because of one time usage of packets
      *
      * @param senderAlias
      */
     protected void setSenderAlias(String senderAlias) {
         this.senderAlias = senderAlias;
     }
+
     /**
      * Prepares the packet for sending
      *

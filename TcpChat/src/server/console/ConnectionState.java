@@ -49,7 +49,7 @@ public enum ConnectionState {
 
     /**
      * Getter for current message send status
-     * 
+     *
      * @return current status of message sending
      */
     public boolean canSendMessages() {

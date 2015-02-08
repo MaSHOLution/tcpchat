@@ -32,7 +32,7 @@ import networking.general.PacketType;
  * @author Manuel Schmid, Fabian Fink
  */
 public class InfoPacket extends MessagePacket {
-    
+
     /**
      * Constructor
      *
@@ -42,14 +42,14 @@ public class InfoPacket extends MessagePacket {
         this.message = message;
         this.packetIdentifier = PacketType.Info;
     }
-    
+
     /**
      * Getter for message
-     * 
+     *
      * @return mesage
      */
     @Override
-    public String getMessage(){
+    public String getMessage() {
         return this.message;
     }
 }

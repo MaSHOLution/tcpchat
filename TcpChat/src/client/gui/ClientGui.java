@@ -586,7 +586,7 @@ public final class ClientGui extends javax.swing.JFrame {
             }
         }
     }
-    
+
     /**
      * Handle for disconnect on close
      */

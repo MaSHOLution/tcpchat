@@ -158,7 +158,7 @@ public final class Counters {
     public static void connection() {
         Totals.Clients.connections++;
     }
-    
+
     /**
      * Increase counter of rejected clients
      */

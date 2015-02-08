@@ -32,7 +32,7 @@ import networking.general.PacketType;
  * @author Manuel Schmid
  */
 public class InvalidPacket extends Packet {
-    
+
     /**
      * Constructor
      */

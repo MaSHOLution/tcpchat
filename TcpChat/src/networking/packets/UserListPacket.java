@@ -68,7 +68,7 @@ public class UserListPacket extends Packet {
     public List<String> getUserList() {
         return this.users;
     }
-    
+
     /**
      * Getter for user
      *
@@ -77,7 +77,7 @@ public class UserListPacket extends Packet {
     public String getUser() {
         return this.user;
     }
-    
+
     /**
      * Getter for UserListType
      *

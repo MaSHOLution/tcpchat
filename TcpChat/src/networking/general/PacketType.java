@@ -35,9 +35,9 @@ public enum PacketType {
     GM,
     Info,
     Invalid,
-    Message,  // Abstract
+    Message, // Abstract
     Userlist,
     Kick,
-    Packet,   // Abstract
-    PM, 
+    Packet, // Abstract
+    PM,
 }

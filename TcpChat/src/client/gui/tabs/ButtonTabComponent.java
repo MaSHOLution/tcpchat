@@ -36,7 +36,8 @@ import java.awt.*;
 import java.awt.event.*;
 
 /**
- * Component to be used as tabComponent; Contains a JLabel to show the text and a JButton to close the tab it belongs to
+ * Component to be used as tabComponent; Contains a JLabel to show the text and
+ * a JButton to close the tab it belongs to
  */
 public class ButtonTabComponent extends JPanel {
 

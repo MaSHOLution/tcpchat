@@ -387,7 +387,7 @@ public final class ClientThread extends Thread {
             // Broadcast changes to all and a full list to hte new client
             this.broadcastExceptMe(new UserListPacket(this.clientName, ulPacketType));
             this.send(new UserListPacket());
-        } else if(ulPacketType == UserListPacketType.Disconnected){
+        } else if (ulPacketType == UserListPacketType.Disconnected) {
             // Broadcast changes only
             this.broadcastExceptMe(new UserListPacket(this.clientName, ulPacketType));
         }

@@ -129,12 +129,13 @@ public final class ChatServer {
         logException = logControl.create(LogName.SERVER, LogPath.EXCEPTION);
         logGeneral = logControl.create(LogName.SERVER, LogPath.GENERAL);
     }
-    
+
     /**
      * Getter for the userlist
-     * @return 
+     *
+     * @return
      */
-    public static List<String> getUserList(){
+    public static List<String> getUserList() {
         return userList;
     }
 }

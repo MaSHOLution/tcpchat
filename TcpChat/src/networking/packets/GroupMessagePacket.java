@@ -33,7 +33,7 @@ import networking.general.PacketType;
  */
 public class GroupMessagePacket extends MessagePacket {
 
-protected String sender;
+    protected String sender;
 
     /**
      * Constructor
@@ -46,7 +46,7 @@ protected String sender;
         this.sender = sender;
         this.packetIdentifier = PacketType.GM;
     }
-    
+
     /**
      * Getter for the sender
      *

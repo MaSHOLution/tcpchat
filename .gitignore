@@ -7,6 +7,7 @@
 
 # Package Files #
 *.jar
+!stable_builds/*.jar
 *.war
 *.ear
 
@@ -16,3 +17,4 @@ hs_err_pid*
 /TcpChat/build/
 /TcpChat/dist/
 /TcpChat/logs/
+/stable_builds/logs/

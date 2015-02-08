@@ -3,13 +3,13 @@
 TCPChat is a server-based open source chat, which is equipped with the following features:
 
   - Multi client chat server
-  - Group and private chat
+  - Group and private chat in tabs
   - Userlist
   - Communication with packets
 
 ### Version
 
-0.2.0
+0.3.0
 
 ### Technology
 
@@ -52,7 +52,7 @@ If you have any questions or feature requests, don't hesitate to contact me at [
  - [ ] Add feature to send files
  - [ ] Implement Database
  - [ ] Save received messages in local file system or database
- - [ ] Implement user accounts
+ - [ ] Implement user accounts / Create client id for claiming names
  - [ ] Better prevention of spam
 
 License

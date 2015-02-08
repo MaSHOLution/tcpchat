@@ -23,8 +23,11 @@
  */
 package client.gui.userlist;
 
-import client.gui.ClientGui;
 import client.gui.tabs.TabController;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
 import networking.packets.UserListPacket;
@@ -70,6 +73,7 @@ public final class UserListController {
             case Connected:
                 listModel.addElement(name);
                 appendInfoMessage("*** User \"" + name + "\" joined ***", name);
+                sortUserList();
                 break;
             case Disconnected:
                 listModel.removeElement(name);
@@ -79,22 +83,39 @@ public final class UserListController {
             case Full:
                 clearList();
                 // TODO sort users
-                for (String user : ulPacket.getUserList()) {
+                List<String> userlist = ulPacket.getUserList();
+                Collections.sort(userlist);
+                for (String user : userlist) {
                     listModel.addElement(user);
                 }
-                break;
         }
     }
 
     /**
      * Writes a line to an existing private message tab
+     *
      * @param message
-     * @param name 
+     * @param name
      */
     private void appendInfoMessage(String message, String name) {
         int index = tabController.getTabIndexByTitle(name);
         if (index != -1) {
             tabController.appendTextToChat(message, index);
+        }
+    }
+
+    /**
+     * Sort the userlist alphabetically
+     */
+    private void sortUserList() {
+        String[] names = new String[listModel.getSize()];
+        for (int i = 0; i < names.length; i++) {
+            names[i] = listModel.getElementAt(i).toString();
+        }
+        Arrays.sort(names);
+        clearList();
+        for (String name : names) {
+            listModel.addElement(name);
         }
     }
 }

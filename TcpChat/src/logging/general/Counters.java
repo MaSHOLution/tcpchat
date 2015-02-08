@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package logging;
+package logging.general;
 
 /**
  * Contains all counters
@@ -62,17 +62,17 @@ public final class Counters {
              * private messages total
              */
             public static int pmTotal = 0;
-            
+
             /**
              * private messages failure total
              */
             public static int pmFailed = 0;
-            
+
             /**
              * group messages total
              */
             public static int gmTotal = 0;
-            
+
             /**
              * group messages failure total
              */
@@ -98,41 +98,77 @@ public final class Counters {
              * total disconnects
              */
             public static int connections = 0;
+
+            /**
+             * total disconnects
+             */
+            public static int rejected = 0;
         }
 
     }
 
+    /**
+     * Increase login count
+     */
     public static void login() {
         Clients.inLoginProcess++;
     }
 
+    /**
+     * Increase counter of currently logged in users
+     */
     public static void loggedIn() {
         Clients.inLoginProcess--;
         Clients.clients++;
         Totals.Clients.logins++;
     }
 
+    /**
+     * Increase counter of written private messages
+     */
     public static void pm() {
         Totals.Messages.pmTotal++;
     }
-    
+
+    /**
+     * Increase counter of failed private messages
+     */
     public static void pmFailed() {
         Totals.Messages.pmFailed++;
     }
 
+    /**
+     * Increase counter of written group messages
+     */
     public static void gm() {
         Totals.Messages.gmTotal++;
     }
 
+    /**
+     * Increase counter of disconnects
+     */
     public static void disconnect() {
         Clients.clients--;
         Totals.Clients.disconnects++;
     }
 
+    /**
+     * Increase counter of connections, which includes received and sent stuff
+     */
     public static void connection() {
         Totals.Clients.connections++;
     }
 
+    /**
+     * Increase counter of rejected clients
+     */
+    public static void rejected() {
+        Totals.Clients.rejected++;
+    }
+
+    /**
+     * Increase counter of exceptions
+     */
     public static void exception() {
         Totals.exceptions++;
     }

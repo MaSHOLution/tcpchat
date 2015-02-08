@@ -31,14 +31,24 @@ package logging.enums;
 public enum LogName {
 
     SERVER(server.console.ChatServer.class.getName()),
-    CLIENT(client.console.ChatClient.class.getName());
+    CLIENT(client.gui.ClientGui.class.getName());
 
     private final String name;
 
+    /**
+     * Constructor
+     *
+     * @param name
+     */
     LogName(String name) {
         this.name = name;
     }
 
+    /**
+     * Getter for name
+     *
+     * @return
+     */
     public String getName() {
         return name;
     }

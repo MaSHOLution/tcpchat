@@ -21,39 +21,36 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package logging.enums;
+package networking.packets;
+
+import networking.general.Packet;
+import networking.general.PacketType;
 
 /**
- * Enum for logpaths
+ * Class for a specific packet type
  *
- * @author Manuel Schmid
+ * @author Manuel Schmid, Fabian Fink
  */
-public enum LogPath {
+public class KickPacket extends Packet {
 
-    LOGDIR("logs"),
-    CLIENTLOGDIR("clientlogs"),
-    SERVERLOGDIR("serverlogs"),
-    CONNECTION("connection.log"),
-    EXCEPTION("exception.log"),
-    GENERAL("general.log");
-
-    private final String path;
+    protected String message;
 
     /**
      * Constructor
      *
-     * @param path
+     * @param message
      */
-    LogPath(String path) {
-        this.path = path;
+    public KickPacket(String message) {
+        this.message = message;
+        this.packetIdentifier = PacketType.Kick;
     }
 
     /**
-     * Getter for path
+     * Getter for the reason
      *
-     * @return
+     * @return reason
      */
-    public String getPath() {
-        return path;
+    public String getMessage() {
+        return "You have been kicked from the server, reason: " + this.message;
     }
 }

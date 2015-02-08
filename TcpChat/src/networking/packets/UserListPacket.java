@@ -21,50 +21,69 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package common.networking.packets;
+package networking.packets;
 
-import common.networking.MessagePacket;
-import common.networking.PacketType;
+import networking.general.Packet;
+import networking.general.PacketType;
+import java.util.List;
+import networking.general.UserListPacketType;
 
 /**
  * Class for a specific packet type
  *
- * @author Manuel Schmid, Fabian Fink
+ * @author Manuel Schmid
  */
-public class PrivateMessagePacket extends MessagePacket {
+public class UserListPacket extends Packet {
 
-    protected String sender;
-    protected String receiver;
+    protected List<String> users;
+    protected String user;
+    private UserListPacketType ulPacketType = UserListPacketType.Full;
 
     /**
      * Constructor
-     *
-     * @param message message to send
-     * @param sender sender
-     * @param receiver receiver
      */
-    public PrivateMessagePacket(String message, String sender, String receiver) {
-        this.message = message;
-        this.sender = sender;
-        this.receiver = receiver;
-        this.packetIdentifier = PacketType.PM;
+    public UserListPacket() {
+        this.users = server.console.ChatServer.getUserList();
+        this.ulPacketType = UserListPacketType.Full;
+        this.packetIdentifier = PacketType.Userlist;
     }
 
     /**
-     * Getter for the sender
+     * Constructor for transmitting only changes
      *
-     * @return
+     * @param user
+     * @param ulPacketType
      */
-    public String getSender() {
-        return this.sender;
+    public UserListPacket(String user, UserListPacketType ulPacketType) {
+        this.user = user;
+        this.ulPacketType = ulPacketType;
+        this.packetIdentifier = PacketType.Userlist;
     }
-    
+
     /**
-     * Getter for the receiver
+     * Getter for users
      *
-     * @return
+     * @return users
      */
-    public String getReceiver() {
-        return this.receiver;
+    public List<String> getUserList() {
+        return this.users;
+    }
+
+    /**
+     * Getter for user
+     *
+     * @return user
+     */
+    public String getUser() {
+        return this.user;
+    }
+
+    /**
+     * Getter for UserListType
+     *
+     * @return userlist packet type
+     */
+    public UserListPacketType getUserListType() {
+        return this.ulPacketType;
     }
 }

@@ -21,36 +21,23 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package common.networking.packets;
+package networking.packets;
 
-import common.networking.MessagePacket;
-import common.networking.PacketType;
+import networking.general.Packet;
+import networking.general.PacketType;
 
 /**
  * Class for a specific packet type
  *
- * @author Manuel Schmid, Fabian Fink
+ * @author Manuel Schmid
  */
-public class InfoPacket extends MessagePacket {
+public class InvalidPacket extends Packet {
 
-    protected String message;
-    
     /**
      * Constructor
-     *
-     * @param message
      */
-    public InfoPacket(String message) {
-        this.message = message;
-        this.packetIdentifier = PacketType.INFO;
-    }
-    
-    /**
-     * Getter for message
-     * 
-     * @return mesage
-     */
-    public String getMessage(){
-        return this.message;
+    public InvalidPacket() {
+        this.packetIdentifier = PacketType.Invalid;
+        this.prepare();
     }
 }

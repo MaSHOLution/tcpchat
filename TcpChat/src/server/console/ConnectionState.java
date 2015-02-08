@@ -21,22 +21,38 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package common.networking.packets;
-
-import common.networking.Packet;
-import common.networking.PacketType;
+package server.console;
 
 /**
- * Class for a specific packet type
  *
- * @author Manuel Schmid, Fabian Fink
+ * @author Manuel Schmid
  */
-public class DisconnectPacket extends Packet {
+public enum ConnectionState {
+
+    InLogin(false),
+    Rejected(false),
+    Kicked(false),
+    Online(true),
+    RequestedDisconnect(false),
+    Disconnected(false);
+
+    private final boolean canSendMessages;
 
     /**
      * Constructor
+     *
+     * @param dir
      */
-    public DisconnectPacket() {
-        this.packetIdentifier = PacketType.DISCONNECT;
+    ConnectionState(boolean canSendMessages) {
+        this.canSendMessages = canSendMessages;
+    }
+
+    /**
+     * Getter for current message send status
+     *
+     * @return current status of message sending
+     */
+    public boolean canSendMessages() {
+        return this.canSendMessages;
     }
 }

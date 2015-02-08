@@ -21,39 +21,59 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package logging.enums;
+package networking.general;
+
+import java.io.Serializable;
 
 /**
- * Enum for logpaths
+ * Abstract class for packets
  *
  * @author Manuel Schmid
  */
-public enum LogPath {
+public abstract class Packet implements Serializable {
 
-    LOGDIR("logs"),
-    CLIENTLOGDIR("clientlogs"),
-    SERVERLOGDIR("serverlogs"),
-    CONNECTION("connection.log"),
-    EXCEPTION("exception.log"),
-    GENERAL("general.log");
-
-    private final String path;
+    protected PacketType packetIdentifier = PacketType.Packet;
+    protected String senderAlias = "Server";
+    protected boolean isPrepared = false;
 
     /**
-     * Constructor
-     *
-     * @param path
-     */
-    LogPath(String path) {
-        this.path = path;
-    }
-
-    /**
-     * Getter for path
+     * Getter for identifier
      *
      * @return
      */
-    public String getPath() {
-        return path;
+    public PacketType getIdentifier() {
+        return this.packetIdentifier;
+    }
+
+    /**
+     * Getter for senderAlias
+     *
+     * @return
+     */
+    public String getSenderAlias() {
+        return this.senderAlias;
+    }
+
+    /**
+     * Setter for senderAlias protected because of one time usage of packets
+     *
+     * @param senderAlias
+     */
+    protected void setSenderAlias(String senderAlias) {
+        this.senderAlias = senderAlias;
+    }
+
+    /**
+     * Prepares the packet for sending
+     *
+     */
+    public void prepare() {
+        if (this.isPrepared) {
+            // TODO Decrypt
+            this.isPrepared = false;
+        } else {
+            // TODO Encrypt
+            this.isPrepared = true;
+        }
     }
 }

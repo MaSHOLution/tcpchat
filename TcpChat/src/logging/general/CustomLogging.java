@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package logging;
+package logging.general;
 
 import java.io.File;
 import java.io.IOException;
@@ -67,8 +67,10 @@ public final class CustomLogging {
         SimpleDateFormat format = new SimpleDateFormat("M-d_HHmmss"); //just to make our log file nicer :)
         try {
             fh = new FileHandler(LogPath.LOGDIR.getPath() + "/" + logPath.getPath());
-        } catch (IOException | SecurityException e) {
+        } catch (IOException | SecurityException ex) {
             // TODO handle
+        } finally {
+            logging.general.Counters.exception();
         }
 
         // Set formatter for logger to get rid of ugly standard format

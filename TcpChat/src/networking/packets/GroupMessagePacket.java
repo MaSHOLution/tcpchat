@@ -21,58 +21,38 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package common.networking;
+package networking.packets;
 
-import java.io.Serializable;
+import networking.general.MessagePacket;
+import networking.general.PacketType;
 
 /**
- * Abstract class for packets
+ * Class for a specific packet type
  *
- * @author Manuel Schmid
+ * @author Manuel Schmid, Fabian Fink
  */
-public abstract class Packet implements Serializable {
+public class GroupMessagePacket extends MessagePacket {
 
-    protected PacketType packetIdentifier = PacketType.PACKET;
-    protected String senderAlias = "Server";
-    protected boolean isPrepared = false;
+    protected String sender;
+
     /**
-     * Getter for identifier
+     * Constructor
+     *
+     * @param message message to send
+     * @param sender name of sender
+     */
+    public GroupMessagePacket(String message, String sender) {
+        this.message = message;
+        this.sender = sender;
+        this.packetIdentifier = PacketType.GM;
+    }
+
+    /**
+     * Getter for the sender
      *
      * @return
      */
-    public PacketType getIdentifier() {
-        return this.packetIdentifier;
-    }
-
-    /**
-     * Getter for senderAlias
-     *
-     * @return
-     */
-    public String getSenderAlias() {
-        return this.senderAlias;
-    }
-
-    /**
-     * Setter for senderAlias
-     * protected because of one time usage of packets
-     *
-     * @param senderAlias
-     */
-    protected void setSenderAlias(String senderAlias) {
-        this.senderAlias = senderAlias;
-    }
-    /**
-     * Setter for senderAlias protected because of one time usage of packets
-     *
-     */
-    public void prepare() {
-        if (this.isPrepared) {
-            // TODO Decrypt
-            this.isPrepared = false;
-        } else {
-            // TODO Encrypt
-            this.isPrepared = true;
-        }
+    public String getSender() {
+        return this.sender;
     }
 }

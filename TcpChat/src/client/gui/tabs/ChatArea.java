@@ -21,38 +21,34 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package common.networking.packets;
+package client.gui.tabs;
 
-import common.networking.MessagePacket;
-import common.networking.PacketType;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JTextPane;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
 
 /**
- * Class for a specific packet type
+ * Class for a chat area
  *
- * @author Manuel Schmid, Fabian Fink
+ * @author Manuel Schmid
  */
-public class GroupMessagePacket extends MessagePacket {
-
-protected String sender;
+public class ChatArea extends JTextPane {
 
     /**
-     * Constructor
+     * Appends a string at th4e end of the document
      *
-     * @param message message to send
-     * @param sender name of sender
+     * @param s
      */
-    public GroupMessagePacket(String message, String sender) {
-        this.message = message;
-        this.sender = sender;
-        this.packetIdentifier = PacketType.GM;
-    }
-    
-    /**
-     * Getter for the sender
-     *
-     * @return
-     */
-    public String getSender() {
-        return this.sender;
+    public void append(String s) {
+
+        Document doc = this.getDocument();
+        try {
+            doc.insertString(doc.getLength(), s, null);
+        } catch (BadLocationException ex) {
+            // TODO remove logger
+            Logger.getLogger(ChatArea.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 }

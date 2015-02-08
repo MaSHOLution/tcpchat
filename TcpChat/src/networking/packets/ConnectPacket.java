@@ -21,10 +21,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package common.networking.packets;
+package networking.packets;
 
-import common.networking.Packet;
-import common.networking.PacketType;
+import networking.general.Packet;
+import networking.general.PacketType;
 
 /**
  * Class for a specific packet type
@@ -32,7 +32,7 @@ import common.networking.PacketType;
  * @author Manuel Schmid, Fabian Fink
  */
 public class ConnectPacket extends Packet {
-    
+
     protected final String name;
 
     /**
@@ -42,14 +42,15 @@ public class ConnectPacket extends Packet {
      */
     public ConnectPacket(String name) {
         this.name = name;
-        this.packetIdentifier = PacketType.CONNECT;
+        this.packetIdentifier = PacketType.Connect;
     }
-    
+
     /**
      * Getter for name
+     *
      * @return name
      */
-    public String getName(){
+    public String getName() {
         return this.name;
     }
 }

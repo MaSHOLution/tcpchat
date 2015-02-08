@@ -24,6 +24,7 @@
 package security.cryptography.method;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -73,6 +74,8 @@ public final class Aes extends EncryptionMethod implements crypter {
             return myEncoder.encode(encrypted);
         } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException ex) {
             // TODO handle exceptions
+        } finally {
+            logging.general.Counters.exception();
         }
         return null;
     }
@@ -95,6 +98,8 @@ public final class Aes extends EncryptionMethod implements crypter {
 
         } catch (IOException | NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException ex) {
             // TODO handle exceptions
+        } finally {
+            logging.general.Counters.exception();
         }
         return null;
     }
@@ -110,8 +115,10 @@ public final class Aes extends EncryptionMethod implements crypter {
             key = sha.digest(key);
             key = Arrays.copyOf(key, CryptoBasics.encryption);
             this.secretKeySpec = new SecretKeySpec(key, "AES");
-        } catch (Exception e) {
+        } catch (UnsupportedEncodingException | NoSuchAlgorithmException ex) {
             // TODO handle exceptions
+        } finally {
+            logging.general.Counters.exception();
         }
     }
 }

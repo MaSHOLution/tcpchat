@@ -23,8 +23,12 @@
  */
 package client.gui;
 
-import common.networking.Packet;
-import common.networking.packets.*;
+import client.gui.tabs.ChatTab;
+import client.gui.tabs.ChatType;
+import client.gui.tabs.TabController;
+import client.gui.userlist.UserListController;
+import networking.packets.*;
+import networking.general.Packet;
 import java.awt.event.KeyEvent;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -33,6 +37,10 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.List;
+import javax.swing.DefaultListModel;
+import static javax.swing.JList.*;
+import static javax.swing.ListSelectionModel.SINGLE_SELECTION;
 
 /**
  * This is the gui class for the client Run this file to initialize gui
@@ -50,13 +58,17 @@ public final class ClientGui extends javax.swing.JFrame {
     protected BufferedReader inputLine = null;
 
     protected DialogHelper dialogHelper = null;
-    
+
     protected boolean isConnected = false;
     protected boolean hasWrittenMessage = false;
-    
-    protected String clientName;
 
-    protected enum connectButtonText {
+    protected String clientName, host;
+    protected int port;
+
+    protected TabController tabController;
+    protected UserListController userListController;
+
+    private enum connectButtonText {
 
         Connect,
         Disconnect
@@ -67,10 +79,22 @@ public final class ClientGui extends javax.swing.JFrame {
      */
     public ClientGui() {
         initComponents();
+
+        this.tabController = new TabController(this.tabbedPane);
+        this.userListController = new UserListController(this.lbUsers, tabController);
+
+        // Set fields to default value
+        tbPort.setText("8000");
+        tbServer.setText("localhost");
+
         // Initialize a new DialogHelper
-        this.dialogHelper = new DialogHelper(this);
+        dialogHelper = new DialogHelper(this);
+
         // Center JFrame
         setLocationRelativeTo(null);
+
+        // Add shutdown hook
+        Runtime.getRuntime().addShutdownHook(new ShutdownHandle());
     }
 
     /**
@@ -91,15 +115,18 @@ public final class ClientGui extends javax.swing.JFrame {
         tbServer = new javax.swing.JTextField();
         jLabel3 = new javax.swing.JLabel();
         tbNickname = new javax.swing.JTextField();
-        serverPanel = new javax.swing.JScrollPane();
-        taChat = new javax.swing.JTextArea();
         sendPanel = new javax.swing.JPanel();
         bSendMessage = new javax.swing.JButton();
         tbMessage = new javax.swing.JTextField();
+        jPanel1 = new javax.swing.JPanel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        lbUsers = new javax.swing.JList();
+        jLabel4 = new javax.swing.JLabel();
+        tabbedPane = new javax.swing.JTabbedPane();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Chat-Client");
-        setMinimumSize(new java.awt.Dimension(580, 400));
+        setMinimumSize(new java.awt.Dimension(700, 400));
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent evt) {
                 formWindowClosing(evt);
@@ -112,8 +139,6 @@ public final class ClientGui extends javax.swing.JFrame {
                 bConnectActionPerformed(evt);
             }
         });
-
-        tbPort.setText("8000");
 
         org.jdesktop.beansbinding.Binding binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, connectionPanel, org.jdesktop.beansbinding.ELProperty.create("${enabled}"), tbPort, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
         bindingGroup.addBinding(binding);
@@ -134,7 +159,8 @@ public final class ClientGui extends javax.swing.JFrame {
         binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, connectionPanel, org.jdesktop.beansbinding.ELProperty.create("${enabled}"), jLabel2, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
         bindingGroup.addBinding(binding);
 
-        tbServer.setText("mash-it.org");
+        tbServer.setMinimumSize(new java.awt.Dimension(50, 20));
+        tbServer.setName(""); // NOI18N
 
         binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, connectionPanel, org.jdesktop.beansbinding.ELProperty.create("${enabled}"), tbServer, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
         bindingGroup.addBinding(binding);
@@ -170,13 +196,13 @@ public final class ClientGui extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(tbServer)
+                .addComponent(tbServer, javax.swing.GroupLayout.DEFAULT_SIZE, 153, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(tbPort, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(bConnect, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(bConnect, javax.swing.GroupLayout.PREFERRED_SIZE, 126, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
         connectionPanelLayout.setVerticalGroup(
             connectionPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -191,19 +217,6 @@ public final class ClientGui extends javax.swing.JFrame {
                     .addComponent(bConnect))
                 .addGap(1, 1, 1))
         );
-
-        serverPanel.setFocusable(false);
-
-        taChat.setEditable(false);
-        taChat.setColumns(20);
-        taChat.setFont(new java.awt.Font("Tahoma", 0, 13)); // NOI18N
-        taChat.setRows(5);
-        taChat.setFocusable(false);
-
-        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, sendPanel, org.jdesktop.beansbinding.ELProperty.create("${enabled}"), taChat, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
-        bindingGroup.addBinding(binding);
-
-        serverPanel.setViewportView(taChat);
 
         sendPanel.setEnabled(false);
 
@@ -234,7 +247,7 @@ public final class ClientGui extends javax.swing.JFrame {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, sendPanelLayout.createSequentialGroup()
                 .addComponent(tbMessage)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(bSendMessage, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(bSendMessage, javax.swing.GroupLayout.PREFERRED_SIZE, 107, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
         sendPanelLayout.setVerticalGroup(
             sendPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -243,25 +256,70 @@ public final class ClientGui extends javax.swing.JFrame {
                 .addComponent(tbMessage))
         );
 
+        lbUsers.setModel(new DefaultListModel());
+        lbUsers.setLayoutOrientation(VERTICAL);
+        lbUsers.setSelectionMode(SINGLE_SELECTION);
+        lbUsers.setVisibleRowCount(-1);
+        lbUsers.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
+            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
+                lbUsersValueChanged(evt);
+            }
+        });
+        jScrollPane1.setViewportView(lbUsers);
+
+        jLabel4.setText("Userlist");
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGap(35, 35, 35)
+                .addComponent(jLabel4)
+                .addContainerGap(37, Short.MAX_VALUE))
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addGap(7, 7, 7)
+                .addComponent(jLabel4)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 320, Short.MAX_VALUE))
+        );
+
+        tabbedPane.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                tabbedPaneStateChanged(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+            .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(serverPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 560, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(sendPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(connectionPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(connectionPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(tabbedPane))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(connectionPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(serverPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 345, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(connectionPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(tabbedPane))
+                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(sendPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -271,6 +329,28 @@ public final class ClientGui extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
+        this.closeHandle();
+    }//GEN-LAST:event_formWindowClosing
+
+    private void tbMessageKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tbMessageKeyPressed
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            this.sendMessageBox();
+        }
+    }//GEN-LAST:event_tbMessageKeyPressed
+
+    private void tbNicknameKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tbNicknameKeyPressed
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            this.connect();
+        }
+    }//GEN-LAST:event_tbNicknameKeyPressed
+
+    private void tbServerKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tbServerKeyPressed
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            this.connect();
+        }
+    }//GEN-LAST:event_tbServerKeyPressed
 
     private void tbPortKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tbPortKeyPressed
         if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
@@ -286,35 +366,46 @@ public final class ClientGui extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_bConnectActionPerformed
 
-    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
-        if (this.isConnected) {
-            if (this.hasWrittenMessage) {
-                this.disconnect();
-            }
-        }
-    }//GEN-LAST:event_formWindowClosing
-
-    private void tbNicknameKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tbNicknameKeyPressed
-        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
-            this.connect();
-        }
-    }//GEN-LAST:event_tbNicknameKeyPressed
-
-    private void tbServerKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tbServerKeyPressed
-        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
-            this.connect();
-        }
-    }//GEN-LAST:event_tbServerKeyPressed
-
     private void bSendMessageActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bSendMessageActionPerformed
         this.sendMessageBox();
     }//GEN-LAST:event_bSendMessageActionPerformed
 
-    private void tbMessageKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tbMessageKeyPressed
-        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
-            this.sendMessageBox();
+    // TODO Add userlist programmatically
+    private void lbUsersValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_lbUsersValueChanged
+        List<String> selectedElements = this.lbUsers.getSelectedValuesList();
+        if (!evt.getValueIsAdjusting() && selectedElements.size() > 0) {
+            boolean addTab = true;
+            int index = -1;
+
+            for (String selectedElement : selectedElements) {
+
+                index = this.tabController.getTabIndexByTitle(selectedElement);
+                // Check if client has selected himself or chat already exists
+                if (selectedElement.equals(this.clientName) || index != -1) {
+                    addTab = false;
+                    break;
+                }
+            }
+
+            if (!addTab) {
+                if (index != -1) {
+                    tabController.setFocusAt(index);
+                } else {
+                    dialogHelper.showInfoDialog("Info", "This is you. You can't send messages to yourself!");
+                }
+            } else {
+
+                tabController.addTab(selectedElements, ChatType.Private);
+                tabController.setFocusAt(selectedElements.get(0));
+            }
+
+            this.tbMessage.requestFocus();
         }
-    }//GEN-LAST:event_tbMessageKeyPressed
+    }//GEN-LAST:event_lbUsersValueChanged
+
+    private void tabbedPaneStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_tabbedPaneStateChanged
+        this.tabController.setActiveChatTab(tabbedPane.getSelectedIndex());
+    }//GEN-LAST:event_tabbedPaneStateChanged
 
     /**
      * Connects the client to the server
@@ -326,8 +417,8 @@ public final class ClientGui extends javax.swing.JFrame {
         if (checkConnData()) {
 
             // Initiating variables
-            String host = this.tbServer.getText();
-            int port = Integer.parseInt(this.tbPort.getText());
+            this.host = this.tbServer.getText();
+            this.port = Integer.parseInt(this.tbPort.getText());
             this.clientName = this.tbNickname.getText().trim();
 
             // Open a socket on a given host and port. Open input and output streams.
@@ -338,24 +429,27 @@ public final class ClientGui extends javax.swing.JFrame {
                 outStream = new ObjectOutputStream(clientSocket.getOutputStream());
                 inStream = new ObjectInputStream(clientSocket.getInputStream());
 
-                // Initial clear of the chat text area
-                this.clearChatArea();
-
                 // Create a thread to read from the server
                 new Thread(new ClientGuiThread(this)).start();
 
                 // Send clientName
-                this.send(new ConnectPacket(this.clientName));
+                if (this.send(new ConnectPacket(this.clientName))) {
 
-                this.switchGui(true);
-                this.isConnected = true;
-                return true;
+                    this.switchGui(true);
+                    this.isConnected = true;
 
-            } catch (UnknownHostException e) {
+                    return true;
+                }
+
+                this.dialogHelper.showWarningDialog("Warning", "Could not send data to host \"" + host + "\" on Port " + port);
+                return false;
+            } catch (UnknownHostException ex) {
                 this.dialogHelper.showWarningDialog("Warning", "Don't know about host " + host);
-            } catch (IOException e) {
+            } catch (IOException ex) {
                 this.dialogHelper.showWarningDialog("Connection failed", "Could not connect to host \"" + host + "\" on Port " + port);
             }
+
+            logging.general.Counters.exception();
             return false;
         }
         return false;
@@ -368,40 +462,55 @@ public final class ClientGui extends javax.swing.JFrame {
         this.send(new DisconnectPacket());
     }
 
+    /**
+     * Checks if given data is valid
+     *
+     * @return
+     */
     protected boolean checkConnData() {
         String nickname = this.tbNickname.getText();
         String server = this.tbServer.getText();
         String portText = this.tbPort.getText();
-        int port = Integer.parseInt(portText);
+        int connectionPort = Integer.parseInt(portText);
 
-        if (nickname.trim().equals("")) {
-            this.dialogHelper.showInfoDialog("Info", "Nickname darf nicht leer sein");
-        } else if (server.trim().equals("")) {
-            this.dialogHelper.showInfoDialog("Info", "Server darf nicht leer sein");
-        } else if (portText.trim().equals("")) {
-            this.dialogHelper.showInfoDialog("Info", "Server darf nicht leer sein");
-        } else if (port < 1 || port > 65555) {
-            this.dialogHelper.showInfoDialog("Info", "Port muss zwischen 1 und 65555 liegen");
-        } else {
-            return true;
+        try {
+            if (nickname.trim().equals("")) {
+                this.dialogHelper.showInfoDialog("Info", "Please set a nickname");
+            } else if (server.trim().equals("")) {
+                this.dialogHelper.showInfoDialog("Info", "Please set a server to connect to");
+            } else if (portText.trim().equals("")) {
+                this.dialogHelper.showInfoDialog("Info", "Please set a port to which to connect to on the server");
+            } else if (connectionPort < 1 || connectionPort > 65555) {
+                this.dialogHelper.showInfoDialog("Info", "The given port has to be an integer in the range from 1 to 65535");
+            } else {
+                return true;
+            }
+            return false;
+        } catch (Exception ex) {
+            this.dialogHelper.showInfoDialog("ERROR", "An error occured, message: " + ex.getMessage());
+            return false;
         }
-        return false;
     }
 
     /**
      * Sends a packet through the outStream to the server
-     * 
+     *
      * @param packet packet to send
+     * @return
      */
-    protected void send(Packet packet) {
+    protected boolean send(Packet packet) {
 
         try {
             this.outStream.writeObject(packet);
             this.tbMessage.setText("");
             this.hasWrittenMessage = true;
+            return true;
         } catch (IOException ex) {
             // TODO exception handling
+        } finally {
+            logging.general.Counters.exception();
         }
+        return false;
     }
 
     /**
@@ -411,40 +520,17 @@ public final class ClientGui extends javax.swing.JFrame {
         String message = this.tbMessage.getText().trim();
         //Check if line is empty
         if (!message.equals("")) {
-            if (message.startsWith("@")) {
-                // messageArray[0] == clientName of receiver
-                // messageArray[1] == message
-                String[] messageArray = message.split("\\s", 2);
-                if (messageArray.length > 1 && messageArray[1] != null) {
-                    if (!messageArray[1].isEmpty()) {
-                        this.send(new PrivateMessagePacket(messageArray[1], this.clientName , messageArray[0].substring(1)));
-                    }
-                } else {
-                    this.outputLineOnGui("Format for PM: @<receiver> <message>");
+            ChatTab currentChatTab = this.tabController.getCurrentChatTab();
+            if (currentChatTab.getChatType() == ChatType.Private) {
+                // TODO Implement group messages
+                for (String person : currentChatTab.getPersons()) {
+                    this.send(new PrivateMessagePacket(message, this.clientName, person));
                 }
-            } else {
+            } else if (currentChatTab.getChatType() == ChatType.Group) {
                 this.send(new GroupMessagePacket(message, this.clientName));
             }
         }
-    }
-
-    /**
-     * Output a message on the chat text area
-     *
-     * @param message
-     */
-    public synchronized void outputLineOnGui(String message) {
-        if (!message.trim().equals("")) {
-            this.taChat.append("\n" + message);
-            this.taChat.setCaretPosition(taChat.getDocument().getLength());
-        }
-    }
-
-    /**
-     * Clears the chat text area
-     */
-    protected void clearChatArea() {
-        this.taChat.setText("");
+        this.tbMessage.requestFocus();
     }
 
     /**
@@ -458,8 +544,10 @@ public final class ClientGui extends javax.swing.JFrame {
             this.clientSocket.close();
 
             this.switchGui(false);
-        } catch (IOException e) {
-            System.err.println("IOException:  " + e);
+        } catch (IOException ex) {
+            System.err.println("IOException:  " + ex);
+        } finally {
+            logging.general.Counters.exception();
         }
     }
 
@@ -472,14 +560,42 @@ public final class ClientGui extends javax.swing.JFrame {
     protected void switchGui(boolean isEnabled) {
 
         if (isEnabled) {
-            this.bConnect.setText(connectButtonText.Disconnect.toString());
-            this.tbMessage.requestFocus();
+            tabController.init();
+            bConnect.setText(connectButtonText.Disconnect.toString());
+            tbMessage.requestFocus();
         } else {
-            this.bConnect.setText(connectButtonText.Connect.toString());
+            tabController.terminate();
+            userListController.clearList();
+            bConnect.setText(connectButtonText.Connect.toString());
         }
-        this.pack();
-        this.sendPanel.setEnabled(isEnabled);
-        this.connectionPanel.setEnabled(!isEnabled);
+
+        sendPanel.setEnabled(isEnabled);
+        lbUsers.setEnabled(isEnabled);
+        connectionPanel.setEnabled(!isEnabled);
+
+        //this.pack();
+    }
+
+    /**
+     * Disconnects the user on close
+     */
+    private void closeHandle() {
+        if (this.isConnected) {
+            if (this.hasWrittenMessage) {
+                this.disconnect();
+            }
+        }
+    }
+
+    /**
+     * Handle for disconnect on close
+     */
+    class ShutdownHandle extends Thread {
+
+        @Override
+        public void run() {
+            closeHandle();
+        }
     }
 
     /**
@@ -501,6 +617,8 @@ public final class ClientGui extends javax.swing.JFrame {
             }
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | javax.swing.UnsupportedLookAndFeelException ex) {
             java.util.logging.Logger.getLogger(ClientGui.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } finally {
+            logging.general.Counters.exception();
         }
 
         /* Create and display the form */
@@ -519,9 +637,12 @@ public final class ClientGui extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JList lbUsers;
     private javax.swing.JPanel sendPanel;
-    private javax.swing.JScrollPane serverPanel;
-    private javax.swing.JTextArea taChat;
+    private javax.swing.JTabbedPane tabbedPane;
     private javax.swing.JTextField tbMessage;
     private javax.swing.JTextField tbNickname;
     private javax.swing.JTextField tbPort;

@@ -36,10 +36,20 @@ public enum LogDir {
 
     private final String dir;
 
+    /**
+     * Constructor
+     *
+     * @param dir
+     */
     LogDir(String dir) {
         this.dir = dir;
     }
 
+    /**
+     * Getter for directory
+     *
+     * @return
+     */
     public String getDir() {
         return dir;
     }

@@ -21,39 +21,35 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package logging.enums;
+package networking.packets;
+
+import networking.general.MessagePacket;
+import networking.general.PacketType;
 
 /**
- * Enum for logpaths
+ * Class for a specific packet type
  *
- * @author Manuel Schmid
+ * @author Manuel Schmid, Fabian Fink
  */
-public enum LogPath {
-
-    LOGDIR("logs"),
-    CLIENTLOGDIR("clientlogs"),
-    SERVERLOGDIR("serverlogs"),
-    CONNECTION("connection.log"),
-    EXCEPTION("exception.log"),
-    GENERAL("general.log");
-
-    private final String path;
+public class InfoPacket extends MessagePacket {
 
     /**
      * Constructor
      *
-     * @param path
+     * @param message
      */
-    LogPath(String path) {
-        this.path = path;
+    public InfoPacket(String message) {
+        this.message = message;
+        this.packetIdentifier = PacketType.Info;
     }
 
     /**
-     * Getter for path
+     * Getter for message
      *
-     * @return
+     * @return mesage
      */
-    public String getPath() {
-        return path;
+    @Override
+    public String getMessage() {
+        return this.message;
     }
 }

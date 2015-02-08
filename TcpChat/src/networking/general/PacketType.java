@@ -21,39 +21,23 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package logging.enums;
+package networking.general;
 
 /**
- * Enum for logpaths
+ * Enum for packet types
  *
- * @author Manuel Schmid
+ * @author Manuel Schmid, Fabian Fink
  */
-public enum LogPath {
+public enum PacketType {
 
-    LOGDIR("logs"),
-    CLIENTLOGDIR("clientlogs"),
-    SERVERLOGDIR("serverlogs"),
-    CONNECTION("connection.log"),
-    EXCEPTION("exception.log"),
-    GENERAL("general.log");
-
-    private final String path;
-
-    /**
-     * Constructor
-     *
-     * @param path
-     */
-    LogPath(String path) {
-        this.path = path;
-    }
-
-    /**
-     * Getter for path
-     *
-     * @return
-     */
-    public String getPath() {
-        return path;
-    }
+    Connect,
+    Disconnect,
+    GM,
+    Info,
+    Invalid,
+    Message, // Abstract
+    Userlist,
+    Kick,
+    Packet, // Abstract
+    PM,
 }

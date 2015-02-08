@@ -21,21 +21,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package common.networking;
+package networking.general;
 
 /**
- * Enum for packet types
  *
- * @author Manuel Schmid, Fabian Fink
+ * @author Manuel Schmid
  */
-public enum PacketType {
+public enum UserListPacketType {
 
-    CONNECT,
-    DISCONNECT,
-    GM,
-    INFO,
-    MESSAGE,  // Abstract
-    KICK,
-    PACKET,   // Abstract
-    PM, 
+    Full,
+    Connected,
+    Disconnected;
 }

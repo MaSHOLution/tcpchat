@@ -21,39 +21,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package logging.enums;
+package networking.general;
 
 /**
- * Enum for logpaths
+ * Abstract class for packets
  *
  * @author Manuel Schmid
  */
-public enum LogPath {
+public abstract class MessagePacket extends Packet {
 
-    LOGDIR("logs"),
-    CLIENTLOGDIR("clientlogs"),
-    SERVERLOGDIR("serverlogs"),
-    CONNECTION("connection.log"),
-    EXCEPTION("exception.log"),
-    GENERAL("general.log");
-
-    private final String path;
+    //protected PacketType packetIdentifier = PacketType.MESSAGEPACKET;
+    protected String message;
 
     /**
-     * Constructor
+     * Getter for message
      *
-     * @param path
+     * @return mesage
      */
-    LogPath(String path) {
-        this.path = path;
-    }
-
-    /**
-     * Getter for path
-     *
-     * @return
-     */
-    public String getPath() {
-        return path;
+    public String getMessage() {
+        return this.message;
     }
 }

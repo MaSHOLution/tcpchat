@@ -23,10 +23,18 @@
  */
 package client.gui;
 
-import common.networking.*;
-import common.networking.packets.*;
+import client.gui.tabs.TabController;
+import networking.packets.KickPacket;
+import networking.packets.PrivateMessagePacket;
+import networking.packets.UserListPacket;
+import networking.packets.GroupMessagePacket;
+import networking.general.PacketType;
+import networking.general.MessagePacket;
+import networking.general.Packet;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.util.List;
+import networking.packets.InvalidPacket;
 
 /**
  * This class serves as an outsourced thread, as the gui can only handle one
@@ -41,6 +49,8 @@ public class ClientGuiThread implements Runnable {
 
     // Current gui thread
     protected ClientGui gui = null;
+
+    protected boolean exitListening = false;
 
     /**
      * Constructor
@@ -60,52 +70,90 @@ public class ClientGuiThread implements Runnable {
     @Override
     public void run() {
 
+        try {
+            while (!TabController.isInitialized()) {
+                Thread.sleep(100);
+            }
+        } catch (InterruptedException ex) {
+        }
+
         /*
          * Keep on reading from the socket untill "Bye" is received from the
          * server
          */
         Packet responsePacket;
         PacketType ptype;
-        boolean exitWhile = false;
+
         String message, sender, receiver;
+        do {
+
+            responsePacket = read();
+            ptype = responsePacket.getIdentifier();
+
+            switch (ptype) {
+                case Disconnect:
+                    exitListening = true;
+                    break;
+                case GM:
+                    GroupMessagePacket gm = ((GroupMessagePacket) responsePacket);
+                    message = gm.getMessage();
+                    sender = gm.getSender();
+
+                    // Always output groupmessage on first tab ("Group Chat")
+                    gui.tabController.outputLineOnGui("<" + sender + "> " + message, 0);
+                    break;
+                case Kick:
+                    // TODO dialog?
+                    gui.tabController.outputLineOnGui(((KickPacket) responsePacket).getMessage());
+                    exitListening = true;
+                    break;
+                case PM:
+                    PrivateMessagePacket pm = ((PrivateMessagePacket) responsePacket);
+                    message = pm.getMessage();
+                    sender = pm.getSender();
+                    receiver = pm.getReceiver();
+
+                    // Get name of other person
+                    String person = (gui.clientName.equals(receiver)) ? sender : receiver;
+
+                    // TODO fix bug where sender is this client
+                    if (gui.tabController.outputLineOnGui("<" + sender + "> " + message, person)) {
+                        if (gui.clientName.equals(sender)) {
+                            gui.tabController.setFocusAt(receiver);
+                        }
+                    }
+
+                    break;
+
+                case Userlist:
+                    UserListPacket ulPacket = (UserListPacket) responsePacket;
+                    gui.userListController.updateUserList(ulPacket);
+                    break;
+                case Info:
+                    gui.tabController.outputLineOnGui(((MessagePacket) responsePacket).getMessage());
+            }
+        } while (!exitListening);
+        // Close the connection as it is no longer needed
+        gui.closeConnection();
+    }
+
+    /**
+     * Reads a message from a specific inStream
+     *
+     * @return read packet
+     */
+    protected synchronized Packet read() {
         try {
-            do {
-
-                responsePacket = (Packet) inStream.readObject();
-                ptype = responsePacket.getIdentifier();
-
-                switch (ptype) {
-                    case DISCONNECT:
-                        gui.outputLineOnGui("*** Disconnected ***");
-                        exitWhile = true;
-                        break;
-                    case KICK:
-                        gui.outputLineOnGui(((KickPacket) responsePacket).getMessage());
-                        exitWhile = true;
-                        break;
-                    case PM:
-                        PrivateMessagePacket pm = ((PrivateMessagePacket) responsePacket);
-                        message = pm.getMessage();
-                        sender = pm.getSender();
-                        receiver = pm.getReceiver();
-                        
-                        gui.outputLineOnGui("<" + sender + " to " + receiver + "> " + message);
-                        break;
-                    case GM:
-                        GroupMessagePacket gm = ((GroupMessagePacket) responsePacket);
-                        message = gm.getMessage();
-                        sender = gm.getSender();
-                        
-                        gui.outputLineOnGui("<" + sender + "> " + message);
-                        break;
-                    default:
-                        gui.outputLineOnGui(((MessagePacket) responsePacket).getMessage());
-                }
-            } while(!exitWhile);
-            // Close the connection as it is no longer needed
-            gui.closeConnection();
-        } catch (IOException | ClassNotFoundException e) {
-            System.err.println("Exception:  " + e);
+            Object temp = this.inStream.readObject();
+            if (temp instanceof Packet) {
+                Packet readPacket = (Packet) temp;
+                return readPacket;
+            }
+        } catch (IOException | ClassNotFoundException ex) {
+            // TODO dialog?
+            gui.tabController.outputLineOnGui("*** SERVER IS GOING DOWN ***");
+            exitListening = true;
         }
+        return new InvalidPacket();
     }
 }

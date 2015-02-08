@@ -1,0 +1,53 @@
+title Networking
+
+loop Accept Clients
+    Client->Server: Connect to socket
+    alt Server is full
+        Server->RecectionThread: Start
+        RecectionThread->Client: KickPacket ("Too many clients")
+        note over RecectionThread: Close RejectionThread
+    else
+        Server->ClientThread: Create and start
+        Client->ClientThread: ConnectPacket
+        alt Packet is not ConnectPacket
+            alt Packet is not DisconnectPacket
+                ClientThread->Client: KickPacket("Please do not use a modified client")
+            end
+            note over ClientThread: Close thread
+        else
+            alt Nickname too long
+                ClientThread->Client: KickPacket("Nickname too long")
+            else
+                note over ClientThread: Create UserListPacket
+                ClientThread->Client: UserListPacket
+                ClientThread->All other ClientThreads: UserListPacket
+                ClientThread->All other ClientThreads: InfoPacket ("User x has logged in")
+                loop Client can send messages now
+                    opt Private Message
+                        Client->+ClientThread: PrivateMessagePacket
+                        alt Receiver is online
+                            ClientThread->One specific ClientThread: PrivateMessagePacket
+                            ClientThread->-Client: PrivateMessagePacket
+                        else
+                            ClientThread->Client: InfoPacket ("Message could not be delivered")
+                        end
+                    end 
+                    opt All other packets
+                        Client->+ClientThread: Packet
+                        ClientThread->-All other ClientThreads: GroupMessagePacket
+                    end
+                    opt Receive Packet
+                        One specific ClientThread->Client: Packet
+                    end
+                    opt Disconnect
+                        Client->+ClientThread: DisconnectPacket
+                    end
+                end
+            end
+            ClientThread->-All other ClientThreads: InfoPacket ("User x has left")
+            ClientThread->Client: DisconnectPacket
+            ClientThread->All other ClientThreads: UserListPacket
+            note over ClientThread: Close thread
+        end
+    end
+end

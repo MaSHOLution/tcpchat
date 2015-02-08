@@ -23,18 +23,17 @@
  */
 package server.console;
 
-import common.networking.Packet;
-import common.networking.packets.KickPacket;
+import networking.packets.KickPacket;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import logging.Counters;
-import logging.CustomLogging;
-import logging.LoggingController;
+import logging.general.Counters;
+import logging.general.LoggingController;
 import logging.enums.LogName;
 import logging.enums.LogPath;
 import static server.console.ChatServer.*;
@@ -45,8 +44,10 @@ import static server.console.ChatServer.*;
 public final class ChatServer {
 
     // Setting up client
-    protected static final int maxClientsCount = 10;
-    protected static final ClientThread[] threads = new ClientThread[maxClientsCount];
+    // maxClientsCount = 0 means infinite clients
+    protected static final int maxClientsCount = 0;
+    protected static final List<ClientThread> threads = new ArrayList<>();
+    protected static List<String> userList = new ArrayList<>();
 
     // Logging
     protected static Logger logConnection = null;
@@ -94,43 +95,30 @@ public final class ChatServer {
 
                 // Create client socket for each connection
                 while (true) {
-                    try {
-                        // Handle for new connection, put it into empty array-slot
-                        clientSocket = serverSocket.accept();
-                        Counters.connection();
-                        int i;
-                        for (i = 0; i < maxClientsCount; i++) {
-                            if (threads[i] == null) {
-                                (threads[i] = new ClientThread(clientSocket)).start();
-                                logControl.log(logConnection, Level.INFO, clientSocket.getRemoteSocketAddress() + ": accepted, thread started");
-                                Counters.login();
-                                break;
-                            }
-                        }
-
-                        // Only when maxclients is reached
-                        if (i == maxClientsCount) {
-                            
-                            try (ObjectOutputStream oos = new ObjectOutputStream(clientSocket.getOutputStream())) {
-                                  oos.writeObject(new KickPacket("Too many clients. Please try later."));
-                            }
-                            Counters.connection();
-                            logControl.log(logConnection, Level.INFO, clientSocket.getRemoteSocketAddress() + ": rejected, server is full");
-                            clientSocket.close();
-                        }
-                    } catch (IOException e) {
-                        System.out.println(e);
-                        logControl.log(logException, Level.SEVERE, clientSocket.getRemoteSocketAddress() + ": error while logging in (" + e.getMessage() + ")");
+                    // Handle for new connection, put it into empty array-slot
+                    clientSocket = serverSocket.accept();
+                    Counters.connection();
+                    // maxClientsCount = 0 means infinite clients
+                    if (threads.size() < maxClientsCount || maxClientsCount == 0) {
+                        ClientThread clientThread = new ClientThread(clientSocket);
+                        threads.add(clientThread);
+                        clientThread.start();
+                        logControl.log(logConnection, Level.INFO, clientSocket.getRemoteSocketAddress() + ": accepted, thread started");
+                        Counters.login();
+                    } else {
+                        // Only when maxclients is reached        
+                        RejectionThread fThread = new RejectionThread(clientSocket);
+                        fThread.start();
                     }
                 }
-            } catch (IOException e) {
-                System.out.println(e);
+            } catch (IOException ex) {
+                System.out.println(ex);
                 logControl.log(logException, Level.SEVERE, "Could not open Server Socket");
                 logControl.log(logException, Level.SEVERE, "Exiting Server");
                 logControl.log(logGeneral, Level.SEVERE, "Exiting Server");
+                logging.general.Counters.exception();
             }
         }
-
     }
 
     /**
@@ -140,6 +128,15 @@ public final class ChatServer {
         logConnection = logControl.create(LogName.SERVER, LogPath.CONNECTION);
         logException = logControl.create(LogName.SERVER, LogPath.EXCEPTION);
         logGeneral = logControl.create(LogName.SERVER, LogPath.GENERAL);
+    }
+
+    /**
+     * Getter for the userlist
+     *
+     * @return
+     */
+    public static List<String> getUserList() {
+        return userList;
     }
 }
 
@@ -151,9 +148,9 @@ class ShutdownHandle extends Thread {
         logControl.log(logConnection, Level.INFO, "*** SERVER IS GOING DOWN ***");
 
         // Send closing of server to all clients
-        for (int i = 0; i < maxClientsCount; i++) {
-            if (threads[i] != null && threads[i].clientName != null) {
-                send(threads[i], new KickPacket("SERVER IS GOING DOWN"));
+        for (ClientThread thread : threads) {
+            if (thread != null && thread.state == ConnectionState.Online) {
+                thread.send(new KickPacket("*** SERVER IS GOING DOWN ***"), thread);
             }
         }
         // Close all loggers
@@ -161,23 +158,6 @@ class ShutdownHandle extends Thread {
             for (Handler handler : logger.getHandlers()) {
                 handler.close();
             }
-        }
-    }
-
-    /**
-     * Writes a packet to a specific PrintStream
-     *
-     * @param printStream stream to write packet to
-     * @param packet stands for itself
-     */
-    private boolean send(ClientThread thread, Packet packet) {
-        try {
-            Counters.connection();
-            thread.outStream.writeObject(packet);
-            return true;
-        } catch (Exception e) {
-            ChatServer.logControl.log(CustomLogging.get(LogName.SERVER, LogPath.EXCEPTION), Level.INFO, e.getMessage());
-            return false;
         }
     }
 }

@@ -21,24 +21,37 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package common.networking;
+package client.gui.tabs;
 
 /**
- * Abstract class for packets
+ * Enum for different chat types
  *
  * @author Manuel Schmid
  */
-public abstract class MessagePacket extends Packet {
+public enum ChatType {
 
-    //protected PacketType packetIdentifier = PacketType.MESSAGEPACKET;
-    protected String message;
-    
+    Group(false),
+    Invalid(false),
+    Private(true);
+
+    // Set true if close button should be displayed on specific chat type
+    private final boolean hasCloseElement;
+
     /**
-     * Getter for message
+     * Constructor
      *
-     * @return mesage
+     * @param path
      */
-    public String getMessage() {
-        return this.message;
+    ChatType(boolean hasCloseElement) {
+        this.hasCloseElement = hasCloseElement;
+    }
+
+    /**
+     * Getter for close button existance
+     *
+     * @return existance of close button
+     */
+    public boolean hasCloseElement() {
+        return hasCloseElement;
     }
 }

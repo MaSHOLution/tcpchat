@@ -12,11 +12,11 @@ TCPChat is a server-based open source chat, which is equipped with the following
 
 ### Technology
 
-TCPChat is based on the network protocol <b>TCP</b>.
-In addition to this, it uses a <b>self-developed packet-framework</b>, which allows an easy transfer of data from cilent to server and vice versa.
+TCPChat is based on the network protocol **TCP**.
+In addition to this, it uses a **self-developed packet-framework**, which allows an easy transfer of data from cilent to server and vice versa.
 
 ### Installation
-Currently there is <b>no installer</b>. Just pull the repository:
+Currently there is **no installer**. Just pull the repository:
 
 ```sh
 $ git clone [git-repo-url] tcpchat
@@ -25,7 +25,7 @@ $ chmod 777 TcpChat/ #for log-files
 ```
 On Windows, you can execute .jar-Files by double-clicking on them. If it doesn't work, you can try to fix your system with [jarfix.exe].
 
-You can find the latest stable builds in the folder <b>"*stable_builds*"</b>
+You can find the latest stable builds in the folder **"*stable_builds*"**
 
 ### Starting stable Server
 Open your favorite terminal and run this command:
@@ -44,7 +44,7 @@ $ java -jar TCPChat_Client.jar
 ```
 
 ### Project Info
-TCPChat is a netbeans project, which is developed with <b>JDK 1.7.0_71</b> with regards to an eventually <b>upcoming Android App</b>.
+TCPChat is a netbeans project, which is developed with **JDK 1.7.0_71** with regards to an eventually **upcoming Android App**.
 
 ### Support
 This project is developed by Manuel Schmid.

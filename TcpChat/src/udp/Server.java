@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import networking.methods.Type;
 import networking.methods.Udp;
 
 /**
@@ -42,7 +43,7 @@ public class Server {
             int[] test = new int[5];
             String message;
             
-            Udp udp = new Udp("localhost", 8000);
+            Udp udp = new Udp("localhost", 8000, Type.Server);
             while (true) {
                 
                 // TODO create class sessionid

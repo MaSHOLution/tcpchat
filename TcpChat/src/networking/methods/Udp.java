@@ -31,7 +31,6 @@ import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import security.basics.SessionIdGenerator;
 
 /**
  *
@@ -47,9 +46,13 @@ public class Udp implements NetworkProtocolClass {
     private final DatagramSocket socket;
     private final int port;
 
-    public Udp(String server, int port) throws UnknownHostException, SocketException {
+    public Udp(String server, int port, Type type) throws UnknownHostException, SocketException {
+        if(type == Type.Client){
+            socket = new DatagramSocket(port);
+        } else {
+            socket = new DatagramSocket();
+        }
         serverIP = InetAddress.getByName(server);
-        socket = new DatagramSocket();
         this.port = port;
     }
 

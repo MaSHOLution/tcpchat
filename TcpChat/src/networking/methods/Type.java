@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2015 Manuel Schmid.
+ * Copyright 2015 manuelschmid.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,39 +21,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package udp;
-
-import java.net.SocketException;
-import java.net.UnknownHostException;
-import networking.methods.Udp;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import networking.methods.Type;
+package networking.methods;
 
 /**
  *
- * @author Manuel Schmid
+ * @author manuelschmid
  */
-public class Client {
-
-    private static Udp udp;
-
-    public static void main(String[] args) throws InterruptedException {
-        try {
-            udp = new Udp("localhost", 8000, Type.Client);
-            udp.sendSessionId();
-
-            String result = udp.read();
-
-            if (result.equals("Ok")) {
-                for (int i = 5; i >= 1; i--) {
-                    udp.send("Stringblabla");
-                    Thread.sleep(5000);
-                }
-            }
-        } catch (UnknownHostException | SocketException | InterruptedException ex) {
-            Logger.getLogger(Udp.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-    }
+public enum Type {
+    Client,
+    Server;
 }

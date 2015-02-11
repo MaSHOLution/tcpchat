@@ -79,13 +79,15 @@ public final class ClientGui extends javax.swing.JFrame {
      */
     public ClientGui() {
         initComponents();
-
+        
+        // Set up controllers
         this.tabController = new TabController(this.tabbedPane);
         this.userListController = new UserListController(this.lbUsers, tabController);
 
         // Set fields to default value
         tbPort.setText("8000");
-        tbServer.setText("mash-it.org");
+        tbServer.setText("localhost");
+//        tbServer.setText("mash-it.org");
 
         // Initialize a new DialogHelper
         dialogHelper = new DialogHelper(this);

@@ -24,7 +24,6 @@
 package client.gui.userlist;
 
 import client.gui.tabs.TabController;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;

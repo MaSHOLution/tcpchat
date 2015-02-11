@@ -38,6 +38,6 @@ public class InvalidPacket extends Packet {
      */
     public InvalidPacket() {
         this.packetIdentifier = PacketType.Invalid;
-        this.prepare();
+        //this.prepare();
     }
 }

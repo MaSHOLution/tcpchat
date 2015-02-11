@@ -23,39 +23,52 @@
  */
 package networking.methods;
 
-import security.basics.SessionIdGenerator;
+import networking.general.Packet;
+import security.basics.CryptoBasics;
+import security.cryptography.EncryptionMethod;
+import server.console.ClientThread;
 
 /**
  *
  * @author Manuel Schmid
  */
-public interface NetworkProtocolClass {
-    final String sessionId = new SessionIdGenerator().nextSessionId();
-    
+public interface NetworkProtocol {
+
+    final EncryptionMethod encMethod = CryptoBasics.makeEncryptionObject();
+
+    /**
+     * Returns the IP of the currently connected client
+     *
+     * @return IP of client
+     */
+    public String getIP();
+
     /**
      * Sends a message
-     * 
-     * @param message
-     * @return 
+     *
+     * @param packet
+     * @return
      */
-    public boolean send(String message);
-    
-    /**
-     * Reads an object
-     * 
-     * @param <T> read object
-     * @return 
-     */
-    public <T>T read();
-    
+    public boolean send(Packet packet);
+
     /**
      * Sends the session id
-     * @return 
+     *
+     * @return
      */
     public boolean sendSessionId();
-    
+
+    /**
+     * Reads an object
+     *
+     * @return
+     */
+    public Packet read();
+
     /**
      * Closes all opened streams
+     *
+     * @return everything closed?
      */
     public boolean close();
 }

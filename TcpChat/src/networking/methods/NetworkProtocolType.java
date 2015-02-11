@@ -27,7 +27,7 @@ package networking.methods;
  *
  * @author manuelschmid
  */
-public enum Type {
-    Client,
-    Server;
+public enum NetworkProtocolType {
+    TCP,
+    UDP;
 }

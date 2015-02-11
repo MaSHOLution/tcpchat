@@ -26,11 +26,13 @@ package networking.methods;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.InetAddress;
 import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import logging.general.Counters;
 import networking.general.Packet;
+import networking.packets.InfoPacket;
 import networking.packets.InvalidPacket;
 import server.console.ClientThread;
 
@@ -38,22 +40,29 @@ import server.console.ClientThread;
  *
  * @author Manuel Schmid
  */
-public class TCP implements NetworkProtocolClass {
+public class TCP extends AbstractNetworkProtocol {
 
-    protected ObjectInputStream inStream = null;
-    protected ObjectOutputStream outStream = null;
-    protected Socket clientSocket = null;
+    public ObjectInputStream inStream = null;
+    public ObjectOutputStream outStream = null;
+    private Socket clientSocket = null;
+    private final InetAddress ip;
+    private final String ipString;
+    private final NetworkProtocolUserType type;
 
     /**
      * Constructor, creates input and output streams
      *
      * @param clientSocket Socket for client
+     * @param type
      * @throws IOException
      */
-    public TCP(Socket clientSocket) throws IOException {
+    public TCP(Socket clientSocket, NetworkProtocolUserType type) throws IOException {
         this.clientSocket = clientSocket;
         inStream = new ObjectInputStream(clientSocket.getInputStream());
         outStream = new ObjectOutputStream(clientSocket.getOutputStream());
+        ip = clientSocket.getInetAddress();
+        ipString = ip.toString();
+        this.type = type;
     }
 
     /**
@@ -62,33 +71,35 @@ public class TCP implements NetworkProtocolClass {
      * @param packet stands for itself
      * @return result of sending
      */
-    public synchronized boolean send(Packet packet) {
+    @Override
+    public boolean send(Packet packet) {
         try {
             Counters.connection();
-            this.outStream.writeObject(packet);
+            outStream.writeObject(packet);
             return true;
         } catch (IOException ex) {
 //            logControl.log(logException, Level.INFO, this.ip + "(" + this.clientName + "): " + ex.getMessage());
-//            logging.general.Counters.exception();
+            Counters.exception();
         }
         return false;
     }
 
     /**
-     * Writes a obj to a specific PrintStream
+     * Writes a Packet to a specific ObjectOutputStream
      *
      * @param packet stands for itself
      * @param thread ClientThread to send obj to
      * @return result of sending
      */
-    public synchronized boolean send(Packet packet, ClientThread thread) {
+    public static boolean send(Packet packet, ClientThread thread) {
         try {
             Counters.connection();
-            thread.conLib.outStream.writeObject(packet);
+            // TODO TEST!!!!!!!!!!!!!
+            thread.conLib.send(packet);
             return true;
         } catch (Exception ex) {
 //            logControl.log(logException, Level.INFO, this.ip + "(" + this.clientName + "): " + ex.getMessage());
-//            logging.general.Counters.exception();
+            Counters.exception();
         }
         return false;
     }
@@ -99,7 +110,7 @@ public class TCP implements NetworkProtocolClass {
      * @return read obj
      */
     @Override
-    public synchronized Packet read() {
+    public Packet read() {
         try {
             Object obj = this.inStream.readObject();
             Counters.connection();
@@ -109,19 +120,16 @@ public class TCP implements NetworkProtocolClass {
             }
         } catch (IOException | ClassNotFoundException ex) {
 //            logControl.log(logException, Level.INFO, this.ip + "(" + this.clientName + ") while reading packet: " + ex.getMessage());
-//            logging.general.Counters.exception();
+            Counters.exception();
         }
         return new InvalidPacket();
     }
 
-    @Override
-    public boolean send(String message) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
+    
     @Override
     public boolean sendSessionId() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        // TODO implement SessionIdPacket
+        return send(new InfoPacket(encMethod.sessionId));
     }
 
     @Override
@@ -138,4 +146,8 @@ public class TCP implements NetworkProtocolClass {
         return false;
     }
 
+    @Override
+    public String getIP() {
+        return ipString;
+    }
 }

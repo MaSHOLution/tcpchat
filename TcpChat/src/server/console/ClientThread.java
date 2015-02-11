@@ -24,14 +24,15 @@
 package server.console;
 
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.SocketAddress;
 import java.util.logging.Level;
 import logging.general.Counters;
 import networking.packets.*;
 import networking.general.*;
+import networking.methods.AbstractNetworkProtocol;
+import networking.methods.TCP;
+import networking.methods.NetworkProtocolUserType;
 import security.basics.CryptoBasics;
 import security.cryptography.EncryptionMethod;
 import static server.console.ChatServer.*;
@@ -44,22 +45,20 @@ import static server.console.ChatServer.*;
 public final class ClientThread extends Thread {
 
     protected String clientName = null;
-    protected ObjectInputStream inStream = null;
-    protected ObjectOutputStream outStream = null;
-    protected Socket clientSocket = null;
     protected SocketAddress ip;
     protected EncryptionMethod encMethod = CryptoBasics.makeEncryptionObject();
-    protected final String sessionId = encMethod.sessionId;
     protected ConnectionState state;
+    public AbstractNetworkProtocol conLib;
 
     /**
      * Constructor
      *
      * @param clientSocket Sochet where the connection was accepted
+     * @throws java.io.IOException
      */
-    public ClientThread(Socket clientSocket) {
-        this.clientSocket = clientSocket;
-        this.ip = clientSocket.getRemoteSocketAddress();
+    public ClientThread(Socket clientSocket) throws IOException {
+        conLib = new TCP(clientSocket, NetworkProtocolUserType.Server);
+        ip = clientSocket.getRemoteSocketAddress();
     }
 
     /**
@@ -71,9 +70,6 @@ public final class ClientThread extends Thread {
         state = ConnectionState.InLogin;
 
         try {
-            // Setting up streams
-            this.initStreams();
-
             // Setting up name
             ConnectPacket cPacket = this.setName();
             if (cPacket != null) {
@@ -84,12 +80,12 @@ public final class ClientThread extends Thread {
                 // Broadcasts welcome message to all clients
                 this.broadcastUserList(UserListPacketType.Connected);
                 //this.broadcastExceptMe(new InfoPacket("*** User \"" + this.clientName + "\" joined ***"));
-                this.send(new InfoPacket("Welcome \"" + this.clientName + "\" to our chat room."));
+                conLib.send(new InfoPacket("Welcome \"" + this.clientName + "\" to our chat room."));
                 logControl.log(logGeneral, Level.INFO, this.clientName + " joined");
 
                 // Start conversation
                 while (state != ConnectionState.Kicked && state != ConnectionState.RequestedDisconnect) {
-                    Packet packet = this.read();
+                    Packet packet = conLib.read();
                     PacketType ptype = packet.getIdentifier();
 
                     switch (ptype) {
@@ -103,7 +99,7 @@ public final class ClientThread extends Thread {
                             break;
                         case Invalid:
                             // Invalid obj or obj received
-                            this.send(new KickPacket("Security breach: Please do not use a modified client"));
+                            conLib.send(new KickPacket("Security breach: Please do not use a modified client"));
                             state = ConnectionState.Kicked;
                             break;
                         case GM:
@@ -121,7 +117,7 @@ public final class ClientThread extends Thread {
                 } else {
                     // Tell every thread, that the current thread is going offline
                     //this.broadcastExceptMe(new InfoPacket("*** User \"" + this.clientName + "\" has left ***"));
-                    this.send(new DisconnectPacket());
+                    conLib.send(new DisconnectPacket());
 
                     // Remove thread from threads array and close connections
                     disconnect();
@@ -139,16 +135,6 @@ public final class ClientThread extends Thread {
     }
 
     /**
-     * Creates input and output streams for this thread
-     *
-     * @throws IOException
-     */
-    protected synchronized void initStreams() throws IOException {
-        this.inStream = new ObjectInputStream(this.clientSocket.getInputStream());
-        this.outStream = new ObjectOutputStream(this.clientSocket.getOutputStream());
-    }
-
-    /**
      * Sends a message to all clients
      *
      * @param message message to send
@@ -156,7 +142,7 @@ public final class ClientThread extends Thread {
     protected synchronized void broadcast(String message) {
         for (ClientThread thread : threads) {
             if (state == ConnectionState.Online) {
-                this.send(new GroupMessagePacket(message, this.clientName), thread);
+                conLib.send(new GroupMessagePacket(message, this.clientName), thread, ChatServer.nwpType);
             }
         }
         logControl.log(logGeneral, Level.INFO, "GM #" + Counters.Totals.Messages.gmTotal + " from " + this.clientName);
@@ -171,7 +157,7 @@ public final class ClientThread extends Thread {
     protected synchronized void broadcast(Packet packet) {
         for (ClientThread thread : threads) {
             if (thread.state == ConnectionState.Online) {
-                this.send(packet, thread);
+                conLib.send(packet, thread, ChatServer.nwpType);
             }
         }
         logControl.log(logGeneral, Level.INFO, "GM #" + Counters.Totals.Messages.gmTotal + " from " + this.clientName);
@@ -186,7 +172,7 @@ public final class ClientThread extends Thread {
     protected synchronized void broadcastExceptMe(Packet packet) {
         for (ClientThread thread : threads) {
             if (thread.state == ConnectionState.Online && thread != this) {
-                this.send(packet, thread);
+                conLib.send(packet, thread, ChatServer.nwpType);
             }
         }
         // Counters.gm(); is normally no group but system shoutout
@@ -203,7 +189,7 @@ public final class ClientThread extends Thread {
             String receiver = privatePacket.getReceiver();
             // Check if sender wants to send privatePacket to himself
             if (receiver.equals(this.clientName)) {
-                this.send(new InfoPacket("You can't send private messages to yourself"));
+                conLib.send(new InfoPacket("You can't send private messages to yourself"));
                 logControl.log(logGeneral, Level.INFO, this.clientName + " wanted to send himself a private message");
                 return true;
             } else {
@@ -213,10 +199,10 @@ public final class ClientThread extends Thread {
                             && thread.clientName.equals(receiver)) {
 
                         // Send privatePacket to receiver
-                        this.send(privatePacket, thread);
+                        conLib.send(privatePacket, thread, ChatServer.nwpType);
 
                         // Send privatePacket to sender
-                        this.send(privatePacket);
+                        conLib.send(privatePacket);
                         Counters.pm();
                         logControl.log(logGeneral, Level.INFO, "PM #" + Counters.Totals.Messages.pmTotal + " from " + this.clientName + " to " + receiver);
                         return true;
@@ -226,7 +212,7 @@ public final class ClientThread extends Thread {
 
             // Receiver has not been found / is not online
             // TODO Handle asynchronous messages/connections
-            this.send(new InfoPacket("Message could not be delivered, reason: \"" + receiver + "\" is not online"));
+            conLib.send(new InfoPacket("Message could not be delivered, reason: \"" + receiver + "\" is not online"));
             Counters.pm();
             Counters.pmFailed();
             logControl.log(logGeneral, Level.INFO, "PM #" + Counters.Totals.Messages.pmTotal + " from " + this.clientName + " failed: " + receiver + " is not online");
@@ -234,69 +220,12 @@ public final class ClientThread extends Thread {
         } catch (Exception ex) {
             logControl.log(logException, Level.INFO, this.ip + "(" + this.clientName + ") while sending PM: " + ex.getMessage());
             logging.general.Counters.exception();
-            this.send(new InfoPacket("Message could not be delivered, reason: Internal Server Error"));
+            conLib.send(new InfoPacket("Message could not be delivered, reason: Internal Server Error"));
             Counters.pm();
             Counters.pmFailed();
             return false;
         }
 
-    }
-
-    /**
-     * Writes a obj to a specific PrintStream
-     *
-     * @param packet stands for itself
-     * @return result of sending
-     */
-    protected synchronized boolean send(Packet packet) {
-        try {
-            Counters.connection();
-            this.outStream.writeObject(packet);
-            return true;
-        } catch (IOException ex) {
-            logControl.log(logException, Level.INFO, this.ip + "(" + this.clientName + "): " + ex.getMessage());
-            logging.general.Counters.exception();
-        }
-        return false;
-    }
-
-    /**
-     * Writes a obj to a specific PrintStream
-     *
-     * @param packet stands for itself
-     * @param thread ClientThread to send obj to
-     * @return result of sending
-     */
-    protected synchronized boolean send(Packet packet, ClientThread thread) {
-        try {
-            Counters.connection();
-            thread.outStream.writeObject(packet);
-            return true;
-        } catch (Exception ex) {
-            logControl.log(logException, Level.INFO, this.ip + "(" + this.clientName + "): " + ex.getMessage());
-            logging.general.Counters.exception();
-        }
-        return false;
-    }
-
-    /**
-     * Reads a message from a specific inStream
-     *
-     * @return read obj
-     */
-    protected synchronized Packet read() {
-        try {
-            Object obj = this.inStream.readObject();
-            Counters.connection();
-            if (obj instanceof Packet) {
-                Packet readPacket = (Packet) obj;
-                return readPacket;
-            }
-        } catch (IOException | ClassNotFoundException ex) {
-            logControl.log(logException, Level.INFO, this.ip + "(" + this.clientName + ") while reading packet: " + ex.getMessage());
-            logging.general.Counters.exception();
-        }
-        return new InvalidPacket();
     }
 
     /**
@@ -306,20 +235,20 @@ public final class ClientThread extends Thread {
      */
     protected ConnectPacket setName() {
 
-        Packet clientAnswer = (Packet) this.read();
+        Packet clientAnswer = (Packet) conLib.read();
         PacketType pType = clientAnswer.getIdentifier();
 
         if (pType == PacketType.Connect) {
             String name = ((ConnectPacket) clientAnswer).getName();
             if (name == null || name.length() < 4 || name.length() > 15) {
-                this.send(new KickPacket("Please make sure that your nickname has between 4 and 15 letters"));
+                conLib.send(new KickPacket("Please make sure that your nickname has between 4 and 15 letters"));
                 return null;
             }
 
             // Check if name is already in use, if yes return null
             for (ClientThread client : threads) {
                 if (client != null && client.state == ConnectionState.Online && client.clientName.equals(name)) {
-                    this.send(new KickPacket("The nickname \"" + name + "\" is already in use"));
+                    conLib.send(new KickPacket("The nickname \"" + name + "\" is already in use"));
                     return null;
                 }
             }
@@ -328,7 +257,7 @@ public final class ClientThread extends Thread {
             return (ConnectPacket) clientAnswer;
         } else {
             if (pType != PacketType.Disconnect) {
-                this.send(new KickPacket("Security breach: Please do not use a modified client"));
+                conLib.send(new KickPacket("Security breach: Please do not use a modified client"));
             }
             return null;
         }
@@ -354,13 +283,9 @@ public final class ClientThread extends Thread {
      * Disconnects the thread
      */
     protected synchronized void disconnect() {
-        try {
+//        try {
             threads.remove(this);
-
-            // Close streams and socket
-            this.inStream.close();
-            this.outStream.close();
-            this.clientSocket.close();
+            conLib.close();
             userList.remove(clientName);
 
             if (state == ConnectionState.Kicked) {
@@ -369,10 +294,10 @@ public final class ClientThread extends Thread {
                 logControl.log(logConnection, Level.INFO, this.ip + ": " + this.clientName + " has been kicked");
             }
             Counters.disconnect();
-        } catch (IOException ex) {
-            logControl.log(logException, Level.INFO, this.ip + "(" + this.clientName + ") while disconnecting: " + ex.getMessage());
-            logging.general.Counters.exception();
-        }
+//        } catch (IOException ex) {
+//            logControl.log(logException, Level.INFO, this.ip + "(" + this.clientName + ") while disconnecting: " + ex.getMessage());
+//            logging.general.Counters.exception();
+//        }
     }
 
     /**
@@ -384,7 +309,7 @@ public final class ClientThread extends Thread {
         if (ulPacketType == UserListPacketType.Connected) {
             // Broadcast changes to all and a full list to hte new client
             this.broadcastExceptMe(new UserListPacket(this.clientName, ulPacketType));
-            this.send(new UserListPacket());
+            conLib.send(new UserListPacket());
         } else if (ulPacketType == UserListPacketType.Disconnected) {
             // Broadcast changes only
             this.broadcastExceptMe(new UserListPacket(this.clientName, ulPacketType));

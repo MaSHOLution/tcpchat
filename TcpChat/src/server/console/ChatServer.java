@@ -36,6 +36,7 @@ import logging.general.Counters;
 import logging.general.LoggingController;
 import logging.enums.LogName;
 import logging.enums.LogPath;
+import networking.methods.NetworkProtocolType;
 import static server.console.ChatServer.*;
 
 /**
@@ -54,6 +55,7 @@ public final class ChatServer {
     protected static Logger logException = null;
     protected static Logger logGeneral = null;
     protected static LoggingController logControl = null;
+    protected static NetworkProtocolType nwpType = NetworkProtocolType.TCP;
 
     public static void main(String args[]) {
 
@@ -95,20 +97,25 @@ public final class ChatServer {
 
                 // Create client socket for each connection
                 while (true) {
-                    // Handle for new connection, put it into empty array-slot
-                    clientSocket = serverSocket.accept();
-                    Counters.connection();
-                    // maxClientsCount = 0 means infinite clients
-                    if (threads.size() < maxClientsCount || maxClientsCount == 0) {
-                        ClientThread clientThread = new ClientThread(clientSocket);
-                        threads.add(clientThread);
-                        clientThread.start();
-                        logControl.log(logConnection, Level.INFO, clientSocket.getRemoteSocketAddress() + ": accepted, thread started");
-                        Counters.login();
-                    } else {
-                        // Only when maxclients is reached        
-                        RejectionThread fThread = new RejectionThread(clientSocket);
-                        fThread.start();
+                    try {
+                        // Handle for new connection, put it into empty array-slot
+                        clientSocket = serverSocket.accept();
+                        Counters.connection();
+                        // maxClientsCount = 0 means infinite clients
+                        if (threads.size() < maxClientsCount || maxClientsCount == 0) {
+                            ClientThread clientThread = new ClientThread(clientSocket);
+                            threads.add(clientThread);
+                            clientThread.start();
+                            logControl.log(logConnection, Level.INFO, clientSocket.getRemoteSocketAddress() + ": accepted, thread started");
+                            Counters.login();
+                        } else {
+                            // Only when maxclients is reached        
+                            RejectionThread fThread = new RejectionThread(clientSocket);
+                            fThread.start();
+                        }
+                    } catch (IOException ex) {
+                        logControl.log(logException, Level.SEVERE, "Could not start thread for " + clientSocket.getInetAddress().toString() + ": " + ex.getMessage());
+                        logging.general.Counters.exception();
                     }
                 }
             } catch (IOException ex) {
@@ -150,7 +157,7 @@ class ShutdownHandle extends Thread {
         // Send closing of server to all clients
         for (ClientThread thread : threads) {
             if (thread != null && thread.state == ConnectionState.Online) {
-                thread.send(new KickPacket("*** SERVER IS GOING DOWN ***"), thread);
+                thread.conLib.send(new KickPacket("*** SERVER IS GOING DOWN ***"), thread, ChatServer.nwpType);
             }
         }
         // Close all loggers

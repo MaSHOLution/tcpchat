@@ -6,7 +6,7 @@
 package udp;
 
 import networking.methods.UDP;
-import networking.methods.Type;
+import networking.methods.NetworkProtocolUserType;
 
 /**
  *
@@ -16,7 +16,7 @@ public class Server {
 
     public static void main(String args[]) throws Exception {
         String message;
-        UDP test = new UDP(Type.Server);
+        UDP test = new UDP(NetworkProtocolUserType.Server);
         System.out.println("SERVER");
 
         while (true) {

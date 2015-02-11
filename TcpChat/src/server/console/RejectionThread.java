@@ -24,22 +24,18 @@
 package server.console;
 
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.SocketAddress;
 import java.util.logging.Level;
 import logging.general.Counters;
 import networking.general.Packet;
 import networking.general.PacketType;
+import networking.methods.NetworkProtocolUserType;
+import networking.methods.TCP;
 import networking.packets.ConnectPacket;
-import networking.packets.InvalidPacket;
 import networking.packets.KickPacket;
-import security.basics.CryptoBasics;
-import security.cryptography.EncryptionMethod;
 import static server.console.ChatServer.logConnection;
 import static server.console.ChatServer.logControl;
-import static server.console.ChatServer.logException;
 
 /**
  * Class for rejecting clients politely if server has already maxClients
@@ -48,21 +44,17 @@ import static server.console.ChatServer.logException;
  */
 public final class RejectionThread extends Thread {
 
-    protected ObjectInputStream inStream = null;
-    protected ObjectOutputStream outStream = null;
-    protected Socket clientSocket = null;
+    protected TCP conLib;
     protected SocketAddress ip;
-    protected EncryptionMethod encMethod = CryptoBasics.makeEncryptionObject();
-    protected final String sessionId = encMethod.sessionId;
 
     /**
      * Constructor
      *
      * @param clientSocket Sochet where the connection was accepted
+     * @throws java.io.IOException
      */
-    public RejectionThread(Socket clientSocket) {
-        this.clientSocket = clientSocket;
-        this.ip = clientSocket.getRemoteSocketAddress();
+    public RejectionThread(Socket clientSocket) throws IOException {
+        conLib = new TCP(clientSocket, NetworkProtocolUserType.Server);
     }
 
     /**
@@ -71,77 +63,25 @@ public final class RejectionThread extends Thread {
     @Override
     public void run() {
 
-        try {
-            // Setting up streams
-            initStreams();
-
-            Packet clientAnswer = read();
+//        try {
+            Packet clientAnswer = conLib.read();
             PacketType pType = clientAnswer.getIdentifier();
 
             if (pType == PacketType.Connect) {
                 String name = ((ConnectPacket) clientAnswer).getName();
-                send(new KickPacket("Sorry \"" + name + "\", too many clients. Please try later."));
+                conLib.send(new KickPacket("Sorry \"" + name + "\", too many clients. Please try later."));
             } else {
-                if (pType != PacketType.Disconnect) {
-                    send(new KickPacket("Security breach: Please do not use a modified client"));
-                }
+                  conLib.send(new KickPacket("Security breach: Please do not use a modified client"));
             }
 
-            logControl.log(logConnection, Level.INFO, clientSocket.getRemoteSocketAddress() + ": rejected, server is full");
-            clientSocket.close();
+            // clientSocket.getRemoteSocketAddress()
+            logControl.log(logConnection, Level.INFO,  ip.toString() + ": rejected, server is full");
+            conLib.close();
 
-        } catch (IOException ex) {
-            logControl.log(logException, Level.INFO, ip + "(Rejected client): " + ex.getMessage());
-            logging.general.Counters.exception();
-        }
+//        } catch (IOException ex) {
+//            logControl.log(logException, Level.INFO, ip + "(Rejected client): " + ex.getMessage());
+//            logging.general.Counters.exception();
+//        }
         Counters.rejected();
-    }
-
-    /**
-     * Creates input and output streams for this client
-     *
-     * @throws IOException
-     */
-    protected synchronized void initStreams() throws IOException {
-        this.inStream = new ObjectInputStream(this.clientSocket.getInputStream());
-        this.outStream = new ObjectOutputStream(this.clientSocket.getOutputStream());
-    }
-
-    /**
-     * Writes a packet to a specific PrintStream
-     *
-     * @param packet stands for itself
-     * @return result of sending
-     */
-    protected synchronized boolean send(Packet packet) {
-        try {
-            Counters.connection();
-            this.outStream.writeObject(packet);
-            return true;
-        } catch (IOException ex) {
-            logControl.log(logException, Level.INFO, this.ip + "(Rejected client): " + ex.getMessage());
-            logging.general.Counters.exception();
-        }
-        return false;
-    }
-
-    /**
-     * Reads a message from a specific inStream
-     *
-     * @return read packet
-     */
-    protected synchronized Packet read() {
-        try {
-            Object temp = this.inStream.readObject();
-            Counters.connection();
-            if (temp instanceof Packet) {
-                Packet readPacket = (Packet) temp;
-                return readPacket;
-            }
-        } catch (IOException | ClassNotFoundException ex) {
-            logControl.log(logException, Level.INFO, this.ip + "(Rejected client) while reading packet: " + ex.getMessage());
-            logging.general.Counters.exception();
-        }
-        return new InvalidPacket();
     }
 }

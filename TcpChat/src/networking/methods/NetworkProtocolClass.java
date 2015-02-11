@@ -57,5 +57,5 @@ public interface NetworkProtocolClass {
     /**
      * Closes all opened streams
      */
-    public void close();
+    public boolean close();
 }

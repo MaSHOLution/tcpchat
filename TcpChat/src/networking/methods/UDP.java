@@ -144,8 +144,9 @@ public class UDP implements NetworkProtocolClass {
     }
 
     @Override
-    public void close() {
+    public boolean close() {
         socket.close();
+        return true;
     }
 
     private void resetSocketTimeout() {

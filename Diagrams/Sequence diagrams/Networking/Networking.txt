@@ -5,20 +5,28 @@ loop Accept Clients
     alt Server is full
         Server->RecectionThread: Start
         RecectionThread->Client: KickPacket ("Too many clients")
-        note over RecectionThread: Close RejectionThread
+        destroy Client
+        destroy RecectionThread
     else
         Server->ClientThread: Create and start
         Client->ClientThread: ConnectPacket
         alt Packet is not ConnectPacket
             alt Packet is not DisconnectPacket
                 ClientThread->Client: KickPacket("Please do not use a modified client")
+                destroy Client
             end
-            note over ClientThread: Close thread
+destroy ClientThread
         else
             alt Nickname too long
                 ClientThread->Client: KickPacket("Nickname too long")
+                destroy Client
+                destroy ClientThread
             else
+<<<<<<< Updated upstream
                 note over ClientThread: Create UserListPacket
+=======
+                note over ClientThread: Send UserListPacket
+>>>>>>> Stashed changes
                 ClientThread->Client: UserListPacket (Full)
                 ClientThread->All other ClientThreads: UserListPacket (Connected)
                 loop Client can send messages now
@@ -31,12 +39,13 @@ loop Accept Clients
                             ClientThread->Client: InfoPacket ("Message could not be delivered")
                         end
                     end 
-                    opt All other packets
-                        Client->+ClientThread: Packet
+                    opt Send  GroupMessagePackets
+                        Client->+ClientThread: GroupMessagePackets
                         ClientThread->-All other ClientThreads: GroupMessagePacket
                     end
-                    opt Receive Packet
-                        One specific ClientThread->Client: Packet
+                    opt Receive  GroupMessagePacket
+                        One specific ClientThread->+ClientThread: GroupMessagePacket
+                        ClientThread->-Client: GroupMessagePacket
                     end
                     opt Disconnect
                         Client->+ClientThread: DisconnectPacket
@@ -44,8 +53,14 @@ loop Accept Clients
                 end
             end
             ClientThread->-Client: DisconnectPacket
+<<<<<<< Updated upstream
             ClientThread->All other ClientThreads: UserListPacket (Disconnedcted)
             note over ClientThread: Close thread
+=======
+            destroy Client
+            ClientThread->All other ClientThreads: UserListPacket (Disconnedcted)
+            destroy ClientThread
+>>>>>>> Stashed changes
         end
     end
 end

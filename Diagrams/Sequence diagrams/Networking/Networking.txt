@@ -3,18 +3,21 @@ title Networking
 loop Accept Clients
     Client->Server: Connect to socket
     alt Server is full
-        Server->RecectionThread: Start
-        RecectionThread->Client: KickPacket ("Too many clients")
+        Server->RejectionThread: << Create and start >>
+        Client->RejectionThread: ConnectPacket
+        alt Packet is ConnectPacket
+            RejectionThread->Client: KickPacket ("Too many clients")
+        else 
+            RejectionThread->Client: KickPacket("Please do not use a modified client")
+        end
         destroy Client
-        destroy RecectionThread
+        destroy RejectionThread
     else
-        Server->ClientThread: Create and start
+        Server->ClientThread: << Create and start >>
         Client->ClientThread: ConnectPacket
         alt Packet is not ConnectPacket
-            alt Packet is not DisconnectPacket
-                ClientThread->Client: KickPacket("Please do not use a modified client")
-                destroy Client
-            end
+            ClientThread->Client: KickPacket("Please do not use a modified client")
+            destroy Client
 destroy ClientThread
         else
             alt Nickname too long
@@ -22,11 +25,7 @@ destroy ClientThread
                 destroy Client
                 destroy ClientThread
             else
-<<<<<<< Updated upstream
-                note over ClientThread: Create UserListPacket
-=======
                 note over ClientThread: Send UserListPacket
->>>>>>> Stashed changes
                 ClientThread->Client: UserListPacket (Full)
                 ClientThread->All other ClientThreads: UserListPacket (Connected)
                 loop Client can send messages now
@@ -53,14 +52,9 @@ destroy ClientThread
                 end
             end
             ClientThread->-Client: DisconnectPacket
-<<<<<<< Updated upstream
-            ClientThread->All other ClientThreads: UserListPacket (Disconnedcted)
-            note over ClientThread: Close thread
-=======
             destroy Client
             ClientThread->All other ClientThreads: UserListPacket (Disconnedcted)
             destroy ClientThread
->>>>>>> Stashed changes
         end
     end
 end

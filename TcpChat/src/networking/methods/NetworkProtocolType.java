@@ -24,10 +24,12 @@
 package networking.methods;
 
 /**
+ * Enum for network protocol types
  *
  * @author manuelschmid
  */
 public enum NetworkProtocolType {
+
     TCP,
     UDP;
 }

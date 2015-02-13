@@ -37,7 +37,8 @@ import networking.packets.InvalidPacket;
 import server.console.ClientThread;
 
 /**
- *
+ * Class for the network protocol TCP
+ * 
  * @author Manuel Schmid
  */
 public class TCP extends AbstractNetworkProtocol {
@@ -47,7 +48,7 @@ public class TCP extends AbstractNetworkProtocol {
     private Socket clientSocket = null;
     private final InetAddress ip;
     private final String ipString;
-    private final NetworkProtocolUserType type;
+    private final NetworkProtocolRole type;
 
     /**
      * Constructor, creates input and output streams
@@ -56,7 +57,7 @@ public class TCP extends AbstractNetworkProtocol {
      * @param type
      * @throws IOException
      */
-    public TCP(Socket clientSocket, NetworkProtocolUserType type) throws IOException {
+    public TCP(Socket clientSocket, NetworkProtocolRole type) throws IOException {
         this.clientSocket = clientSocket;
         inStream = new ObjectInputStream(clientSocket.getInputStream());
         outStream = new ObjectOutputStream(clientSocket.getOutputStream());

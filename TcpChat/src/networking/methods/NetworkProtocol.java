@@ -26,9 +26,9 @@ package networking.methods;
 import networking.general.Packet;
 import security.basics.CryptoBasics;
 import security.cryptography.EncryptionMethod;
-import server.console.ClientThread;
 
 /**
+ * Interface for a network protocol
  *
  * @author Manuel Schmid
  */

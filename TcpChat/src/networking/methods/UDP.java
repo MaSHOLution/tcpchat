@@ -41,7 +41,8 @@ import static networking.methods.NetworkProtocol.encMethod;
 import networking.packets.InfoPacket;
 
 /**
- *
+ * Class for the network protocol UDP
+ * 
  * @author Manuel Schmid
  */
 public class UDP extends AbstractNetworkProtocol {
@@ -54,13 +55,18 @@ public class UDP extends AbstractNetworkProtocol {
     private DatagramSocket socket;
     private int senderPort;
     private InetAddress senderIP;
-    private NetworkProtocolUserType type;
+    private NetworkProtocolRole type;
     private Packet returnPacket;
 
-    public UDP(NetworkProtocolUserType type) {
+    /**
+     * Constructor
+     *
+     * @param type
+     */
+    public UDP(NetworkProtocolRole type) {
         try {
             this.type = type;
-            if (type == NetworkProtocolUserType.Client) {
+            if (type == NetworkProtocolRole.Client) {
                 senderIP = InetAddress.getByName("localhost");
                 socket = new DatagramSocket(8001);
             } else {
@@ -75,7 +81,7 @@ public class UDP extends AbstractNetworkProtocol {
     public Packet read() {
         try {
             resetSocketTimeout();
-            if (type == NetworkProtocolUserType.Client) {
+            if (type == NetworkProtocolRole.Client) {
                 // Antwort empfangen und ausgeben.
                 DatagramPacket in = new DatagramPacket(inData, inData.length);
                 socket.receive(in);
@@ -122,10 +128,15 @@ public class UDP extends AbstractNetworkProtocol {
         return false;
     }
 
+    /**
+     * Sends a packet withoutapplying a timeout on the socket
+     *
+     * @param packet Packet to send
+     * @return if packet has been sent successfully
+     */
     public boolean sendWithoutTimeout(Packet packet) {
         try {
-
-            if (type == NetworkProtocolUserType.Client) {
+            if (type == NetworkProtocolRole.Client) {
                 //socket = new DatagramSocket();
                 outData = serializePacket(packet);
                 DatagramPacket out = new DatagramPacket(outData, outData.length, senderIP, 8000);
@@ -155,6 +166,9 @@ public class UDP extends AbstractNetworkProtocol {
         return true;
     }
 
+    /**
+     * Resets the socket timeout
+     */
     private void resetSocketTimeout() {
         try {
             if (socket != null) {
@@ -167,17 +181,20 @@ public class UDP extends AbstractNetworkProtocol {
 
     /**
      * Serializes a packet
+     *
+     * @param packet Packet to serialize
+     * @return byteArray from given packet
      */
     private byte[] serializePacket(Packet packet) {
         try {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream(2048);
-            ObjectOutputStream oos = new ObjectOutputStream(baos);
-            oos.writeObject(packet);
-            oos.close();
+            ByteArrayOutputStream baOutputStream = new ByteArrayOutputStream(2048);
+            ObjectOutputStream objectOutputStream = new ObjectOutputStream(baOutputStream);
+            objectOutputStream.writeObject(packet);
+            objectOutputStream.close();
             // get the byte array of the object
-            byte[] obj = baos.toByteArray();
-            baos.close();
-            return obj;
+            byte[] byteArray = baOutputStream.toByteArray();
+            baOutputStream.close();
+            return byteArray;
         } catch (Exception ex) {
             Logger.getLogger(UDP.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -187,19 +204,18 @@ public class UDP extends AbstractNetworkProtocol {
     /**
      * Deserializes a packet
      *
-     * @param data
-     * @return
+     * @param data received data to built packet from
+     * @return Packet
      */
     public Packet deserializePacket(byte[] data) {
         try {
-            ObjectInputStream iStream = new ObjectInputStream(new ByteArrayInputStream(data));
-            Packet obj = (Packet) iStream.readObject();
-            iStream.close();
-            return obj;
+            ObjectInputStream objectInputStream = new ObjectInputStream(new ByteArrayInputStream(data));
+            Packet packet = (Packet) objectInputStream.readObject();
+            objectInputStream.close();
+            return packet;
         } catch (IOException | ClassNotFoundException ex) {
             Logger.getLogger(UDP.class.getName()).log(Level.SEVERE, null, ex);
         }
-
         return null;
     }
 }

@@ -24,10 +24,10 @@
 package networking.methods;
 
 /**
- *
+ * Enum for network protocol user types
  * @author manuelschmid
  */
-public enum NetworkProtocolUserType {
+public enum NetworkProtocolRole {
     Client,
     Server;
 }

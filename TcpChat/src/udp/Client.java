@@ -6,7 +6,7 @@
 package udp;
 
 import networking.methods.UDP;
-import networking.methods.NetworkProtocolUserType;
+import networking.methods.NetworkProtocolRole;
 
 /**
  *
@@ -18,7 +18,7 @@ public class Client {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        UDP test = new UDP(NetworkProtocolUserType.Client);
+        UDP test = new UDP(NetworkProtocolRole.Client);
         int i = 0;
         System.out.println("CLIENT");
         while (true) {

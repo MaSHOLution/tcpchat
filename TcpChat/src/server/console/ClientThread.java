@@ -32,7 +32,7 @@ import networking.packets.*;
 import networking.general.*;
 import networking.methods.AbstractNetworkProtocol;
 import networking.methods.TCP;
-import networking.methods.NetworkProtocolUserType;
+import networking.methods.NetworkProtocolRole;
 import security.basics.CryptoBasics;
 import security.cryptography.EncryptionMethod;
 import static server.console.ChatServer.*;
@@ -57,7 +57,7 @@ public final class ClientThread extends Thread {
      * @throws java.io.IOException
      */
     public ClientThread(Socket clientSocket) throws IOException {
-        conLib = new TCP(clientSocket, NetworkProtocolUserType.Server);
+        conLib = new TCP(clientSocket, NetworkProtocolRole.Server);
         ip = clientSocket.getRemoteSocketAddress();
     }
 

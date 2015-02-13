@@ -30,7 +30,7 @@ import java.util.logging.Level;
 import logging.general.Counters;
 import networking.general.Packet;
 import networking.general.PacketType;
-import networking.methods.NetworkProtocolUserType;
+import networking.methods.NetworkProtocolRole;
 import networking.methods.TCP;
 import networking.packets.ConnectPacket;
 import networking.packets.KickPacket;
@@ -54,7 +54,7 @@ public final class RejectionThread extends Thread {
      * @throws java.io.IOException
      */
     public RejectionThread(Socket clientSocket) throws IOException {
-        conLib = new TCP(clientSocket, NetworkProtocolUserType.Server);
+        conLib = new TCP(clientSocket, NetworkProtocolRole.Server);
     }
 
     /**

@@ -28,7 +28,6 @@ import de.mash1t.chat.logging.Counters;
 import de.mash1t.chat.networking.packets.*;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import de.mash1t.chat.networking.packets.InvalidPacket;
 
 /**
  * This class serves as an outsourced thread, as the gui can only handle one

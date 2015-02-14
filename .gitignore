@@ -16,5 +16,5 @@ hs_err_pid*
 /TcpChat/nbproject/private/
 /TcpChat/build/
 /TcpChat/dist/
-/TcpChat/logs/
+/TcpChat/workdir/*
 /stable_builds/logs/

@@ -45,35 +45,35 @@ public abstract class Packet implements Serializable {
         return this.packetIdentifier;
     }
 
-    /**
-     * Getter for senderAlias
-     *
-     * @return
-     */
-    public String getSenderAlias() {
-        return this.senderAlias;
-    }
-
-    /**
-     * Setter for senderAlias protected because of one time usage of packets
-     *
-     * @param senderAlias
-     */
-    protected void setSenderAlias(String senderAlias) {
-        this.senderAlias = senderAlias;
-    }
-
-    /**
-     * Prepares the packet for sending
-     *
-     */
-    public void prepare() {
-        if (this.isPrepared) {
-            // TODO Decrypt
-            this.isPrepared = false;
-        } else {
-            // TODO Encrypt
-            this.isPrepared = true;
-        }
-    }
+//    /**
+//     * Getter for senderAlias
+//     *
+//     * @return
+//     */
+//    public String getSenderAlias() {
+//        return this.senderAlias;
+//    }
+//
+//    /**
+//     * Setter for senderAlias protected because of one time usage of packets
+//     *
+//     * @param senderAlias
+//     */
+//    protected void setSenderAlias(String senderAlias) {
+//        this.senderAlias = senderAlias;
+//    }
+//
+//    /**
+//     * Prepares the packet for sending
+//     *
+//     */
+//    public void prepare() {
+//        if (this.isPrepared) {
+//            // TODO Decrypt
+//            this.isPrepared = false;
+//        } else {
+//            // TODO Encrypt
+//            this.isPrepared = true;
+//        }
+//    }
 }

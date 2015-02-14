@@ -5,7 +5,6 @@ TCPChat is a server-based open source chat, which is equipped with the following
   - Multi client chat server
   - Group and private chat in tabs
   - Userlist
-  - Communication with packets
 
 ### Version
 
@@ -13,19 +12,23 @@ TCPChat is a server-based open source chat, which is equipped with the following
 
 ### Technology
 
-TCPChat uses a self-developed packet-framework, which allows an easy transfer of data from cilent to server and vice versa.
+TCPChat is based on the network protocol **TCP**.
+In addition to this, it uses a **self-developed packet-framework**, which allows an easy transfer of data from cilent to server and vice versa.
 
 ### Installation
-Currently there is no installer. You can just pull the repository.
+Currently there is **no installer**. Just pull the repository:
+
 ```sh
 $ git clone [git-repo-url] tcpchat
 $ cd tcpchat/
 $ chmod 777 TcpChat/ #for log-files
 ```
-You can execute the .jar-Files in the way as you can do it with .exe files. You can find stable builds under "*stable_builds*"
+On Windows, you can execute .jar-Files by double-clicking on them. If it doesn't work, you can try to fix your system with [jarfix.exe].
+
+You can find the latest stable builds in the folder **"*stable_builds*"**
 
 ### Starting stable Server
-Open your favorite Terminal and run this command:
+Open your favorite terminal and run this command:
 
 ```sh
 $ cd stable_builds/
@@ -33,20 +36,22 @@ $ java -jar TCPChat_Server.jar <port> <logging yes/no>
 ```
 
 ### Starting stable Client
-Open your favorite Terminal and run this command:
+Open your favorite terminal and run this command:
 
 ```sh
 $ cd stable_builds/
 $ java -jar TCPChat_Client.jar
 ```
 
-### Support
+### Project Info
+TCPChat is a netbeans project, which is developed with **JDK 1.7.0_71** with regards to an eventually **upcoming Android App**.
 
-If you have any questions or feature requests, don't hesitate to contact me at [mash-it.org]
+### Support
+This project is developed by Manuel Schmid.
+If you have any questions or feature requests, don't hesitate to contact me on [Twitter] or my [homepage].
 
 ### Current Todo's
 
- - [x] Show private messages in tabs
  - [ ] AES-256-Encryption
  - [ ] Add configuration file for server
  - [ ] Add feature to send files
@@ -60,4 +65,7 @@ License
 
 This software is under MIT-License
 
-[mash-it.org]:http://mash-it.org/
+[mash1t.de]:http://mash1t.de/
+[homepage]:http://mash1t.de/
+[Twitter]:https://twitter.com/mash1t
+[jarfix.exe]:http://johann.loefflmann.net/en/software/jarfix/index.html

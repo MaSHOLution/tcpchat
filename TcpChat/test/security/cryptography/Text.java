@@ -23,6 +23,7 @@
  */
 package security.cryptography;
 
+import de.mash1t.chat.security.cryptography.EncryptionMethod;
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
@@ -32,10 +33,10 @@ import javax.crypto.Cipher;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
 import org.junit.Test;
-import security.basics.CryptoBasics;
+import de.mash1t.chat.security.basics.CryptoBasics;
 import static org.junit.Assert.*;
-import security.basics.SessionIdGenerator;
-import security.cryptography.method.Aes;
+import de.mash1t.chat.security.basics.SessionIdGenerator;
+import de.mash1t.chat.security.cryptography.method.Aes;
 
 /**
  * Tests for encrypting and decrypting text

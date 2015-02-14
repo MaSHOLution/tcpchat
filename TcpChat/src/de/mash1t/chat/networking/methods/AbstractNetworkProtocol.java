@@ -73,9 +73,6 @@ public abstract class AbstractNetworkProtocol implements NetworkProtocol {
             case TCP:
                 returnValue = TCP.send(packet, clientThread);
                 break;
-            case UDP:
-                returnValue = UDP.send(packet, clientThread);
-                break;
             default:
                 returnValue = false;
         }

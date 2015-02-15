@@ -21,38 +21,32 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package de.mash1t.chat.logging;
-
-import de.mash1t.chat.client.gui.ClientGui;
-import de.mash1t.chat.server.console.ChatServer;
+package de.mash1t.chat.server.config;
 
 /**
- * Enum for logger names (classnames)
  *
  * @author Manuel Schmid
  */
-public enum LogName {
-
-    SERVER(ChatServer.class.getName()),
-    CLIENT(ClientGui.class.getName());
-
-    private final String name;
+public enum ConfigParam {
+    Port("Port");
+    
+     private final String configString;
 
     /**
      * Constructor
      *
      * @param name
      */
-    LogName(String name) {
-        this.name = name;
+    ConfigParam(String configString) {
+        this.configString = configString;
     }
 
     /**
-     * Getter for name
+     * Getter for configString
      *
      * @return
      */
-    public String getName() {
-        return name;
+    public String getConfigString() {
+        return configString;
     }
 }

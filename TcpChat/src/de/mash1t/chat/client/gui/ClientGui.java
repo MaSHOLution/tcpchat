@@ -481,7 +481,7 @@ public final class ClientGui extends javax.swing.JFrame {
                 this.dialogHelper.showInfoDialog("Info", "Please set a server to connect to");
             } else if (portText.trim().equals("")) {
                 this.dialogHelper.showInfoDialog("Info", "Please set a port to which to connect to on the server");
-            } else if (connectionPort < 1 || connectionPort > 65555) {
+            } else if (connectionPort < 1 || connectionPort > 65535) {
                 this.dialogHelper.showInfoDialog("Info", "The given port has to be an integer in the range from 1 to 65535");
             } else {
                 return true;

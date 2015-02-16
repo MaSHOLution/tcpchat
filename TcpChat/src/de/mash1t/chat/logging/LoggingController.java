@@ -34,19 +34,21 @@ import java.util.logging.Logger;
  */
 public final class LoggingController {
 
-    private final boolean enableLogging;
+    private final boolean logToFiles;
     private final boolean showOnConsole;
+    private final boolean loggingEnabled;
     private final List<Logger> loggerList = new ArrayList<>();
 
     /**
      * Constructor
      *
-     * @param enableLogging enable/disable logging
+     * @param logToFiles enable/disable logging
      * @param showOnConsole enable/disable output on console
      */
-    public LoggingController(boolean enableLogging, boolean showOnConsole) {
-        this.enableLogging = enableLogging;
+    public LoggingController(boolean logToFiles, boolean showOnConsole) {
+        this.logToFiles = logToFiles;
         this.showOnConsole = showOnConsole;
+        this.loggingEnabled = (logToFiles || showOnConsole);
     }
 
     /**
@@ -58,7 +60,7 @@ public final class LoggingController {
      */
     public void log(Logger logger, Level logLevel, String message) {
         // Only log when logging is enabled
-        if (this.enableLogging) {
+        if (this.loggingEnabled) {
             logger.log(logLevel, message);
         }
     }
@@ -72,9 +74,9 @@ public final class LoggingController {
      */
     public Logger create(LogName logName, LogPath logPath) {
         // Check if logging is enabled
-        if (this.enableLogging) {
+        if (this.loggingEnabled) {
             // Create logger
-            Logger logger = CustomLogging.create(logName, logPath, showOnConsole);
+            Logger logger = CustomLogging.create(logName, logPath, logToFiles, showOnConsole);
             // Add logger to internal list
             loggerList.add(logger);
             return logger;

@@ -28,6 +28,7 @@ import de.mash1t.chat.client.gui.tabs.ChatTab;
 import de.mash1t.chat.client.gui.tabs.ChatType;
 import de.mash1t.chat.client.gui.tabs.TabController;
 import de.mash1t.chat.client.gui.userlist.UserListController;
+import de.mash1t.chat.server.config.ServerConfigParam;
 import java.awt.event.KeyEvent;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -84,7 +85,7 @@ public final class ClientGui extends javax.swing.JFrame {
         this.userListController = new UserListController(this.lbUsers, tabController);
 
         // Set fields to default value
-        tbPort.setText("8000");
+        tbPort.setText(ServerConfigParam.Port.getDefaultValue());
         tbServer.setText("localhost");
 //        tbServer.setText("mash-it.org");
 

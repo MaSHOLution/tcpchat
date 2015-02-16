@@ -46,56 +46,59 @@ public final class CustomLogging {
      *
      * @param logName Name of the logger, element of enum LogName
      * @param logPath Path to logfile, element of enum LogPath
+     * @param logToFiles enable/disable logging to files
      * @param showOnConsole enable/disable output on console
      * @return Logger
      */
-    public static Logger create(LogName logName, LogPath logPath, boolean showOnConsole) {
+    public static Logger create(LogName logName, LogPath logPath, boolean logToFiles, boolean showOnConsole) {
 
         // Basic declarations
         Logger logger = Logger.getLogger(logName + "." + logPath);
-        FileHandler fh = null;
-
-        checkDir();
 
         if (!showOnConsole) {
             logger.setUseParentHandlers(false);
         }
 
-        // Setting up format for filename
-        SimpleDateFormat format = new SimpleDateFormat("M-d_HHmmss"); //just to make our log file nicer :)
-        try {
-            fh = new FileHandler(LogPath.LOGDIR.getPath() + "/" + logPath.getPath());
-        } catch (IOException | SecurityException ex) {
-            // TODO handle
-        } finally {
-            de.mash1t.chat.logging.Counters.exception();
-        }
+        if (logToFiles) {
+            FileHandler fh = null;
+            checkDir();
 
-        // Set formatter for logger to get rid of ugly standard format
-        fh.setFormatter(new Formatter() {
-            @Override
-            public String format(LogRecord record) {
-                SimpleDateFormat logTime = new SimpleDateFormat(
-                        "MM-dd-yyyy HH:mm:ss");
-                Calendar cal = new GregorianCalendar();
-                cal.setTimeInMillis(record.getMillis());
-                String recordLevel = record.getLevel().toString();
-
-                // Giving LogLevels the same margin for better overview
-                while (recordLevel.length() < 10) {
-                    recordLevel += " ";
-                }
-
-                // Building output string
-                String returnString = recordLevel
-                        + logTime.format(cal.getTime())
-                        + ": "
-                        + record.getMessage() + System.getProperty("line.separator");
-                return returnString;
+            // Setting up format for filename
+            SimpleDateFormat format = new SimpleDateFormat("M-d_HHmmss"); //just to make our log file nicer :)
+            try {
+                fh = new FileHandler(LogPath.LOGDIR.getPath() + "/" + logPath.getPath());
+            } catch (IOException | SecurityException ex) {
+                // TODO handle
+            } finally {
+                de.mash1t.chat.logging.Counters.exception();
             }
-        });
 
-        logger.addHandler(fh);
+            // Set formatter for logger to get rid of ugly standard format
+            fh.setFormatter(new Formatter() {
+                @Override
+                public String format(LogRecord record) {
+                    SimpleDateFormat logTime = new SimpleDateFormat(
+                            "MM-dd-yyyy HH:mm:ss");
+                    Calendar cal = new GregorianCalendar();
+                    cal.setTimeInMillis(record.getMillis());
+                    String recordLevel = record.getLevel().toString();
+
+                    // Giving LogLevels the same margin for better overview
+                    while (recordLevel.length() < 10) {
+                        recordLevel += " ";
+                    }
+
+                    // Building output string
+                    String returnString = recordLevel
+                            + logTime.format(cal.getTime())
+                            + ": "
+                            + record.getMessage() + System.getProperty("line.separator");
+                    return returnString;
+                }
+            });
+
+            logger.addHandler(fh);
+        }
         return logger;
     }
 

@@ -24,21 +24,26 @@
 package de.mash1t.chat.server.config;
 
 /**
- *
+ * Class for configuration parameters for server
+ * 
  * @author Manuel Schmid
  */
-public enum ConfigParam {
-    Port("Port");
+public enum ServerConfigParam {
+    Port("port", "8000"),
+    LogFiles("log_to_files","true"),
+    LogConsole("log_to_console","false");
     
      private final String configString;
+     private final String defaultValue;
 
     /**
      * Constructor
      *
      * @param name
      */
-    ConfigParam(String configString) {
+    ServerConfigParam(String configString, String defaultValue) {
         this.configString = configString;
+        this.defaultValue = defaultValue;
     }
 
     /**
@@ -48,5 +53,14 @@ public enum ConfigParam {
      */
     public String getConfigString() {
         return configString;
+    }
+    
+    /**
+     * Getter for defaultValue
+     *
+     * @return
+     */
+    public String getDefaultValue() {
+        return defaultValue;
     }
 }

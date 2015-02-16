@@ -24,46 +24,52 @@
 package de.mash1t.chat.server.config;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedWriter;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.util.EnumSet;
 import java.util.Properties;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Class for reading/writing config data from/to file system
+ *
+ * TODO Add property-support for client
  *
  * @author Manuel Schmid
  */
 public final class ConfigController {
 
-    private Properties properties = new Properties();
-    private EnumSet<ConfigParam> allParamTypes = EnumSet.allOf(ConfigParam.class);
+    private final Properties properties = new Properties();
+    private final EnumSet<ServerConfigParam> serverConfig = EnumSet.allOf(ServerConfigParam.class);
+    private final String fileName;
 
     /**
      * Constructor, directly loads configurations from file into internal variable
-     *
-     * @param filename name of the config file
      */
-    public ConfigController(String filename) {
-
+    public ConfigController() {
+        this.fileName = "ServerConfig.ini";
+    }
+    
+    /**
+     * Reads a config file
+     * @return 
+     */
+    public boolean readConfigFile(){
         BufferedInputStream stream = null;
         try {
-            stream = new BufferedInputStream(new FileInputStream(filename));
+            stream = new BufferedInputStream(new FileInputStream(this.fileName));
             properties.load(stream);
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(ConfigController.class.getName()).log(Level.SEVERE, null, ex);
+            return true;
         } catch (IOException ex) {
-            Logger.getLogger(ConfigController.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             try {
                 stream.close();
-            } catch (IOException ex) {
-                Logger.getLogger(ConfigController.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (Exception ex) {
             }
         }
+        return false;
     }
 
     /**
@@ -72,23 +78,25 @@ public final class ConfigController {
      * @param param the param to get the configuration from
      * @return configuration set in file
      */
-    public String getConfigValue(ConfigParam param) {
+    public String getConfigValue(ServerConfigParam param) {
         return properties.getProperty(param.getConfigString());
     }
-
+    
     /**
      * Validates all set values
      *
      * @return validated
      */
-    private boolean validateConfig() {
+    public boolean validateConfig() {
         String temp;
-        for (ConfigParam param : allParamTypes) {
+        for (ServerConfigParam param : serverConfig) {
             temp = getConfigValue(param);
             if (temp == null) {
                 return false;
             } else {
-                validateParam(param, temp);
+                if (!validateParam(param, temp)) {
+                    return false;
+                }
             }
         }
         return true;
@@ -101,7 +109,7 @@ public final class ConfigController {
      * @param temp the value of the config parameter
      * @return
      */
-    private boolean validateParam(ConfigParam param, String temp) {
+    private boolean validateParam(ServerConfigParam param, String temp) {
         switch (param) {
             case Port:
                 int port = Integer.parseInt(temp);
@@ -111,5 +119,27 @@ public final class ConfigController {
                 break;
         }
         return true;
+    }
+
+    
+    public boolean makeDefaultFile() {
+
+        BufferedWriter writer = null;
+
+        try {
+            writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(this.fileName), "utf-8"));
+            for (ServerConfigParam param : serverConfig) {
+                writer.write(param.getConfigString() + "=" + param.getDefaultValue());
+                writer.newLine();
+            }
+            return true;
+        } catch (IOException ex) {
+            return false;
+        } finally {
+            try {
+                writer.close();
+            } catch (Exception ex) {
+            }
+        }
     }
 }

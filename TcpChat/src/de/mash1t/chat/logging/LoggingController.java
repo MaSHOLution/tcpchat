@@ -23,8 +23,10 @@
  */
 package de.mash1t.chat.logging;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -44,11 +46,15 @@ public final class LoggingController {
      *
      * @param logToFiles enable/disable logging
      * @param showOnConsole enable/disable output on console
+     * @param cleanLogsOnStartup deletes old logfiles on startup
      */
-    public LoggingController(boolean logToFiles, boolean showOnConsole) {
+    public LoggingController(boolean logToFiles, boolean showOnConsole, boolean cleanLogsOnStartup) {
         this.logToFiles = logToFiles;
         this.showOnConsole = showOnConsole;
         this.loggingEnabled = (logToFiles || showOnConsole);
+        if (cleanLogsOnStartup) {
+            deleteLogDir();
+        }
     }
 
     /**
@@ -85,11 +91,53 @@ public final class LoggingController {
     }
 
     /**
-     * Gets all loggers which were created in this LoggingController
-     *
-     * @return List of all loggers created in this LoggingController
+     * Checks if the log dir exists if not, create it
      */
-    public List<Logger> getAllLoggers() {
-        return loggerList;
+    protected static void checkDir() {
+
+        File f = new File(LogPath.LOGDIR.getPath());
+        if (!f.exists() || !f.isDirectory()) {
+            f.mkdir();
+        }
+    }
+
+    /**
+     * Deletes the log dir and all including files
+     */
+    protected static boolean deleteLogDir() {
+
+        File f = new File(LogPath.LOGDIR.getPath());
+        if (f.exists() && f.isDirectory()) {
+            return deleteRecursive(f);
+        }
+        return true;
+    }
+
+    /**
+     * Deletes a given directory recursively
+     *
+     * @param path
+     * @return
+     */
+    private static boolean deleteRecursive(File path) {
+        boolean ret = true;
+        if (path.isDirectory()) {
+            for (File f : path.listFiles()) {
+                ret = ret && deleteRecursive(f);
+            }
+        }
+        return ret && path.delete();
+    }
+    
+    /**
+     * Closes all loggers which were created in this LoggingController
+     */
+    public void closeLoggers(){
+        // Close all loggers
+        for (Logger logger : loggerList) {
+            for (Handler handler : logger.getHandlers()) {
+                handler.close();
+            }
+        }
     }
 }

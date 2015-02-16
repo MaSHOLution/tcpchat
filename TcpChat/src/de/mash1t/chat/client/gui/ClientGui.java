@@ -28,7 +28,7 @@ import de.mash1t.chat.client.gui.tabs.ChatTab;
 import de.mash1t.chat.client.gui.tabs.ChatType;
 import de.mash1t.chat.client.gui.tabs.TabController;
 import de.mash1t.chat.client.gui.userlist.UserListController;
-import de.mash1t.chat.server.config.ServerConfigParam;
+import de.mash1t.chat.config.ServerConfigParam;
 import java.awt.event.KeyEvent;
 import java.io.BufferedReader;
 import java.io.IOException;

@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package de.mash1t.chat.server.config;
+package de.mash1t.chat.config;
 
 /**
  * Class for configuration parameters for server
@@ -31,7 +31,8 @@ package de.mash1t.chat.server.config;
 public enum ServerConfigParam {
     Port("port", "8000"),
     LogFiles("log_to_files","true"),
-    LogConsole("log_to_console","false");
+    LogConsole("log_to_console","false"),
+    CleanLogsOnStartup("clean_logs_on_start", "false");
     
      private final String configString;
      private final String defaultValue;

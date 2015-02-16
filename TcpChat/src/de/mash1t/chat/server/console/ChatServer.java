@@ -33,9 +33,10 @@ import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import de.mash1t.chat.logging.*;
+import de.mash1t.chat.networking.methods.AbstractNetworkProtocol;
 import de.mash1t.chat.networking.methods.NetworkProtocolType;
-import de.mash1t.chat.server.config.ConfigController;
-import de.mash1t.chat.server.config.ServerConfigParam;
+import de.mash1t.chat.config.ConfigController;
+import de.mash1t.chat.config.ServerConfigParam;
 import java.util.Scanner;
 
 /**
@@ -58,11 +59,6 @@ public final class ChatServer {
 
     // Config controller
     private static ConfigController conf = new ConfigController();
-
-    // Read params from config file
-    private static int portNumber;
-    private static boolean loggingEnabled;
-    private static boolean showOnConsole;
 
     /**
      * Main method for server
@@ -93,12 +89,13 @@ public final class ChatServer {
 
     private static void runServer() {
 
-        portNumber = Integer.parseInt(conf.getConfigValue(ServerConfigParam.Port));
-        loggingEnabled = Boolean.parseBoolean(conf.getConfigValue(ServerConfigParam.LogFiles));
-        showOnConsole = Boolean.parseBoolean(conf.getConfigValue(ServerConfigParam.LogConsole));
+        int portNumber = Integer.parseInt(conf.getConfigValue(ServerConfigParam.Port));
+        boolean loggingEnabled = Boolean.parseBoolean(conf.getConfigValue(ServerConfigParam.LogFiles));
+        boolean showOnConsole = Boolean.parseBoolean(conf.getConfigValue(ServerConfigParam.LogConsole));
+        boolean cleanLogsOnStartup = Boolean.parseBoolean(conf.getConfigValue(ServerConfigParam.CleanLogsOnStartup));
 
         // Setting up LoggingController
-        logControl = new LoggingController(loggingEnabled, showOnConsole);
+        logControl = new LoggingController(loggingEnabled, showOnConsole, cleanLogsOnStartup);
         initLoggers();
         System.out.println("Server started on port " + portNumber);
         logControl.log(logGeneral, Level.INFO, "Server started on port " + portNumber);
@@ -173,15 +170,12 @@ class ShutdownHandle extends Thread {
 
         // Send closing of server to all clients
         for (ClientThread thread : ChatServer.threads) {
-            if (thread != null && thread.state == ConnectionState.Online) {
-                thread.conLib.send(new KickPacket("*** SERVER IS GOING DOWN ***"), thread, ChatServer.nwpType);
+            if (thread.state == ConnectionState.Online) {
+                AbstractNetworkProtocol.send(new KickPacket("*** SERVER IS GOING DOWN ***"), thread, ChatServer.nwpType);
             }
         }
-        // Close all loggers
-        for (Logger logger : ChatServer.logControl.getAllLoggers()) {
-            for (Handler handler : logger.getHandlers()) {
-                handler.close();
-            }
-        }
+
+        // Close loggers
+        ChatServer.logControl.closeLoggers();
     }
 }

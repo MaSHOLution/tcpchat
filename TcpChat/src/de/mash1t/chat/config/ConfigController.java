@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package de.mash1t.chat.server.config;
+package de.mash1t.chat.config;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedWriter;

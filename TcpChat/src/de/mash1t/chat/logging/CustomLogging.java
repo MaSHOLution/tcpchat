@@ -23,7 +23,7 @@
  */
 package de.mash1t.chat.logging;
 
-import java.io.File;
+import static de.mash1t.chat.logging.LoggingController.checkDir;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -112,17 +112,6 @@ public final class CustomLogging {
     public static Logger get(LogName logName, LogPath logPath) {
         Logger logger = Logger.getLogger(logName + "." + logPath);
         return logger;
-    }
-
-    /**
-     * Checks if the log dir exists if not, create it
-     */
-    private static void checkDir() {
-
-        File f = new File(LogPath.LOGDIR.getPath());
-        if (!f.exists() || !f.isDirectory()) {
-            f.mkdir();
-        }
     }
 
     /**

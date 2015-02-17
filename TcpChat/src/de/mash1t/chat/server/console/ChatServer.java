@@ -57,7 +57,7 @@ public final class ChatServer {
     protected static NetworkProtocolType nwpType = NetworkProtocolType.TCP;
 
     // Config controller
-    private static ConfigController conf = new ConfigController();
+    private static final ConfigController conf = new ConfigController();
 
     /**
      * Main method for server
@@ -179,7 +179,7 @@ class ShutdownHandle extends Thread {
 
         // Close loggers
         ChatServer.logControl.closeLoggers();
-        
+
         System.out.println("Shut down successfully");
     }
 }

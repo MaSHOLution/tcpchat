@@ -103,6 +103,8 @@ public final class LoggingController {
 
     /**
      * Deletes the log dir and all including files
+     *
+     * @return
      */
     protected static boolean deleteLogDir() {
 
@@ -128,11 +130,11 @@ public final class LoggingController {
         }
         return ret && path.delete();
     }
-    
+
     /**
      * Closes all loggers which were created in this LoggingController
      */
-    public void closeLoggers(){
+    public void closeLoggers() {
         // Close all loggers
         for (Logger logger : loggerList) {
             for (Handler handler : logger.getHandlers()) {

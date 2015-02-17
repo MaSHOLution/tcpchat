@@ -27,8 +27,7 @@ import de.mash1t.chat.networking.packets.Packet;
 import de.mash1t.chat.server.console.ClientThread;
 
 /**
- * Abstract class for mainly handling static methid call of send(packet, thread,
- * nwpType) Methods have to be implemented by childs
+ * Abstract class for mainly handling static methid call of send(packet, thread, nwpType) Methods have to be implemented by childs
  *
  * @author Manuel Schmid
  */

@@ -30,8 +30,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 
 /**
- * This class serves as an outsourced thread, as the gui can only handle one
- * thread (itself)
+ * This class serves as an outsourced thread, as the gui can only handle one thread (itself)
  *
  * @author Manuel Schmid
  */

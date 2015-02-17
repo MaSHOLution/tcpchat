@@ -46,7 +46,7 @@ public final class CustomLogger {
     // Setting up date formats 
     private static final DateFormat dateFormatFiles = new SimpleDateFormat("dd_MM_yyyy_HH_mm_ss");
     private static final DateFormat dateFormatLogs = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-    
+
     /**
      * Creates a logger and adds handler
      *

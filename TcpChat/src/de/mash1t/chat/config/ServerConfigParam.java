@@ -25,17 +25,18 @@ package de.mash1t.chat.config;
 
 /**
  * Class for configuration parameters for server
- * 
+ *
  * @author Manuel Schmid
  */
 public enum ServerConfigParam {
+
     Port("port", "8000"),
-    LogFiles("log_to_files","true"),
-    LogConsole("log_to_console","false"),
+    LogFiles("log_to_files", "true"),
+    LogConsole("log_to_console", "false"),
     CleanLogsOnStartup("clean_logs_on_start", "false");
-    
-     private final String configString;
-     private final String defaultValue;
+
+    private final String configString;
+    private final String defaultValue;
 
     /**
      * Constructor
@@ -55,7 +56,7 @@ public enum ServerConfigParam {
     public String getConfigString() {
         return configString;
     }
-    
+
     /**
      * Getter for defaultValue
      *

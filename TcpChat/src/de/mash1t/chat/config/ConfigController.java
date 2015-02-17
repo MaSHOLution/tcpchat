@@ -51,12 +51,13 @@ public final class ConfigController {
     public ConfigController() {
         this.fileName = "ServerConfig.ini";
     }
-    
+
     /**
      * Reads a config file
-     * @return 
+     *
+     * @return
      */
-    public boolean readConfigFile(){
+    public boolean readConfigFile() {
         BufferedInputStream stream = null;
         try {
             stream = new BufferedInputStream(new FileInputStream(this.fileName));
@@ -81,7 +82,7 @@ public final class ConfigController {
     public String getConfigValue(ServerConfigParam param) {
         return properties.getProperty(param.getConfigString());
     }
-    
+
     /**
      * Validates all set values
      *
@@ -121,7 +122,6 @@ public final class ConfigController {
         return true;
     }
 
-    
     public boolean makeDefaultFile() {
 
         BufferedWriter writer = null;

@@ -136,7 +136,7 @@ public final class ClientThread extends Thread {
     protected synchronized void broadcast(String message) {
         for (ClientThread thread : threads) {
             if (state == ConnectionState.Online) {
-                conLib.send(new GroupMessagePacket(message, this.clientName), thread, ChatServer.nwpType);
+                AbstractNetworkProtocol.send(new GroupMessagePacket(message, this.clientName), thread, ChatServer.nwpType);
             }
         }
         logControl.log(logGeneral, Level.INFO, "GM #" + Counters.Totals.Messages.gmTotal + " from " + this.clientName);
@@ -151,7 +151,7 @@ public final class ClientThread extends Thread {
     protected synchronized void broadcast(Packet packet) {
         for (ClientThread thread : threads) {
             if (thread.state == ConnectionState.Online) {
-                conLib.send(packet, thread, ChatServer.nwpType);
+                AbstractNetworkProtocol.send(packet, thread, ChatServer.nwpType);
             }
         }
         logControl.log(logGeneral, Level.INFO, "GM #" + Counters.Totals.Messages.gmTotal + " from " + this.clientName);
@@ -166,7 +166,7 @@ public final class ClientThread extends Thread {
     protected synchronized void broadcastExceptMe(Packet packet) {
         for (ClientThread thread : threads) {
             if (thread.state == ConnectionState.Online && thread != this) {
-                conLib.send(packet, thread, ChatServer.nwpType);
+                AbstractNetworkProtocol.send(packet, thread, ChatServer.nwpType);
             }
         }
         // Counters.gm(); is normally no group but system shoutout
@@ -193,7 +193,7 @@ public final class ClientThread extends Thread {
                             && thread.clientName.equals(receiver)) {
 
                         // Send privatePacket to receiver
-                        conLib.send(privatePacket, thread, ChatServer.nwpType);
+                        AbstractNetworkProtocol.send(privatePacket, thread, ChatServer.nwpType);
 
                         // Send privatePacket to sender
                         conLib.send(privatePacket);

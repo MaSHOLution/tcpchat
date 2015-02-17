@@ -147,6 +147,9 @@ class ShutdownHandle extends Thread {
 
     @Override
     public void run() {
+        
+        System.out.println("Shutting down Server");
+        
         ChatServer.logControl.log(ChatServer.logGeneral, Level.INFO, "*** SERVER IS GOING DOWN ***");
         ChatServer.logControl.log(ChatServer.logConnection, Level.INFO, "*** SERVER IS GOING DOWN ***");
 
@@ -162,5 +165,7 @@ class ShutdownHandle extends Thread {
                 handler.close();
             }
         }
+
+        System.out.println("Shut down successfully");
     }
 }

@@ -82,7 +82,7 @@ public final class LoggingController {
         // Check if logging is enabled
         if (this.loggingEnabled) {
             // Create logger
-            Logger logger = CustomLogging.create(logName, logPath, logToFiles, showOnConsole);
+            Logger logger = CustomLogger.create(logName, logPath, logToFiles, showOnConsole);
             // Add logger to internal list
             loggerList.add(logger);
             return logger;

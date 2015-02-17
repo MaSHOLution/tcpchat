@@ -25,8 +25,10 @@ package de.mash1t.chat.logging;
 
 import static de.mash1t.chat.logging.LoggingController.checkDir;
 import java.io.IOException;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.logging.FileHandler;
 import java.util.logging.Formatter;
@@ -39,8 +41,12 @@ import java.util.logging.Logger;
  *
  * @author Manuel Schmid
  */
-public final class CustomLogging {
+public final class CustomLogger {
 
+    // Setting up date formats 
+    private static final DateFormat dateFormatFiles = new SimpleDateFormat("dd_MM_yyyy_HH_mm_ss");
+    private static final DateFormat dateFormatLogs = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+    
     /**
      * Creates a logger and adds handler
      *
@@ -64,9 +70,8 @@ public final class CustomLogging {
             checkDir();
 
             // Setting up format for filename
-            SimpleDateFormat format = new SimpleDateFormat("M-d_HHmmss"); //just to make our log file nicer :)
             try {
-                fh = new FileHandler(LogPath.LOGDIR.getPath() + "/" + logPath.getPath());
+                fh = new FileHandler(LogPath.LOGDIR.getPath() + "/" + logPath.getPath() + "_" + getCurrentTateTime() + ".log");
             } catch (IOException | SecurityException ex) {
                 // TODO handle
             } finally {
@@ -77,8 +82,6 @@ public final class CustomLogging {
             fh.setFormatter(new Formatter() {
                 @Override
                 public String format(LogRecord record) {
-                    SimpleDateFormat logTime = new SimpleDateFormat(
-                            "MM-dd-yyyy HH:mm:ss");
                     Calendar cal = new GregorianCalendar();
                     cal.setTimeInMillis(record.getMillis());
                     String recordLevel = record.getLevel().toString();
@@ -90,7 +93,7 @@ public final class CustomLogging {
 
                     // Building output string
                     String returnString = recordLevel
-                            + logTime.format(cal.getTime())
+                            + dateFormatLogs.format(cal.getTime())
                             + ": "
                             + record.getMessage() + System.getProperty("line.separator");
                     return returnString;
@@ -100,6 +103,12 @@ public final class CustomLogging {
             logger.addHandler(fh);
         }
         return logger;
+    }
+
+    private static String getCurrentTateTime() {
+        //get current date time with Date()
+        Date date = new Date();
+        return dateFormatFiles.format(date);
     }
 
     /**

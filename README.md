@@ -53,7 +53,6 @@ If you have any questions or feature requests, don't hesitate to contact me on [
 ### Current Todo's
 
  - [ ] AES-256-Encryption
- - [ ] Add configuration file for server
  - [ ] Add feature to send files
  - [ ] Implement Database
  - [ ] Save received messages in local file system or database

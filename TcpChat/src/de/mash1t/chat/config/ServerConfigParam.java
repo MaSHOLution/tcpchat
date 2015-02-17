@@ -21,39 +21,47 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package de.mash1t.chat.logging;
+package de.mash1t.chat.config;
 
 /**
- * Enum for logpaths
- *
+ * Class for configuration parameters for server
+ * 
  * @author Manuel Schmid
  */
-public enum LogPath {
-
-    LOGDIR("logs"),
-    CLIENTLOGDIR("clientlogs"),
-    SERVERLOGDIR("serverlogs"),
-    CONNECTION("connection"),
-    EXCEPTION("exception"),
-    GENERAL("general");
-
-    private final String path;
+public enum ServerConfigParam {
+    Port("port", "8000"),
+    LogFiles("log_to_files","true"),
+    LogConsole("log_to_console","false"),
+    CleanLogsOnStartup("clean_logs_on_start", "false");
+    
+     private final String configString;
+     private final String defaultValue;
 
     /**
      * Constructor
      *
-     * @param path
+     * @param name
      */
-    LogPath(String path) {
-        this.path = path;
+    ServerConfigParam(String configString, String defaultValue) {
+        this.configString = configString;
+        this.defaultValue = defaultValue;
     }
 
     /**
-     * Getter for path
+     * Getter for configString
      *
      * @return
      */
-    public String getPath() {
-        return path;
+    public String getConfigString() {
+        return configString;
+    }
+    
+    /**
+     * Getter for defaultValue
+     *
+     * @return
+     */
+    public String getDefaultValue() {
+        return defaultValue;
     }
 }

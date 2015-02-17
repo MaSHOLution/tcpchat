@@ -28,6 +28,7 @@ import de.mash1t.chat.client.gui.tabs.ChatTab;
 import de.mash1t.chat.client.gui.tabs.ChatType;
 import de.mash1t.chat.client.gui.tabs.TabController;
 import de.mash1t.chat.client.gui.userlist.UserListController;
+import de.mash1t.chat.config.ServerConfigParam;
 import java.awt.event.KeyEvent;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -84,7 +85,7 @@ public final class ClientGui extends javax.swing.JFrame {
         this.userListController = new UserListController(this.lbUsers, tabController);
 
         // Set fields to default value
-        tbPort.setText("8000");
+        tbPort.setText(ServerConfigParam.Port.getDefaultValue());
         tbServer.setText("localhost");
 //        tbServer.setText("mash-it.org");
 
@@ -481,7 +482,7 @@ public final class ClientGui extends javax.swing.JFrame {
                 this.dialogHelper.showInfoDialog("Info", "Please set a server to connect to");
             } else if (portText.trim().equals("")) {
                 this.dialogHelper.showInfoDialog("Info", "Please set a port to which to connect to on the server");
-            } else if (connectionPort < 1 || connectionPort > 65555) {
+            } else if (connectionPort < 1 || connectionPort > 65535) {
                 this.dialogHelper.showInfoDialog("Info", "The given port has to be an integer in the range from 1 to 65535");
             } else {
                 return true;

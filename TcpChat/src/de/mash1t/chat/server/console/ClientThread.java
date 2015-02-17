@@ -283,9 +283,9 @@ public final class ClientThread extends Thread {
         userList.remove(clientName);
 
         if (state == ConnectionState.Kicked) {
-            logControl.log(logConnection, Level.INFO, conLib.getIP() + ": " + this.clientName + " has disconnected");
-        } else {
             logControl.log(logConnection, Level.INFO, conLib.getIP() + ": " + this.clientName + " has been kicked");
+        } else {
+            logControl.log(logConnection, Level.INFO, conLib.getIP() + ": " + this.clientName + " has disconnected");
         }
         Counters.disconnect();
 //        } catch (IOException ex) {

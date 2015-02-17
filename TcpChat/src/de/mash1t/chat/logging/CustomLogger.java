@@ -23,10 +23,12 @@
  */
 package de.mash1t.chat.logging;
 
-import java.io.File;
+import static de.mash1t.chat.logging.LoggingController.checkDir;
 import java.io.IOException;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.logging.FileHandler;
 import java.util.logging.Formatter;
@@ -39,64 +41,74 @@ import java.util.logging.Logger;
  *
  * @author Manuel Schmid
  */
-public final class CustomLogging {
+public final class CustomLogger {
 
+    // Setting up date formats 
+    private static final DateFormat dateFormatFiles = new SimpleDateFormat("dd_MM_yyyy_HH_mm_ss");
+    private static final DateFormat dateFormatLogs = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+    
     /**
      * Creates a logger and adds handler
      *
      * @param logName Name of the logger, element of enum LogName
      * @param logPath Path to logfile, element of enum LogPath
+     * @param logToFiles enable/disable logging to files
      * @param showOnConsole enable/disable output on console
      * @return Logger
      */
-    public static Logger create(LogName logName, LogPath logPath, boolean showOnConsole) {
+    public static Logger create(LogName logName, LogPath logPath, boolean logToFiles, boolean showOnConsole) {
 
         // Basic declarations
         Logger logger = Logger.getLogger(logName + "." + logPath);
-        FileHandler fh = null;
-
-        checkDir();
 
         if (!showOnConsole) {
             logger.setUseParentHandlers(false);
         }
 
-        // Setting up format for filename
-        SimpleDateFormat format = new SimpleDateFormat("M-d_HHmmss"); //just to make our log file nicer :)
-        try {
-            fh = new FileHandler(LogPath.LOGDIR.getPath() + "/" + logPath.getPath());
-        } catch (IOException | SecurityException ex) {
-            // TODO handle
-        } finally {
-            de.mash1t.chat.logging.Counters.exception();
-        }
+        if (logToFiles) {
+            FileHandler fh = null;
+            checkDir();
 
-        // Set formatter for logger to get rid of ugly standard format
-        fh.setFormatter(new Formatter() {
-            @Override
-            public String format(LogRecord record) {
-                SimpleDateFormat logTime = new SimpleDateFormat(
-                        "MM-dd-yyyy HH:mm:ss");
-                Calendar cal = new GregorianCalendar();
-                cal.setTimeInMillis(record.getMillis());
-                String recordLevel = record.getLevel().toString();
-
-                // Giving LogLevels the same margin for better overview
-                while (recordLevel.length() < 10) {
-                    recordLevel += " ";
-                }
-
-                // Building output string
-                String returnString = recordLevel
-                        + logTime.format(cal.getTime())
-                        + ": "
-                        + record.getMessage() + System.getProperty("line.separator");
-                return returnString;
+            // Setting up format for filename
+            try {
+                fh = new FileHandler(LogPath.LOGDIR.getPath() + "/" + logPath.getPath() + "_" + getCurrentTateTime() + ".log");
+            } catch (IOException | SecurityException ex) {
+                // TODO handle
+            } finally {
+                de.mash1t.chat.logging.Counters.exception();
             }
-        });
 
-        logger.addHandler(fh);
+            // Set formatter for logger to get rid of ugly standard format
+            fh.setFormatter(new Formatter() {
+                @Override
+                public String format(LogRecord record) {
+                    Calendar cal = new GregorianCalendar();
+                    cal.setTimeInMillis(record.getMillis());
+                    String recordLevel = record.getLevel().toString();
+
+                    // Giving LogLevels the same margin for better overview
+                    while (recordLevel.length() < 10) {
+                        recordLevel += " ";
+                    }
+
+                    // Building output string
+                    String returnString = recordLevel
+                            + dateFormatLogs.format(cal.getTime())
+                            + ": "
+                            + record.getMessage() + System.getProperty("line.separator");
+                    return returnString;
+                }
+            });
+
+            logger.addHandler(fh);
+        }
         return logger;
+    }
+
+    private static String getCurrentTateTime() {
+        //get current date time with Date()
+        Date date = new Date();
+        return dateFormatFiles.format(date);
     }
 
     /**
@@ -109,17 +121,6 @@ public final class CustomLogging {
     public static Logger get(LogName logName, LogPath logPath) {
         Logger logger = Logger.getLogger(logName + "." + logPath);
         return logger;
-    }
-
-    /**
-     * Checks if the log dir exists if not, create it
-     */
-    private static void checkDir() {
-
-        File f = new File(LogPath.LOGDIR.getPath());
-        if (!f.exists() || !f.isDirectory()) {
-            f.mkdir();
-        }
     }
 
     /**

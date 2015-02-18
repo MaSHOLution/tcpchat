@@ -1,0 +1,44 @@
+@startuml
+abstract class de.mash1t.chat.networking.methods.AbstractNetworkProtocol
+abstract class de.mash1t.chat.networking.packets.MessagePacket
+abstract class de.mash1t.chat.networking.packets.Packet
+class de.mash1t.chat.logging.Counters
+class de.mash1t.chat.networking.methods.TCP
+class de.mash1t.chat.networking.packets.ConnectPacket
+class de.mash1t.chat.networking.packets.DisconnectPacket
+class de.mash1t.chat.networking.packets.GroupMessagePacket
+class de.mash1t.chat.networking.packets.InfoPacket
+class de.mash1t.chat.networking.packets.InvalidPacket
+class de.mash1t.chat.networking.packets.KickPacket
+class de.mash1t.chat.networking.packets.PrivateMessagePacket
+class de.mash1t.chat.networking.packets.UserListPacket
+class de.mash1t.chat.security.basics.CryptoBasics
+class de.mash1t.chat.security.cryptography.EncryptionMethod
+class de.mash1t.chat.server.console.ClientThread
+enum de.mash1t.chat.networking.methods.NetworkProtocolRole
+enum de.mash1t.chat.networking.methods.NetworkProtocolType
+enum de.mash1t.chat.networking.packets.PacketType
+enum de.mash1t.chat.networking.packets.UserListPacketType
+interface de.mash1t.chat.networking.methods.NetworkProtocol
+de.mash1t.chat.networking.methods.AbstractNetworkProtocol ..> de.mash1t.chat.networking.packets.Packet
+de.mash1t.chat.networking.methods.AbstractNetworkProtocol ..> de.mash1t.chat.server.console.ClientThread
+de.mash1t.chat.networking.methods.AbstractNetworkProtocol --|> de.mash1t.chat.networking.methods.NetworkProtocol
+de.mash1t.chat.networking.packets.MessagePacket --|> de.mash1t.chat.networking.packets.Packet
+de.mash1t.chat.networking.methods.TCP --|> de.mash1t.chat.networking.methods.AbstractNetworkProtocol
+de.mash1t.chat.networking.methods.TCP ..> de.mash1t.chat.networking.packets.Packet
+de.mash1t.chat.networking.methods.TCP ..> de.mash1t.chat.logging.Counters
+de.mash1t.chat.networking.methods.TCP ..> de.mash1t.chat.networking.packets.InfoPacket
+de.mash1t.chat.networking.methods.TCP ..> de.mash1t.chat.networking.packets.InvalidPacket
+de.mash1t.chat.networking.methods.TCP ..> de.mash1t.chat.server.console.ClientThread
+de.mash1t.chat.networking.packets.ConnectPacket --|> de.mash1t.chat.networking.packets.Packet
+de.mash1t.chat.networking.packets.DisconnectPacket --|> de.mash1t.chat.networking.packets.Packet
+de.mash1t.chat.networking.packets.GroupMessagePacket --|> de.mash1t.chat.networking.packets.MessagePacket
+de.mash1t.chat.networking.packets.InfoPacket --|> de.mash1t.chat.networking.packets.MessagePacket
+de.mash1t.chat.networking.packets.InvalidPacket --|> de.mash1t.chat.networking.packets.Packet
+de.mash1t.chat.networking.packets.KickPacket --|> de.mash1t.chat.networking.packets.Packet
+de.mash1t.chat.networking.packets.PrivateMessagePacket --|> de.mash1t.chat.networking.packets.MessagePacket
+de.mash1t.chat.networking.packets.UserListPacket --|> de.mash1t.chat.networking.packets.Packet
+de.mash1t.chat.networking.methods.NetworkProtocol ..> de.mash1t.chat.networking.packets.Packet
+de.mash1t.chat.networking.methods.NetworkProtocol ..> de.mash1t.chat.security.basics.CryptoBasics
+de.mash1t.chat.networking.methods.NetworkProtocol ..> de.mash1t.chat.security.cryptography.EncryptionMethod
+@enduml

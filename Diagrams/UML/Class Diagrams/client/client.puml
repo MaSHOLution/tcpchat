@@ -1,0 +1,26 @@
+@startuml
+class de.mash1t.chat.client.gui.ClientGui
+class de.mash1t.chat.client.gui.ClientGuiThread
+class de.mash1t.chat.client.gui.DialogHelper
+class de.mash1t.chat.client.gui.tabs.ButtonTabComponent
+class de.mash1t.chat.client.gui.tabs.ChatArea
+class de.mash1t.chat.client.gui.tabs.ChatTab
+class de.mash1t.chat.client.gui.tabs.JPanel
+class de.mash1t.chat.client.gui.tabs.TabController
+class de.mash1t.chat.client.gui.userlist.UserListController
+class de.mash1t.chat.config.ServerConfigParam
+class de.mash1t.chat.logging.Counters
+class de.mash1t.chat.networking.packets.UserListPacket
+enum de.mash1t.chat.client.gui.tabs.ChatType
+de.mash1t.chat.client.gui.ClientGui ..> de.mash1t.chat.client.gui.tabs.ChatTab
+de.mash1t.chat.client.gui.ClientGui ..> de.mash1t.chat.client.gui.tabs.TabController
+de.mash1t.chat.client.gui.ClientGui ..> de.mash1t.chat.client.gui.userlist.UserListController
+de.mash1t.chat.client.gui.ClientGui ..> de.mash1t.chat.config.ServerConfigParam
+de.mash1t.chat.client.gui.ClientGui ..> de.mash1t.chat.client.gui.tabs.ChatType
+de.mash1t.chat.client.gui.ClientGuiThread ..> de.mash1t.chat.client.gui.tabs.TabController
+de.mash1t.chat.client.gui.ClientGuiThread ..> de.mash1t.chat.logging.Counters
+de.mash1t.chat.client.gui.tabs.ButtonTabComponent --|> de.mash1t.chat.client.gui.tabs.JPanel
+de.mash1t.chat.client.gui.tabs.ButtonTabComponent ..> de.mash1t.chat.logging.Counters
+de.mash1t.chat.client.gui.userlist.UserListController ..> de.mash1t.chat.client.gui.tabs.TabController
+de.mash1t.chat.client.gui.userlist.UserListController ..> de.mash1t.chat.networking.packets.UserListPacket
+@enduml

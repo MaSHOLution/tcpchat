@@ -8,7 +8,7 @@ TCPChat is a server-based open source chat, which is equipped with the following
 
 ### Version
 
-0.3.1
+0.3.2
 
 ### Technology
 
@@ -28,20 +28,22 @@ On Windows, you can execute .jar-Files by double-clicking on them. If it doesn't
 You can find the latest stable builds in the folder **"*stable_builds*"**
 
 ### Starting stable Server
-Open your favorite terminal and run this command:
+Open your favorite terminal and run this commands:
 
 ```sh
 $ cd stable_builds/
-$ java -jar TCPChat_Server.jar <port> <logging yes/no>
+$ java -jar TCPChat_Server.jar
 ```
 
 ### Starting stable Client
-Open your favorite terminal and run this command:
+Open your favorite terminal and run this commands:
 
 ```sh
 $ cd stable_builds/
 $ java -jar TCPChat_Client.jar
 ```
+
+
 
 ### Project Info
 TCPChat is a netbeans project, which is developed with **JDK 1.7.0_71** with regards to an eventually **upcoming Android App**.

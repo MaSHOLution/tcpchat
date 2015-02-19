@@ -23,6 +23,9 @@
  */
 package de.mash1t.chat.logging;
 
+import de.mash1t.chat.client.gui.ClientGui;
+import de.mash1t.chat.server.console.ChatServer;
+
 /**
  * Enum for logger names (classnames)
  *
@@ -30,8 +33,8 @@ package de.mash1t.chat.logging;
  */
 public enum LogName {
 
-    SERVER(de.mash1t.chat.server.console.ChatServer.class.getName()),
-    CLIENT(de.mash1t.chat.client.gui.ClientGui.class.getName());
+    SERVER(ChatServer.class.getName()),
+    CLIENT(ClientGui.class.getName());
 
     private final String name;
 

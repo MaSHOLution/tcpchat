@@ -1,0 +1,20 @@
+@startuml
+class de.mash1t.chat.config.ConfigController
+class java.io.BufferedInputStream
+class java.io.BufferedWriter
+class java.io.FileInputStream
+class java.io.FileOutputStream
+class java.io.IOException
+class java.io.OutputStreamWriter
+class java.util.EnumSet
+class java.util.Properties
+enum de.mash1t.chat.config.ServerConfigParam
+de.mash1t.chat.config.ConfigController ..> java.io.BufferedInputStream
+de.mash1t.chat.config.ConfigController ..> java.io.BufferedWriter
+de.mash1t.chat.config.ConfigController ..> java.io.FileInputStream
+de.mash1t.chat.config.ConfigController ..> java.io.FileOutputStream
+de.mash1t.chat.config.ConfigController ..> java.io.IOException
+de.mash1t.chat.config.ConfigController ..> java.io.OutputStreamWriter
+de.mash1t.chat.config.ConfigController ..> java.util.EnumSet
+de.mash1t.chat.config.ConfigController ..> java.util.Properties
+@enduml

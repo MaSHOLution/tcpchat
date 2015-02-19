@@ -52,10 +52,9 @@ public class GroupMessage {
     @Test
     public void write() throws FileNotFoundException, IOException {
         FileOutputStream fos = new FileOutputStream(filename);
-        ObjectOutputStream oos = new ObjectOutputStream(fos);
-
-        oos.writeObject(new GroupMessagePacket(this.message, this.sender));
-        oos.close();
+        try (ObjectOutputStream oos = new ObjectOutputStream(fos)) {
+            oos.writeObject(new GroupMessagePacket(this.message, this.sender));
+        }
     }
 
     /**
@@ -68,10 +67,10 @@ public class GroupMessage {
     @Test
     public void read() throws FileNotFoundException, IOException, ClassNotFoundException {
         FileInputStream fis = new FileInputStream(filename);
-        ObjectInputStream ois = new ObjectInputStream(fis);
-
-        GroupMessagePacket msgPacket = (GroupMessagePacket) ois.readObject();
-        ois.close();
+        GroupMessagePacket msgPacket;
+        try (ObjectInputStream ois = new ObjectInputStream(fis)) {
+            msgPacket = (GroupMessagePacket) ois.readObject();
+        }
 
         assertEquals(msgPacket.getMessage(), this.message);
         assertEquals(msgPacket.getSender(), this.sender);

@@ -33,9 +33,9 @@ public enum LogPath {
     LOGDIR("logs"),
     CLIENTLOGDIR("clientlogs"),
     SERVERLOGDIR("serverlogs"),
-    CONNECTION("connection.log"),
-    EXCEPTION("exception.log"),
-    GENERAL("general.log");
+    CONNECTION("connection"),
+    EXCEPTION("exception"),
+    GENERAL("general");
 
     private final String path;
 

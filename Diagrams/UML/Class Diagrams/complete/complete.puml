@@ -1,0 +1,108 @@
+@startuml
+abstract class de.mash1t.chat.networking.methods.AbstractNetworkProtocol
+abstract class de.mash1t.chat.networking.packets.MessagePacket
+abstract class de.mash1t.chat.networking.packets.Packet
+class de.mash1t.chat.client.gui.ClientGui
+class de.mash1t.chat.client.gui.ClientGuiThread
+class de.mash1t.chat.client.gui.DialogHelper
+class de.mash1t.chat.client.gui.tabs.ButtonTabComponent
+class de.mash1t.chat.client.gui.tabs.ChatArea
+class de.mash1t.chat.client.gui.tabs.ChatTab
+class de.mash1t.chat.client.gui.tabs.JPanel
+class de.mash1t.chat.client.gui.tabs.TabController
+class de.mash1t.chat.client.gui.userlist.UserListController
+class de.mash1t.chat.config.ConfigController
+class de.mash1t.chat.logging.Counters
+class de.mash1t.chat.logging.CustomLogger
+class de.mash1t.chat.logging.LoggingController
+class de.mash1t.chat.networking.methods.TCP
+class de.mash1t.chat.networking.packets.ConnectPacket
+class de.mash1t.chat.networking.packets.DisconnectPacket
+class de.mash1t.chat.networking.packets.GroupMessagePacket
+class de.mash1t.chat.networking.packets.InfoPacket
+class de.mash1t.chat.networking.packets.InvalidPacket
+class de.mash1t.chat.networking.packets.KickPacket
+class de.mash1t.chat.networking.packets.PrivateMessagePacket
+class de.mash1t.chat.networking.packets.UserListPacket
+class de.mash1t.chat.security.basics.CryptoBasics
+class de.mash1t.chat.security.basics.SessionIdGenerator
+class de.mash1t.chat.security.cryptography.EncryptionMethod
+class de.mash1t.chat.security.cryptography.method.Aes
+class de.mash1t.chat.server.console.ChatServer
+class de.mash1t.chat.server.console.ClientThread
+class de.mash1t.chat.server.console.RejectionThread
+enum de.mash1t.chat.client.gui.tabs.ChatType
+enum de.mash1t.chat.config.ServerConfigParam
+enum de.mash1t.chat.logging.LogDir
+enum de.mash1t.chat.logging.LogName
+enum de.mash1t.chat.logging.LogPath
+enum de.mash1t.chat.networking.methods.NetworkProtocolRole
+enum de.mash1t.chat.networking.methods.NetworkProtocolType
+enum de.mash1t.chat.networking.packets.PacketType
+enum de.mash1t.chat.networking.packets.UserListPacketType
+enum de.mash1t.chat.security.cryptography.Method
+enum de.mash1t.chat.server.console.ConnectionState
+interface de.mash1t.chat.networking.methods.NetworkProtocol
+interface de.mash1t.chat.security.cryptography.crypter
+de.mash1t.chat.networking.methods.AbstractNetworkProtocol ..> de.mash1t.chat.networking.packets.Packet
+de.mash1t.chat.networking.methods.AbstractNetworkProtocol ..> java.lang.Override
+de.mash1t.chat.networking.methods.AbstractNetworkProtocol ..> de.mash1t.chat.server.console.ClientThread
+de.mash1t.chat.networking.methods.AbstractNetworkProtocol --|> de.mash1t.chat.networking.methods.NetworkProtocol
+de.mash1t.chat.networking.packets.MessagePacket --|> de.mash1t.chat.networking.packets.Packet
+de.mash1t.chat.client.gui.ClientGui ..> de.mash1t.chat.client.gui.tabs.ChatTab
+de.mash1t.chat.client.gui.ClientGui ..> de.mash1t.chat.client.gui.tabs.TabController
+de.mash1t.chat.client.gui.ClientGui ..> de.mash1t.chat.client.gui.userlist.UserListController
+de.mash1t.chat.client.gui.ClientGui ..> de.mash1t.chat.client.gui.tabs.ChatType
+de.mash1t.chat.client.gui.ClientGui ..> de.mash1t.chat.config.ServerConfigParam
+de.mash1t.chat.client.gui.ClientGuiThread ..> de.mash1t.chat.client.gui.tabs.TabController
+de.mash1t.chat.client.gui.ClientGuiThread ..> de.mash1t.chat.logging.Counters
+de.mash1t.chat.client.gui.tabs.ButtonTabComponent --|> de.mash1t.chat.client.gui.tabs.JPanel
+de.mash1t.chat.client.gui.tabs.ButtonTabComponent ..> de.mash1t.chat.logging.Counters
+de.mash1t.chat.client.gui.userlist.UserListController ..> de.mash1t.chat.client.gui.tabs.TabController
+de.mash1t.chat.client.gui.userlist.UserListController ..> de.mash1t.chat.networking.packets.UserListPacket
+de.mash1t.chat.logging.CustomLogger ..> de.mash1t.chat.logging.LoggingController
+de.mash1t.chat.networking.methods.TCP --|> de.mash1t.chat.networking.methods.AbstractNetworkProtocol
+de.mash1t.chat.networking.methods.TCP ..> de.mash1t.chat.networking.packets.Packet
+de.mash1t.chat.networking.methods.TCP ..> de.mash1t.chat.logging.Counters
+de.mash1t.chat.networking.methods.TCP ..> de.mash1t.chat.networking.packets.InfoPacket
+de.mash1t.chat.networking.methods.TCP ..> de.mash1t.chat.networking.packets.InvalidPacket
+de.mash1t.chat.networking.methods.TCP ..> de.mash1t.chat.server.console.ClientThread
+de.mash1t.chat.networking.packets.ConnectPacket --|> de.mash1t.chat.networking.packets.Packet
+de.mash1t.chat.networking.packets.DisconnectPacket --|> de.mash1t.chat.networking.packets.Packet
+de.mash1t.chat.networking.packets.GroupMessagePacket --|> de.mash1t.chat.networking.packets.MessagePacket
+de.mash1t.chat.networking.packets.InfoPacket --|> de.mash1t.chat.networking.packets.MessagePacket
+de.mash1t.chat.networking.packets.InvalidPacket --|> de.mash1t.chat.networking.packets.Packet
+de.mash1t.chat.networking.packets.KickPacket --|> de.mash1t.chat.networking.packets.Packet
+de.mash1t.chat.networking.packets.PrivateMessagePacket --|> de.mash1t.chat.networking.packets.MessagePacket
+de.mash1t.chat.networking.packets.UserListPacket --|> de.mash1t.chat.networking.packets.Packet
+de.mash1t.chat.security.basics.CryptoBasics ..> de.mash1t.chat.security.cryptography.EncryptionMethod
+de.mash1t.chat.security.basics.CryptoBasics ..> de.mash1t.chat.security.cryptography.method.Aes
+de.mash1t.chat.security.basics.CryptoBasics ..> de.mash1t.chat.security.cryptography.Method
+de.mash1t.chat.security.cryptography.EncryptionMethod ..> de.mash1t.chat.security.basics.SessionIdGenerator
+de.mash1t.chat.security.cryptography.EncryptionMethod --|> de.mash1t.chat.security.cryptography.crypter
+de.mash1t.chat.security.cryptography.method.Aes ..> de.mash1t.chat.security.basics.CryptoBasics
+de.mash1t.chat.security.cryptography.method.Aes --|> de.mash1t.chat.security.cryptography.EncryptionMethod
+de.mash1t.chat.security.cryptography.method.Aes --|> de.mash1t.chat.security.cryptography.crypter
+de.mash1t.chat.server.console.ChatServer ..> de.mash1t.chat.networking.methods.AbstractNetworkProtocol
+de.mash1t.chat.server.console.ChatServer ..> de.mash1t.chat.config.ConfigController
+de.mash1t.chat.server.console.ChatServer ..> de.mash1t.chat.networking.packets.KickPacket
+de.mash1t.chat.server.console.ChatServer ..> de.mash1t.chat.config.ServerConfigParam
+de.mash1t.chat.server.console.ChatServer ..> de.mash1t.chat.networking.methods.NetworkProtocolType
+de.mash1t.chat.server.console.ClientThread ..> de.mash1t.chat.logging.Counters
+de.mash1t.chat.server.console.ClientThread ..> de.mash1t.chat.security.basics.CryptoBasics
+de.mash1t.chat.server.console.ClientThread ..> de.mash1t.chat.security.cryptography.EncryptionMethod
+de.mash1t.chat.server.console.ClientThread ..> de.mash1t.chat.server.console.ChatServer
+de.mash1t.chat.server.console.RejectionThread ..> de.mash1t.chat.networking.packets.Packet
+de.mash1t.chat.server.console.RejectionThread ..> de.mash1t.chat.logging.Counters
+de.mash1t.chat.server.console.RejectionThread ..> de.mash1t.chat.networking.methods.TCP
+de.mash1t.chat.server.console.RejectionThread ..> de.mash1t.chat.networking.packets.ConnectPacket
+de.mash1t.chat.server.console.RejectionThread ..> de.mash1t.chat.networking.packets.KickPacket
+de.mash1t.chat.server.console.RejectionThread ..> de.mash1t.chat.server.console.ChatServer
+de.mash1t.chat.server.console.RejectionThread ..> de.mash1t.chat.networking.methods.NetworkProtocolRole
+de.mash1t.chat.server.console.RejectionThread ..> de.mash1t.chat.networking.packets.PacketType
+de.mash1t.chat.logging.LogName ..> de.mash1t.chat.client.gui.ClientGui
+de.mash1t.chat.logging.LogName ..> de.mash1t.chat.server.console.ChatServer
+de.mash1t.chat.networking.methods.NetworkProtocol ..> de.mash1t.chat.networking.packets.Packet
+de.mash1t.chat.networking.methods.NetworkProtocol ..> de.mash1t.chat.security.basics.CryptoBasics
+de.mash1t.chat.networking.methods.NetworkProtocol ..> de.mash1t.chat.security.cryptography.EncryptionMethod
+@enduml

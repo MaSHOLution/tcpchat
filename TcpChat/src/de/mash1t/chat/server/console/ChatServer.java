@@ -23,6 +23,7 @@
  */
 package de.mash1t.chat.server.console;
 
+import de.mash1t.chat.core.RoleType;
 import de.mash1t.chat.networking.packets.KickPacket;
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -144,9 +145,9 @@ public final class ChatServer {
      * Initializes loggers with LoggingController
      */
     protected static void initLoggers() {
-        logConnection = logControl.create(LogName.SERVER, LogPath.CONNECTION);
-        logException = logControl.create(LogName.SERVER, LogPath.EXCEPTION);
-        logGeneral = logControl.create(LogName.SERVER, LogPath.GENERAL);
+        logConnection = logControl.create(RoleType.Server, LogPath.CONNECTION);
+        logException = logControl.create(RoleType.Server, LogPath.EXCEPTION);
+        logGeneral = logControl.create(RoleType.Server, LogPath.GENERAL);
     }
 
     /**

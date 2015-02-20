@@ -23,6 +23,7 @@
  */
 package de.mash1t.chat.networking.methods;
 
+import de.mash1t.chat.core.RoleType;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -48,7 +49,7 @@ public class TCP extends AbstractNetworkProtocol {
     private Socket clientSocket = null;
     private final InetAddress ip;
     private final String ipString;
-    private final NetworkProtocolRole type;
+    private final RoleType type;
 
     /**
      * Constructor, creates input and output streams
@@ -57,7 +58,7 @@ public class TCP extends AbstractNetworkProtocol {
      * @param type
      * @throws IOException
      */
-    public TCP(Socket clientSocket, NetworkProtocolRole type) throws IOException {
+    public TCP(Socket clientSocket, RoleType type) throws IOException {
         this.clientSocket = clientSocket;
         inStream = new ObjectInputStream(clientSocket.getInputStream());
         outStream = new ObjectOutputStream(clientSocket.getOutputStream());

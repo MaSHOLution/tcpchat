@@ -30,7 +30,7 @@ import java.util.logging.Level;
 import de.mash1t.chat.logging.Counters;
 import de.mash1t.chat.networking.packets.Packet;
 import de.mash1t.chat.networking.packets.PacketType;
-import de.mash1t.chat.networking.methods.NetworkProtocolRole;
+import de.mash1t.chat.core.RoleType;
 import de.mash1t.chat.networking.methods.TCP;
 import de.mash1t.chat.networking.packets.ConnectPacket;
 import de.mash1t.chat.networking.packets.KickPacket;
@@ -54,7 +54,7 @@ public final class RejectionThread extends Thread {
      * @throws java.io.IOException
      */
     public RejectionThread(Socket clientSocket) throws IOException {
-        conLib = new TCP(clientSocket, NetworkProtocolRole.Server);
+        conLib = new TCP(clientSocket, RoleType.Server);
     }
 
     /**

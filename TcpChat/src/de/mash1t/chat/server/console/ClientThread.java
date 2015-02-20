@@ -23,6 +23,7 @@
  */
 package de.mash1t.chat.server.console;
 
+import de.mash1t.chat.core.RoleType;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.logging.Level;
@@ -52,7 +53,7 @@ public final class ClientThread extends Thread {
      * @throws java.io.IOException
      */
     public ClientThread(Socket clientSocket) throws IOException {
-        conLib = new TCP(clientSocket, NetworkProtocolRole.Server);
+        conLib = new TCP(clientSocket, RoleType.Server);
     }
 
     /**

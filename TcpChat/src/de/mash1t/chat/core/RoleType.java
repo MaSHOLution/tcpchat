@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package de.mash1t.chat.logging;
+package de.mash1t.chat.core;
 
 import de.mash1t.chat.client.gui.ClientGui;
 import de.mash1t.chat.server.console.ChatServer;
@@ -31,10 +31,10 @@ import de.mash1t.chat.server.console.ChatServer;
  *
  * @author Manuel Schmid
  */
-public enum LogName {
+public enum RoleType {
 
-    SERVER(ChatServer.class.getName()),
-    CLIENT(ClientGui.class.getName());
+    Server(ChatServer.class.getName()),
+    Client(ClientGui.class.getName());
 
     private final String name;
 
@@ -43,7 +43,7 @@ public enum LogName {
      *
      * @param name
      */
-    LogName(String name) {
+    RoleType(String name) {
         this.name = name;
     }
 

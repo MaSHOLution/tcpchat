@@ -23,6 +23,7 @@
  */
 package de.mash1t.chat.logging;
 
+import de.mash1t.chat.core.RoleType;
 import static de.mash1t.chat.logging.LoggingController.checkDir;
 import java.io.IOException;
 import java.text.DateFormat;
@@ -50,13 +51,13 @@ public final class CustomLogger {
     /**
      * Creates a logger and adds handler
      *
-     * @param logName Name of the logger, element of enum LogName
+     * @param logName Name of the logger, element of enum RoleType
      * @param logPath Path to logfile, element of enum LogPath
      * @param logToFiles enable/disable logging to files
      * @param showOnConsole enable/disable output on console
      * @return Logger
      */
-    public static Logger create(LogName logName, LogPath logPath, boolean logToFiles, boolean showOnConsole) {
+    public static Logger create(RoleType logName, LogPath logPath, boolean logToFiles, boolean showOnConsole) {
 
         // Basic declarations
         Logger logger = Logger.getLogger(logName + "." + logPath);
@@ -114,11 +115,11 @@ public final class CustomLogger {
     /**
      * Returns a Logger by name and purpose
      *
-     * @param logName name of the logger, defined in enum LogName
+     * @param logName name of the logger, defined in enum RoleType
      * @param logPath purpose of logger, defined in enum LogPath
      * @return
      */
-    public static Logger get(LogName logName, LogPath logPath) {
+    public static Logger get(RoleType logName, LogPath logPath) {
         Logger logger = Logger.getLogger(logName + "." + logPath);
         return logger;
     }

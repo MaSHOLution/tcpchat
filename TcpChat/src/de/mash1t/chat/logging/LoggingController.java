@@ -23,6 +23,7 @@
  */
 package de.mash1t.chat.logging;
 
+import de.mash1t.chat.core.RoleType;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -74,11 +75,11 @@ public final class LoggingController {
     /**
      * Creates a logger
      *
-     * @param logName Name of the logger, element of enum LogName
+     * @param logName Name of the logger, element of enum RoleType
      * @param logPath Path to logfile, element of enum LogPath
      * @return Logger
      */
-    public Logger create(LogName logName, LogPath logPath) {
+    public Logger create(RoleType logName, LogPath logPath) {
         // Check if logging is enabled
         if (this.loggingEnabled) {
             // Create logger

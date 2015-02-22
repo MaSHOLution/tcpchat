@@ -29,8 +29,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import de.mash1t.chat.logging.Counters;
 import de.mash1t.chat.server.console.ClientThread;
 import de.mash1t.networklib.methods.NetworkProtocol;

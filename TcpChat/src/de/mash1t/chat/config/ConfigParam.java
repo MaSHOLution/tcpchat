@@ -21,33 +21,48 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package de.mash1t.chat.networking.packets;
+package de.mash1t.chat.config;
 
 /**
- * Class for a specific packet type
+ * Class for configuration parameters for server
  *
- * @author Manuel Schmid, Fabian Fink
+ * @author Manuel Schmid
  */
-public class ConnectPacket extends Packet {
+public enum ConfigParam {
 
-    protected final String name;
+    Port("port", "8000"),
+    LogFiles("log_to_files", "true"),
+    LogConsole("log_to_console", "false"),
+    CleanLogsOnStartup("clean_logs_on_start", "false");
+
+    private final String configString;
+    private final String defaultValue;
 
     /**
      * Constructor
      *
      * @param name
      */
-    public ConnectPacket(String name) {
-        this.name = name;
-        this.packetIdentifier = PacketType.Connect;
+    ConfigParam(String configString, String defaultValue) {
+        this.configString = configString;
+        this.defaultValue = defaultValue;
     }
 
     /**
-     * Getter for name
+     * Getter for configString
      *
-     * @return name
+     * @return
      */
-    public String getName() {
-        return this.name;
+    public String getConfigString() {
+        return configString;
+    }
+
+    /**
+     * Getter for defaultValue
+     *
+     * @return
+     */
+    public String getDefaultValue() {
+        return defaultValue;
     }
 }

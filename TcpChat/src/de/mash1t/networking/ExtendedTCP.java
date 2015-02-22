@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package de.mash1t.chat.networking.methods;
+package de.mash1t.networking;
 
 import de.mash1t.chat.core.RoleType;
 import java.io.IOException;
@@ -32,17 +32,18 @@ import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import de.mash1t.chat.logging.Counters;
-import de.mash1t.chat.networking.packets.Packet;
-import de.mash1t.chat.networking.packets.InfoPacket;
-import de.mash1t.chat.networking.packets.InvalidPacket;
 import de.mash1t.chat.server.console.ClientThread;
+import de.mash1t.networking.methods.NetworkProtocol;
+import de.mash1t.networking.packets.Packet;
+import de.mash1t.networking.packets.InfoPacket;
+import de.mash1t.networking.packets.InvalidPacket;
 
 /**
- * Class for the network protocol TCP
+ * Class for the network protocol ExtendedTCP
  *
  * @author Manuel Schmid
  */
-public class TCP extends AbstractNetworkProtocol {
+public class ExtendedTCP extends AbstractNetworkProtocol implements NetworkProtocol {
 
     public ObjectInputStream inStream = null;
     public ObjectOutputStream outStream = null;
@@ -58,7 +59,7 @@ public class TCP extends AbstractNetworkProtocol {
      * @param type
      * @throws IOException
      */
-    public TCP(Socket clientSocket, RoleType type) throws IOException {
+    public ExtendedTCP(Socket clientSocket, RoleType type) throws IOException {
         this.clientSocket = clientSocket;
         inStream = new ObjectInputStream(clientSocket.getInputStream());
         outStream = new ObjectOutputStream(clientSocket.getOutputStream());
@@ -80,10 +81,9 @@ public class TCP extends AbstractNetworkProtocol {
             outStream.writeObject(packet);
             return true;
         } catch (IOException ex) {
-//            logControl.log(logException, Level.INFO, this.ip + "(" + this.clientName + "): " + ex.getMessage());
             Counters.exception();
+            return false;
         }
-        return false;
     }
 
     /**
@@ -96,14 +96,11 @@ public class TCP extends AbstractNetworkProtocol {
     public static boolean send(Packet packet, ClientThread thread) {
         try {
             Counters.connection();
-            // TODO TEST!!!!!!!!!!!!!
-            thread.conLib.send(packet);
-            return true;
+            return thread.conLib.send(packet);
         } catch (Exception ex) {
-//            logControl.log(logException, Level.INFO, this.ip + "(" + this.clientName + "): " + ex.getMessage());
             Counters.exception();
+            return false;
         }
-        return false;
     }
 
     /**
@@ -121,13 +118,11 @@ public class TCP extends AbstractNetworkProtocol {
                 return readPacket;
             }
         } catch (IOException | ClassNotFoundException ex) {
-//            logControl.log(logException, Level.INFO, this.ip + "(" + this.clientName + ") while reading packet: " + ex.getMessage());
             Counters.exception();
         }
         return new InvalidPacket();
     }
 
-    @Override
     public boolean sendSessionId() {
         // TODO implement SessionIdPacket
         return send(new InfoPacket(encMethod.sessionId));
@@ -142,9 +137,9 @@ public class TCP extends AbstractNetworkProtocol {
             clientSocket.close();
             return true;
         } catch (IOException ex) {
-            Logger.getLogger(TCP.class.getName()).log(Level.SEVERE, null, ex);
+            Counters.exception();
+            return false;
         }
-        return false;
     }
 
     @Override

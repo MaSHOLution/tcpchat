@@ -23,9 +23,16 @@
  */
 package de.mash1t.chat.client.gui;
 
+import de.mash1t.networking.packets.KickPacket;
+import de.mash1t.networking.packets.PacketType;
+import de.mash1t.networking.packets.UserListPacket;
+import de.mash1t.networking.packets.Packet;
+import de.mash1t.networking.packets.InvalidPacket;
+import de.mash1t.networking.packets.PrivateMessagePacket;
+import de.mash1t.networking.packets.MessagePacket;
+import de.mash1t.networking.packets.GroupMessagePacket;
 import de.mash1t.chat.client.gui.tabs.TabController;
 import de.mash1t.chat.logging.Counters;
-import de.mash1t.chat.networking.packets.*;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 
@@ -82,7 +89,7 @@ public class ClientGuiThread implements Runnable {
         do {
 
             responsePacket = read();
-            ptype = responsePacket.getIdentifier();
+            ptype = responsePacket.getType();
 
             switch (ptype) {
                 case Disconnect:

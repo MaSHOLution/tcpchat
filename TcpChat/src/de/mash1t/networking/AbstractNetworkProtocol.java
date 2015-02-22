@@ -21,43 +21,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package de.mash1t.chat.networking.methods;
+package de.mash1t.networking;
 
-import de.mash1t.chat.networking.packets.Packet;
+import de.mash1t.networking.methods.NetworkProtocolType;
+import de.mash1t.networking.packets.Packet;
 import de.mash1t.chat.server.console.ClientThread;
+import de.mash1t.cryptography.CryptoBasics;
+import de.mash1t.cryptography.EncryptionMethod;
+import de.mash1t.networking.methods.NetworkProtocol;
 
 /**
- * Abstract class for mainly handling static methid call of send(packet, thread, nwpType) Methods have to be implemented by childs
+ * Abstract class for mainly handling static method call of send(packet, thread, nwpType) Methods have to be implemented by childs
  *
  * @author Manuel Schmid
  */
 public abstract class AbstractNetworkProtocol implements NetworkProtocol {
-
-    @Override
-    public String getIP() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public boolean send(Packet packet) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public boolean sendSessionId() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public Packet read() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public boolean close() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
+    
+    EncryptionMethod encMethod = CryptoBasics.makeEncryptionObject();
+    
     /**
      * Sends a message to a specific thread
      *
@@ -70,12 +51,32 @@ public abstract class AbstractNetworkProtocol implements NetworkProtocol {
         boolean returnValue;
         switch (nwpType) {
             case TCP:
-                returnValue = TCP.send(packet, clientThread);
+                returnValue = ExtendedTCP.send(packet, clientThread);
                 break;
             default:
                 returnValue = false;
         }
         return returnValue;
+    }
+
+    @Override
+    public String getIP() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public boolean send(Packet packet) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public Packet read() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public boolean close() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
 }

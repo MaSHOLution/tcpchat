@@ -21,23 +21,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package de.mash1t.chat.security.cryptography.method;
+package de.mash1t.cryptography.method;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
 import javax.crypto.BadPaddingException;
-
-import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
-import de.mash1t.chat.security.basics.CryptoBasics;
-import de.mash1t.chat.security.cryptography.EncryptionMethod;
-import de.mash1t.chat.security.cryptography.crypter;
 
 import sun.misc.BASE64Decoder;
 import sun.misc.BASE64Encoder;
@@ -48,30 +41,21 @@ import sun.misc.BASE64Encoder;
  * @see http://blog.axxg.de/java-aes-verschluesselung-mit-beispiel/
  * @author Manuel Schmid
  */
-public final class Aes extends EncryptionMethod implements crypter {
+public final class ExtendedAes extends Aes {
 
     private SecretKeySpec secretKeySpec;
 
     /**
      * Constructor, makes a new secretKeySpec from the SessionId
      */
-    public Aes() {
+    public ExtendedAes() {
         this.makeKey();
     }
 
     @Override
     public String encrypt(String message) {
         try {
-            // Encrypt bytes
-            Cipher cipher = Cipher.getInstance("AES");
-            cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec);
-            byte[] encrypted = cipher.doFinal(message.getBytes());
-
-            // Convert bytes to Base64-String
-            BASE64Encoder myEncoder = new BASE64Encoder();
-
-            // Result
-            return myEncoder.encode(encrypted);
+            return super.encrypt(message);
         } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException ex) {
             // TODO handle exceptions
         } finally {
@@ -83,19 +67,7 @@ public final class Aes extends EncryptionMethod implements crypter {
     @Override
     public String decrypt(String message) {
         try {
-            // BASE64 String zu Byte-Array konvertieren
-            BASE64Decoder myDecoder2 = new BASE64Decoder();
-            byte[] crypted2 = myDecoder2.decodeBuffer(message);
-
-            // Entschluesseln
-            Cipher cipher2 = Cipher.getInstance("AES");
-            cipher2.init(Cipher.DECRYPT_MODE, secretKeySpec);
-            byte[] cipherData2 = cipher2.doFinal(crypted2);
-            String erg = new String(cipherData2);
-
-            // Klartext
-            return erg;
-
+            return super.decrypt(message);
         } catch (IOException | NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException ex) {
             // TODO handle exceptions
         } finally {
@@ -104,21 +76,12 @@ public final class Aes extends EncryptionMethod implements crypter {
         return null;
     }
 
-    public void makeKey() {
-        try {
-            // Make Byte-Array out of session id
-            byte[] key = sessionId.getBytes("UTF-8");
-            // Create MD5 hash from array
-            MessageDigest sha = MessageDigest.getInstance("SHA-256");
-            // Create secret key
-            // TODO Change SecretKeySpec creation
-            key = sha.digest(key);
-            key = Arrays.copyOf(key, CryptoBasics.encryption);
-            this.secretKeySpec = new SecretKeySpec(key, "AES");
-        } catch (UnsupportedEncodingException | NoSuchAlgorithmException ex) {
-            // TODO handle exceptions
-        } finally {
+    @Override
+    public boolean makeKey() {
+        boolean result = super.makeKey();
+        if (result) {
             de.mash1t.chat.logging.Counters.exception();
         }
+        return result;
     }
 }

@@ -23,10 +23,11 @@
  */
 package security.cryptography;
 
-import de.mash1t.cryptography.CryptoBasics;
-import de.mash1t.cryptography.EncryptionMethod;
-import de.mash1t.cryptography.SessionIdGenerator;
-import de.mash1t.cryptography.method.ExtendedAes;
+import de.mash1t.cryptolib.CryptoBasics;
+import de.mash1t.cryptolib.EncryptionMethod;
+import de.mash1t.cryptolib.SessionIdGenerator;
+import de.mash1t.cryptolib.method.Aes;
+import de.mash1t.cryptolib.method.ExtendedAes;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
@@ -85,7 +86,7 @@ public class Text {
      */
     @Test
     public void aes() throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, IOException {
-        EncryptionMethod aes = new ExtendedAes();
+        EncryptionMethod aes = new Aes();
 
         String encrypted = aes.encrypt(base);
         assertFalse(base.equals(encrypted));

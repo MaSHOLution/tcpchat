@@ -23,7 +23,7 @@
  */
 package common.networking.packets;
 
-import de.mash1t.networking.packets.GroupMessagePacket;
+import de.mash1t.networklib.packets.GroupMessagePacket;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;

@@ -29,7 +29,7 @@ import java.util.Collections;
 import java.util.List;
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
-import de.mash1t.networking.packets.UserListPacket;
+import de.mash1t.networklib.packets.UserListPacket;
 
 /**
  * Controller for the userlist

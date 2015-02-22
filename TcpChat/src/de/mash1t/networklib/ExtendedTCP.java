@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package de.mash1t.networking;
+package de.mash1t.networklib;
 
 import de.mash1t.chat.core.RoleType;
 import java.io.IOException;
@@ -33,10 +33,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import de.mash1t.chat.logging.Counters;
 import de.mash1t.chat.server.console.ClientThread;
-import de.mash1t.networking.methods.NetworkProtocol;
-import de.mash1t.networking.packets.Packet;
-import de.mash1t.networking.packets.InfoPacket;
-import de.mash1t.networking.packets.InvalidPacket;
+import de.mash1t.networklib.methods.NetworkProtocol;
+import de.mash1t.networklib.packets.Packet;
+import de.mash1t.networklib.packets.InfoPacket;
+import de.mash1t.networklib.packets.InvalidPacket;
 
 /**
  * Class for the network protocol ExtendedTCP

@@ -28,15 +28,14 @@ import java.net.Socket;
 import java.net.SocketAddress;
 import java.util.logging.Level;
 import de.mash1t.chat.logging.Counters;
-import de.mash1t.networking.packets.Packet;
-import de.mash1t.networking.packets.PacketType;
+import de.mash1t.networklib.packets.Packet;
+import de.mash1t.networklib.packets.PacketType;
 import de.mash1t.chat.core.RoleType;
-import de.mash1t.networking.ExtendedTCP;
-import de.mash1t.networking.packets.ConnectPacket;
-import de.mash1t.networking.packets.KickPacket;
+import de.mash1t.networklib.packets.ConnectPacket;
+import de.mash1t.networklib.packets.KickPacket;
 import static de.mash1t.chat.server.console.ChatServer.logConnection;
 import static de.mash1t.chat.server.console.ChatServer.logControl;
-import de.mash1t.networking.ExtendedTCP;
+import de.mash1t.networklib.ExtendedTCP;
 
 /**
  * Class for rejecting clients politely if server has already maxClients

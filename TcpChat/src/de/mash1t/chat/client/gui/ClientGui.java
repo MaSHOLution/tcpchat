@@ -23,11 +23,7 @@
  */
 package de.mash1t.chat.client.gui;
 
-import de.mash1t.networking.packets.ConnectPacket;
-import de.mash1t.networking.packets.Packet;
-import de.mash1t.networking.packets.DisconnectPacket;
-import de.mash1t.networking.packets.PrivateMessagePacket;
-import de.mash1t.networking.packets.GroupMessagePacket;
+import de.mash1t.networklib.packets.*;
 import de.mash1t.chat.client.gui.tabs.ChatTab;
 import de.mash1t.chat.client.gui.tabs.ChatType;
 import de.mash1t.chat.client.gui.tabs.TabController;

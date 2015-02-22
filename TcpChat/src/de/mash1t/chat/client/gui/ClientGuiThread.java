@@ -23,14 +23,7 @@
  */
 package de.mash1t.chat.client.gui;
 
-import de.mash1t.networking.packets.KickPacket;
-import de.mash1t.networking.packets.PacketType;
-import de.mash1t.networking.packets.UserListPacket;
-import de.mash1t.networking.packets.Packet;
-import de.mash1t.networking.packets.InvalidPacket;
-import de.mash1t.networking.packets.PrivateMessagePacket;
-import de.mash1t.networking.packets.MessagePacket;
-import de.mash1t.networking.packets.GroupMessagePacket;
+import de.mash1t.networklib.packets.*;
 import de.mash1t.chat.client.gui.tabs.TabController;
 import de.mash1t.chat.logging.Counters;
 import java.io.IOException;

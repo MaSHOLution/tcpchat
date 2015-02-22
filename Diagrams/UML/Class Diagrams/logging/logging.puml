@@ -1,48 +1,11 @@
 @startuml
-annotation java.lang.Override
-class de.mash1t.chat.client.gui.ClientGui
+class de.mash1t.chat.core.RoleType
 class de.mash1t.chat.logging.Counters
 class de.mash1t.chat.logging.CustomLogger
 class de.mash1t.chat.logging.LoggingController
-class de.mash1t.chat.server.console.ChatServer
-class java.io.File
-class java.io.IOException
-class java.text.DateFormat
-class java.text.SimpleDateFormat
-class java.util.ArrayList
-class java.util.Calendar
-class java.util.Date
-class java.util.GregorianCalendar
-class java.util.List
-class java.util.logging.FileHandler
-class java.util.logging.Formatter
-class java.util.logging.Handler
-class java.util.logging.Level
-class java.util.logging.LogManager
-class java.util.logging.LogRecord
-class java.util.logging.Logger
 enum de.mash1t.chat.logging.LogDir
-enum de.mash1t.chat.logging.LogName
 enum de.mash1t.chat.logging.LogPath
-de.mash1t.chat.logging.CustomLogger ..> java.lang.Override
+de.mash1t.chat.logging.CustomLogger ..> de.mash1t.chat.core.RoleType
 de.mash1t.chat.logging.CustomLogger ..> de.mash1t.chat.logging.LoggingController
-de.mash1t.chat.logging.CustomLogger ..> java.io.IOException
-de.mash1t.chat.logging.CustomLogger ..> java.text.DateFormat
-de.mash1t.chat.logging.CustomLogger ..> java.text.SimpleDateFormat
-de.mash1t.chat.logging.CustomLogger ..> java.util.Calendar
-de.mash1t.chat.logging.CustomLogger ..> java.util.Date
-de.mash1t.chat.logging.CustomLogger ..> java.util.GregorianCalendar
-de.mash1t.chat.logging.CustomLogger ..> java.util.logging.FileHandler
-de.mash1t.chat.logging.CustomLogger ..> java.util.logging.Formatter
-de.mash1t.chat.logging.CustomLogger ..> java.util.logging.LogManager
-de.mash1t.chat.logging.CustomLogger ..> java.util.logging.LogRecord
-de.mash1t.chat.logging.CustomLogger ..> java.util.logging.Logger
-de.mash1t.chat.logging.LoggingController ..> java.io.File
-de.mash1t.chat.logging.LoggingController ..> java.util.ArrayList
-de.mash1t.chat.logging.LoggingController ..> java.util.List
-de.mash1t.chat.logging.LoggingController ..> java.util.logging.Handler
-de.mash1t.chat.logging.LoggingController ..> java.util.logging.Level
-de.mash1t.chat.logging.LoggingController ..> java.util.logging.Logger
-de.mash1t.chat.logging.LogName ..> de.mash1t.chat.client.gui.ClientGui
-de.mash1t.chat.logging.LogName ..> de.mash1t.chat.server.console.ChatServer
+de.mash1t.chat.logging.LoggingController ..> de.mash1t.chat.core.RoleType
 @enduml

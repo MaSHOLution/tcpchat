@@ -1,0 +1,30 @@
+@startuml
+abstract class de.mash1t.networking.packets.MessagePacket
+abstract class de.mash1t.networking.packets.Packet
+class de.mash1t.networking.methods.TCP
+class de.mash1t.networking.packets.ConnectPacket
+class de.mash1t.networking.packets.DisconnectPacket
+class de.mash1t.networking.packets.GroupMessagePacket
+class de.mash1t.networking.packets.InfoPacket
+class de.mash1t.networking.packets.InvalidPacket
+class de.mash1t.networking.packets.KickPacket
+class de.mash1t.networking.packets.PrivateMessagePacket
+class de.mash1t.networking.packets.UserListPacket
+enum de.mash1t.networking.methods.NetworkProtocolType
+enum de.mash1t.networking.packets.PacketType
+enum de.mash1t.networking.packets.UserListPacketType
+interface de.mash1t.networking.methods.NetworkProtocol
+de.mash1t.networking.packets.MessagePacket --|> de.mash1t.networking.packets.Packet
+de.mash1t.networking.methods.TCP ..> de.mash1t.networking.packets.Packet
+de.mash1t.networking.methods.TCP ..> de.mash1t.networking.packets.InvalidPacket
+de.mash1t.networking.methods.TCP --|> de.mash1t.networking.methods.NetworkProtocol
+de.mash1t.networking.packets.ConnectPacket --|> de.mash1t.networking.packets.Packet
+de.mash1t.networking.packets.DisconnectPacket --|> de.mash1t.networking.packets.Packet
+de.mash1t.networking.packets.GroupMessagePacket --|> de.mash1t.networking.packets.MessagePacket
+de.mash1t.networking.packets.InfoPacket --|> de.mash1t.networking.packets.MessagePacket
+de.mash1t.networking.packets.InvalidPacket --|> de.mash1t.networking.packets.Packet
+de.mash1t.networking.packets.KickPacket --|> de.mash1t.networking.packets.Packet
+de.mash1t.networking.packets.PrivateMessagePacket --|> de.mash1t.networking.packets.MessagePacket
+de.mash1t.networking.packets.UserListPacket --|> de.mash1t.networking.packets.Packet
+de.mash1t.networking.methods.NetworkProtocol ..> de.mash1t.networking.packets.Packet
+@enduml

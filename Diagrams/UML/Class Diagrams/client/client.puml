@@ -8,19 +8,41 @@ class de.mash1t.chat.client.gui.tabs.ChatTab
 class de.mash1t.chat.client.gui.tabs.JPanel
 class de.mash1t.chat.client.gui.tabs.TabController
 class de.mash1t.chat.client.gui.userlist.UserListController
-class de.mash1t.chat.config.ServerConfigParam
+class de.mash1t.chat.config.ConfigParam
 class de.mash1t.chat.logging.Counters
-class de.mash1t.chat.networking.packets.UserListPacket
+class de.mash1t.networking.packets.ConnectPacket
+class de.mash1t.networking.packets.DisconnectPacket
+class de.mash1t.networking.packets.GroupMessagePacket
+class de.mash1t.networking.packets.InvalidPacket
+class de.mash1t.networking.packets.KickPacket
+class de.mash1t.networking.packets.MessagePacket
+class de.mash1t.networking.packets.Packet
+class de.mash1t.networking.packets.PacketType
+class de.mash1t.networking.packets.PrivateMessagePacket
+class de.mash1t.networking.packets.UserListPacket
 enum de.mash1t.chat.client.gui.tabs.ChatType
 de.mash1t.chat.client.gui.ClientGui ..> de.mash1t.chat.client.gui.tabs.ChatTab
 de.mash1t.chat.client.gui.ClientGui ..> de.mash1t.chat.client.gui.tabs.TabController
 de.mash1t.chat.client.gui.ClientGui ..> de.mash1t.chat.client.gui.userlist.UserListController
-de.mash1t.chat.client.gui.ClientGui ..> de.mash1t.chat.config.ServerConfigParam
+de.mash1t.chat.client.gui.ClientGui ..> de.mash1t.chat.config.ConfigParam
+de.mash1t.chat.client.gui.ClientGui ..> de.mash1t.networking.packets.ConnectPacket
+de.mash1t.chat.client.gui.ClientGui ..> de.mash1t.networking.packets.DisconnectPacket
+de.mash1t.chat.client.gui.ClientGui ..> de.mash1t.networking.packets.GroupMessagePacket
+de.mash1t.chat.client.gui.ClientGui ..> de.mash1t.networking.packets.Packet
+de.mash1t.chat.client.gui.ClientGui ..> de.mash1t.networking.packets.PrivateMessagePacket
 de.mash1t.chat.client.gui.ClientGui ..> de.mash1t.chat.client.gui.tabs.ChatType
 de.mash1t.chat.client.gui.ClientGuiThread ..> de.mash1t.chat.client.gui.tabs.TabController
 de.mash1t.chat.client.gui.ClientGuiThread ..> de.mash1t.chat.logging.Counters
+de.mash1t.chat.client.gui.ClientGuiThread ..> de.mash1t.networking.packets.GroupMessagePacket
+de.mash1t.chat.client.gui.ClientGuiThread ..> de.mash1t.networking.packets.InvalidPacket
+de.mash1t.chat.client.gui.ClientGuiThread ..> de.mash1t.networking.packets.KickPacket
+de.mash1t.chat.client.gui.ClientGuiThread ..> de.mash1t.networking.packets.MessagePacket
+de.mash1t.chat.client.gui.ClientGuiThread ..> de.mash1t.networking.packets.Packet
+de.mash1t.chat.client.gui.ClientGuiThread ..> de.mash1t.networking.packets.PacketType
+de.mash1t.chat.client.gui.ClientGuiThread ..> de.mash1t.networking.packets.PrivateMessagePacket
+de.mash1t.chat.client.gui.ClientGuiThread ..> de.mash1t.networking.packets.UserListPacket
 de.mash1t.chat.client.gui.tabs.ButtonTabComponent --|> de.mash1t.chat.client.gui.tabs.JPanel
 de.mash1t.chat.client.gui.tabs.ButtonTabComponent ..> de.mash1t.chat.logging.Counters
 de.mash1t.chat.client.gui.userlist.UserListController ..> de.mash1t.chat.client.gui.tabs.TabController
-de.mash1t.chat.client.gui.userlist.UserListController ..> de.mash1t.chat.networking.packets.UserListPacket
+de.mash1t.chat.client.gui.userlist.UserListController ..> de.mash1t.networking.packets.UserListPacket
 @enduml

@@ -114,7 +114,7 @@ public class Text {
      * @see CryptoBasics.encMethod
      */
     @Test
-    public void current() throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, IOException {
+    public void current() throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, IOException  {
         EncryptionMethod encMethod = CryptoBasics.makeEncryptionObject();
 
         String encrypted = encMethod.encrypt(base);

@@ -23,7 +23,8 @@
  */
 package de.mash1t.chat.server.console;
 
-import de.mash1t.chat.networking.packets.KickPacket;
+import de.mash1t.chat.core.RoleType;
+import de.mash1t.networking.packets.KickPacket;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -32,10 +33,10 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import de.mash1t.chat.logging.*;
-import de.mash1t.chat.networking.methods.AbstractNetworkProtocol;
-import de.mash1t.chat.networking.methods.NetworkProtocolType;
+import de.mash1t.networking.AbstractNetworkProtocol;
+import de.mash1t.networking.methods.NetworkProtocolType;
 import de.mash1t.chat.config.ConfigController;
-import de.mash1t.chat.config.ServerConfigParam;
+import de.mash1t.chat.config.ConfigParam;
 import java.util.Scanner;
 
 /**
@@ -50,9 +51,9 @@ public final class ChatServer {
     protected static List<String> userList = new ArrayList<>();
 
     // Logging
-    protected static Logger logConnection = null;
-    protected static Logger logException = null;
-    protected static Logger logGeneral = null;
+    protected static Logger logConnection;
+    protected static Logger logException;
+    protected static Logger logGeneral;
     protected static LoggingController logControl = null;
     protected static NetworkProtocolType nwpType = NetworkProtocolType.TCP;
 
@@ -88,10 +89,10 @@ public final class ChatServer {
 
     private static void runServer() {
 
-        int portNumber = Integer.parseInt(conf.getConfigValue(ServerConfigParam.Port));
-        boolean loggingEnabled = Boolean.parseBoolean(conf.getConfigValue(ServerConfigParam.LogFiles));
-        boolean showOnConsole = Boolean.parseBoolean(conf.getConfigValue(ServerConfigParam.LogConsole));
-        boolean cleanLogsOnStartup = Boolean.parseBoolean(conf.getConfigValue(ServerConfigParam.CleanLogsOnStartup));
+        int portNumber = Integer.parseInt(conf.getConfigValue(ConfigParam.Port));
+        boolean loggingEnabled = Boolean.parseBoolean(conf.getConfigValue(ConfigParam.LogFiles));
+        boolean showOnConsole = Boolean.parseBoolean(conf.getConfigValue(ConfigParam.LogConsole));
+        boolean cleanLogsOnStartup = Boolean.parseBoolean(conf.getConfigValue(ConfigParam.CleanLogsOnStartup));
 
         // Setting up LoggingController
         logControl = new LoggingController(loggingEnabled, showOnConsole, cleanLogsOnStartup);
@@ -144,9 +145,9 @@ public final class ChatServer {
      * Initializes loggers with LoggingController
      */
     protected static void initLoggers() {
-        logConnection = logControl.create(LogName.SERVER, LogPath.CONNECTION);
-        logException = logControl.create(LogName.SERVER, LogPath.EXCEPTION);
-        logGeneral = logControl.create(LogName.SERVER, LogPath.GENERAL);
+        logConnection = logControl.create(RoleType.Server, LogPath.CONNECTION);
+        logException = logControl.create(RoleType.Server, LogPath.EXCEPTION);
+        logGeneral = logControl.create(RoleType.Server, LogPath.GENERAL);
     }
 
     /**

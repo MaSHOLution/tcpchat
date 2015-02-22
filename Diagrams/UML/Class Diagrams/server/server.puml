@@ -1,37 +1,36 @@
 @startuml
 class de.mash1t.chat.config.ConfigController
-class de.mash1t.chat.config.ServerConfigParam
+class de.mash1t.chat.config.ConfigParam
+class de.mash1t.chat.core.RoleType
 class de.mash1t.chat.logging.Counters
-class de.mash1t.chat.networking.methods.AbstractNetworkProtocol
-class de.mash1t.chat.networking.methods.NetworkProtocolRole
-class de.mash1t.chat.networking.methods.NetworkProtocolType
-class de.mash1t.chat.networking.methods.TCP
-class de.mash1t.chat.networking.packets.ConnectPacket
-class de.mash1t.chat.networking.packets.KickPacket
-class de.mash1t.chat.networking.packets.Packet
-class de.mash1t.chat.networking.packets.PacketType
-class de.mash1t.chat.security.basics.CryptoBasics
-class de.mash1t.chat.security.cryptography.EncryptionMethod
 class de.mash1t.chat.server.console.ChatServer
 class de.mash1t.chat.server.console.ClientThread
 class de.mash1t.chat.server.console.RejectionThread
+class de.mash1t.networking.AbstractNetworkProtocol
+class de.mash1t.networking.ExtendedTCP
+class de.mash1t.networking.methods.NetworkProtocolType
+class de.mash1t.networking.packets.ConnectPacket
+class de.mash1t.networking.packets.KickPacket
+class de.mash1t.networking.packets.Packet
+class de.mash1t.networking.packets.PacketType
 enum de.mash1t.chat.server.console.ConnectionState
-de.mash1t.chat.server.console.ChatServer ..> java.lang.Override
 de.mash1t.chat.server.console.ChatServer ..> de.mash1t.chat.config.ConfigController
-de.mash1t.chat.server.console.ChatServer ..> de.mash1t.chat.config.ServerConfigParam
-de.mash1t.chat.server.console.ChatServer ..> de.mash1t.chat.networking.methods.AbstractNetworkProtocol
-de.mash1t.chat.server.console.ChatServer ..> de.mash1t.chat.networking.methods.NetworkProtocolType
-de.mash1t.chat.server.console.ChatServer ..> de.mash1t.chat.networking.packets.KickPacket
+de.mash1t.chat.server.console.ChatServer ..> de.mash1t.chat.config.ConfigParam
+de.mash1t.chat.server.console.ChatServer ..> de.mash1t.chat.core.RoleType
+de.mash1t.chat.server.console.ChatServer ..> de.mash1t.networking.AbstractNetworkProtocol
+de.mash1t.chat.server.console.ChatServer ..> de.mash1t.networking.methods.NetworkProtocolType
+de.mash1t.chat.server.console.ChatServer ..> de.mash1t.networking.packets.KickPacket
+de.mash1t.chat.server.console.ClientThread ..> de.mash1t.chat.core.RoleType
 de.mash1t.chat.server.console.ClientThread ..> de.mash1t.chat.logging.Counters
-de.mash1t.chat.server.console.ClientThread ..> de.mash1t.chat.security.basics.CryptoBasics
-de.mash1t.chat.server.console.ClientThread ..> de.mash1t.chat.security.cryptography.EncryptionMethod
 de.mash1t.chat.server.console.ClientThread ..> de.mash1t.chat.server.console.ChatServer
+de.mash1t.chat.server.console.ClientThread ..> de.mash1t.networking.AbstractNetworkProtocol
+de.mash1t.chat.server.console.ClientThread ..> de.mash1t.networking.ExtendedTCP
+de.mash1t.chat.server.console.RejectionThread ..> de.mash1t.chat.core.RoleType
 de.mash1t.chat.server.console.RejectionThread ..> de.mash1t.chat.logging.Counters
-de.mash1t.chat.server.console.RejectionThread ..> de.mash1t.chat.networking.methods.NetworkProtocolRole
-de.mash1t.chat.server.console.RejectionThread ..> de.mash1t.chat.networking.methods.TCP
-de.mash1t.chat.server.console.RejectionThread ..> de.mash1t.chat.networking.packets.ConnectPacket
-de.mash1t.chat.server.console.RejectionThread ..> de.mash1t.chat.networking.packets.KickPacket
-de.mash1t.chat.server.console.RejectionThread ..> de.mash1t.chat.networking.packets.Packet
-de.mash1t.chat.server.console.RejectionThread ..> de.mash1t.chat.networking.packets.PacketType
 de.mash1t.chat.server.console.RejectionThread ..> de.mash1t.chat.server.console.ChatServer
+de.mash1t.chat.server.console.RejectionThread ..> de.mash1t.networking.ExtendedTCP
+de.mash1t.chat.server.console.RejectionThread ..> de.mash1t.networking.packets.ConnectPacket
+de.mash1t.chat.server.console.RejectionThread ..> de.mash1t.networking.packets.KickPacket
+de.mash1t.chat.server.console.RejectionThread ..> de.mash1t.networking.packets.Packet
+de.mash1t.chat.server.console.RejectionThread ..> de.mash1t.networking.packets.PacketType
 @enduml

@@ -1,0 +1,28 @@
+@startuml
+abstract class de.mash1t.networking.AbstractNetworkProtocol
+class de.mash1t.chat.core.RoleType
+class de.mash1t.chat.logging.Counters
+class de.mash1t.chat.server.console.ClientThread
+class de.mash1t.cryptography.CryptoBasics
+class de.mash1t.cryptography.EncryptionMethod
+class de.mash1t.networking.ExtendedTCP
+class de.mash1t.networking.methods.NetworkProtocolType
+class de.mash1t.networking.packets.InfoPacket
+class de.mash1t.networking.packets.InvalidPacket
+class de.mash1t.networking.packets.Packet
+interface de.mash1t.networking.methods.NetworkProtocol
+de.mash1t.networking.AbstractNetworkProtocol ..> de.mash1t.chat.server.console.ClientThread
+de.mash1t.networking.AbstractNetworkProtocol ..> de.mash1t.cryptography.CryptoBasics
+de.mash1t.networking.AbstractNetworkProtocol ..> de.mash1t.cryptography.EncryptionMethod
+de.mash1t.networking.AbstractNetworkProtocol ..> de.mash1t.networking.methods.NetworkProtocolType
+de.mash1t.networking.AbstractNetworkProtocol ..> de.mash1t.networking.packets.Packet
+de.mash1t.networking.AbstractNetworkProtocol --|> de.mash1t.networking.methods.NetworkProtocol
+de.mash1t.networking.ExtendedTCP --|> de.mash1t.networking.AbstractNetworkProtocol
+de.mash1t.networking.ExtendedTCP ..> de.mash1t.chat.core.RoleType
+de.mash1t.networking.ExtendedTCP ..> de.mash1t.chat.logging.Counters
+de.mash1t.networking.ExtendedTCP ..> de.mash1t.chat.server.console.ClientThread
+de.mash1t.networking.ExtendedTCP ..> de.mash1t.networking.packets.InfoPacket
+de.mash1t.networking.ExtendedTCP ..> de.mash1t.networking.packets.InvalidPacket
+de.mash1t.networking.ExtendedTCP ..> de.mash1t.networking.packets.Packet
+de.mash1t.networking.ExtendedTCP --|> de.mash1t.networking.methods.NetworkProtocol
+@enduml

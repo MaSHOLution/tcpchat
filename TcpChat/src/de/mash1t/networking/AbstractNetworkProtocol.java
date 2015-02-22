@@ -31,14 +31,14 @@ import de.mash1t.cryptography.EncryptionMethod;
 import de.mash1t.networking.methods.NetworkProtocol;
 
 /**
- * Abstract class for mainly handling static method call of send(packet, thread, nwpType) Methods have to be implemented by childs
+ * Abstract class for mainly handling static method call of send(packet, thread, nwpType). Methods have to be implemented by childs
  *
  * @author Manuel Schmid
  */
 public abstract class AbstractNetworkProtocol implements NetworkProtocol {
-    
+
     EncryptionMethod encMethod = CryptoBasics.makeEncryptionObject();
-    
+
     /**
      * Sends a message to a specific thread
      *

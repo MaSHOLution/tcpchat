@@ -53,7 +53,7 @@ public class ExtendedTCP extends AbstractNetworkProtocol implements NetworkProto
     private final RoleType type;
 
     /**
-     * Constructor, creates input and output streams
+     * Creates input and output streams
      *
      * @param clientSocket Socket for client
      * @param type

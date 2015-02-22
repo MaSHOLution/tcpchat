@@ -23,15 +23,15 @@
  */
 package de.mash1t.chat.server.console;
 
-import de.mash1t.networking.packets.*;
-import de.mash1t.networking.AbstractNetworkProtocol;
+import de.mash1t.networklib.packets.*;
+import de.mash1t.networklib.AbstractNetworkProtocol;
 import de.mash1t.chat.core.RoleType;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.logging.Level;
 import de.mash1t.chat.logging.Counters;
 import static de.mash1t.chat.server.console.ChatServer.*;
-import de.mash1t.networking.ExtendedTCP;
+import de.mash1t.networklib.ExtendedTCP;
 
 /**
  * Class for a seperate thread for a thread

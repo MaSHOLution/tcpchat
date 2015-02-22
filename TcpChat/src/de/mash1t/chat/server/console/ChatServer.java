@@ -24,7 +24,7 @@
 package de.mash1t.chat.server.console;
 
 import de.mash1t.chat.core.RoleType;
-import de.mash1t.networking.packets.KickPacket;
+import de.mash1t.networklib.packets.KickPacket;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -33,8 +33,8 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import de.mash1t.chat.logging.*;
-import de.mash1t.networking.AbstractNetworkProtocol;
-import de.mash1t.networking.methods.NetworkProtocolType;
+import de.mash1t.networklib.AbstractNetworkProtocol;
+import de.mash1t.networklib.methods.NetworkProtocolType;
 import de.mash1t.chat.config.ConfigController;
 import de.mash1t.chat.config.ConfigParam;
 import java.util.Scanner;

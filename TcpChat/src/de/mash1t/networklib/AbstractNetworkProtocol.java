@@ -21,14 +21,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package de.mash1t.networking;
+package de.mash1t.networklib;
 
-import de.mash1t.networking.methods.NetworkProtocolType;
-import de.mash1t.networking.packets.Packet;
+import de.mash1t.networklib.methods.NetworkProtocolType;
+import de.mash1t.networklib.packets.Packet;
 import de.mash1t.chat.server.console.ClientThread;
-import de.mash1t.cryptography.CryptoBasics;
-import de.mash1t.cryptography.EncryptionMethod;
-import de.mash1t.networking.methods.NetworkProtocol;
+import de.mash1t.cryptolib.CryptoBasics;
+import de.mash1t.cryptolib.EncryptionMethod;
+import de.mash1t.networklib.methods.NetworkProtocol;
 
 /**
  * Abstract class for mainly handling static method call of send(packet, thread, nwpType) Methods have to be implemented by childs

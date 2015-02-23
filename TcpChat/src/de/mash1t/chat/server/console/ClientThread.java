@@ -23,15 +23,15 @@
  */
 package de.mash1t.chat.server.console;
 
+import de.mash1t.networklib.packets.*;
+import de.mash1t.networklib.AbstractNetworkProtocol;
+import de.mash1t.chat.core.RoleType;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.logging.Level;
 import de.mash1t.chat.logging.Counters;
-import de.mash1t.chat.networking.packets.*;
-import de.mash1t.chat.networking.methods.*;
-import de.mash1t.chat.security.basics.CryptoBasics;
-import de.mash1t.chat.security.cryptography.EncryptionMethod;
 import static de.mash1t.chat.server.console.ChatServer.*;
+import de.mash1t.networklib.ExtendedTCP;
 
 /**
  * Class for a seperate thread for a thread
@@ -41,7 +41,6 @@ import static de.mash1t.chat.server.console.ChatServer.*;
 public final class ClientThread extends Thread {
 
     protected String clientName = null;
-    protected EncryptionMethod encMethod = CryptoBasics.makeEncryptionObject();
     protected ConnectionState state;
     public AbstractNetworkProtocol conLib;
 
@@ -52,7 +51,7 @@ public final class ClientThread extends Thread {
      * @throws java.io.IOException
      */
     public ClientThread(Socket clientSocket) throws IOException {
-        conLib = new TCP(clientSocket, NetworkProtocolRole.Server);
+        conLib = new ExtendedTCP(clientSocket, RoleType.Server);
     }
 
     /**
@@ -80,7 +79,7 @@ public final class ClientThread extends Thread {
                 // Start conversation
                 while (state != ConnectionState.Kicked && state != ConnectionState.RequestedDisconnect) {
                     Packet packet = conLib.read();
-                    PacketType ptype = packet.getIdentifier();
+                    PacketType ptype = packet.getType();
 
                     switch (ptype) {
                         case Disconnect:
@@ -151,7 +150,7 @@ public final class ClientThread extends Thread {
     protected synchronized void broadcast(Packet packet) {
         for (ClientThread thread : threads) {
             if (thread.state == ConnectionState.Online) {
-                AbstractNetworkProtocol.send(packet, thread, ChatServer.nwpType);
+                AbstractNetworkProtocol.send(packet, thread, nwpType);
             }
         }
         logControl.log(logGeneral, Level.INFO, "GM #" + Counters.Totals.Messages.gmTotal + " from " + this.clientName);
@@ -166,7 +165,7 @@ public final class ClientThread extends Thread {
     protected synchronized void broadcastExceptMe(Packet packet) {
         for (ClientThread thread : threads) {
             if (thread.state == ConnectionState.Online && thread != this) {
-                AbstractNetworkProtocol.send(packet, thread, ChatServer.nwpType);
+                AbstractNetworkProtocol.send(packet, thread, nwpType);
             }
         }
         // Counters.gm(); is normally no group but system shoutout
@@ -230,7 +229,7 @@ public final class ClientThread extends Thread {
     protected ConnectPacket setName() {
 
         Packet clientAnswer = (Packet) conLib.read();
-        PacketType pType = clientAnswer.getIdentifier();
+        PacketType pType = clientAnswer.getType();
 
         if (pType == PacketType.Connect) {
             String name = ((ConnectPacket) clientAnswer).getName();
@@ -303,7 +302,7 @@ public final class ClientThread extends Thread {
         if (ulPacketType == UserListPacketType.Connected) {
             // Broadcast changes to all and a full list to hte new client
             this.broadcastExceptMe(new UserListPacket(this.clientName, ulPacketType));
-            conLib.send(new UserListPacket());
+            conLib.send(new UserListPacket(getUserList()));
         } else if (ulPacketType == UserListPacketType.Disconnected) {
             // Broadcast changes only
             this.broadcastExceptMe(new UserListPacket(this.clientName, ulPacketType));

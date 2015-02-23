@@ -23,20 +23,24 @@
  */
 package security.cryptography;
 
-import de.mash1t.chat.security.cryptography.EncryptionMethod;
+import de.mash1t.cryptolib.CryptoBasics;
+import de.mash1t.cryptolib.EncryptionMethod;
+import de.mash1t.cryptolib.SessionIdGenerator;
+import de.mash1t.cryptolib.method.Aes;
+import de.mash1t.cryptolib.method.ExtendedAes;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
+import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
 import org.junit.Test;
-import de.mash1t.chat.security.basics.CryptoBasics;
 import static org.junit.Assert.*;
-import de.mash1t.chat.security.basics.SessionIdGenerator;
-import de.mash1t.chat.security.cryptography.method.Aes;
 
 /**
  * Tests for encrypting and decrypting text
@@ -81,7 +85,7 @@ public class Text {
      * @throws InvalidKeyException
      */
     @Test
-    public void aes() throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException {
+    public void aes() throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, IOException {
         EncryptionMethod aes = new Aes();
 
         String encrypted = aes.encrypt(base);
@@ -95,7 +99,7 @@ public class Text {
      * Test for no encryption method
      */
     @Test
-    public void off() {
+    public void off() throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, IOException {
         EncryptionMethod encMethod = new EncryptionMethod();
 
         String encrypted = encMethod.encrypt(base);
@@ -111,7 +115,7 @@ public class Text {
      * @see CryptoBasics.encMethod
      */
     @Test
-    public void current() {
+    public void current() throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, IOException  {
         EncryptionMethod encMethod = CryptoBasics.makeEncryptionObject();
 
         String encrypted = encMethod.encrypt(base);

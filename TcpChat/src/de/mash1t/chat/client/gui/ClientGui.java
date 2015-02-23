@@ -23,12 +23,12 @@
  */
 package de.mash1t.chat.client.gui;
 
-import de.mash1t.chat.networking.packets.*;
+import de.mash1t.networklib.packets.*;
 import de.mash1t.chat.client.gui.tabs.ChatTab;
 import de.mash1t.chat.client.gui.tabs.ChatType;
 import de.mash1t.chat.client.gui.tabs.TabController;
 import de.mash1t.chat.client.gui.userlist.UserListController;
-import de.mash1t.chat.config.ServerConfigParam;
+import de.mash1t.chat.config.ConfigParam;
 import java.awt.event.KeyEvent;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -85,9 +85,9 @@ public final class ClientGui extends javax.swing.JFrame {
         this.userListController = new UserListController(this.lbUsers, tabController);
 
         // Set fields to default value
-        tbPort.setText(ServerConfigParam.Port.getDefaultValue());
-        //tbServer.setText("localhost");
-        tbServer.setText("mash-it.org");
+        tbPort.setText(ConfigParam.Port.getDefaultValue());
+        tbServer.setText("localhost");
+        //tbServer.setText("mash-it.org");
 
         // Initialize a new DialogHelper
         dialogHelper = new DialogHelper(this);

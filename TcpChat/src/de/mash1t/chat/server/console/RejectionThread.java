@@ -28,14 +28,14 @@ import java.net.Socket;
 import java.net.SocketAddress;
 import java.util.logging.Level;
 import de.mash1t.chat.logging.Counters;
-import de.mash1t.chat.networking.packets.Packet;
-import de.mash1t.chat.networking.packets.PacketType;
-import de.mash1t.chat.networking.methods.NetworkProtocolRole;
-import de.mash1t.chat.networking.methods.TCP;
-import de.mash1t.chat.networking.packets.ConnectPacket;
-import de.mash1t.chat.networking.packets.KickPacket;
+import de.mash1t.networklib.packets.Packet;
+import de.mash1t.networklib.packets.PacketType;
+import de.mash1t.chat.core.RoleType;
+import de.mash1t.networklib.packets.ConnectPacket;
+import de.mash1t.networklib.packets.KickPacket;
 import static de.mash1t.chat.server.console.ChatServer.logConnection;
 import static de.mash1t.chat.server.console.ChatServer.logControl;
+import de.mash1t.networklib.ExtendedTCP;
 
 /**
  * Class for rejecting clients politely if server has already maxClients
@@ -44,7 +44,7 @@ import static de.mash1t.chat.server.console.ChatServer.logControl;
  */
 public final class RejectionThread extends Thread {
 
-    protected TCP conLib;
+    protected ExtendedTCP conLib;
     protected SocketAddress ip;
 
     /**
@@ -54,7 +54,7 @@ public final class RejectionThread extends Thread {
      * @throws java.io.IOException
      */
     public RejectionThread(Socket clientSocket) throws IOException {
-        conLib = new TCP(clientSocket, NetworkProtocolRole.Server);
+        conLib = new ExtendedTCP(clientSocket, RoleType.Server);
     }
 
     /**
@@ -65,7 +65,7 @@ public final class RejectionThread extends Thread {
 
 //        try {
         Packet clientAnswer = conLib.read();
-        PacketType pType = clientAnswer.getIdentifier();
+        PacketType pType = clientAnswer.getType();
 
         if (pType == PacketType.Connect) {
             String name = ((ConnectPacket) clientAnswer).getName();

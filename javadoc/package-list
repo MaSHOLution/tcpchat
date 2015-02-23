@@ -2,10 +2,8 @@ de.mash1t.chat.client.gui
 de.mash1t.chat.client.gui.tabs
 de.mash1t.chat.client.gui.userlist
 de.mash1t.chat.config
+de.mash1t.chat.core
 de.mash1t.chat.logging
-de.mash1t.chat.networking.methods
-de.mash1t.chat.networking.packets
-de.mash1t.chat.security.basics
-de.mash1t.chat.security.cryptography
-de.mash1t.chat.security.cryptography.method
 de.mash1t.chat.server.console
+de.mash1t.cryptography.method
+de.mash1t.networking

@@ -1,0 +1,5 @@
+@startuml
+class de.mash1t.cryptography.method.Aes
+class de.mash1t.cryptography.method.ExtendedAes
+de.mash1t.cryptography.method.ExtendedAes --|> de.mash1t.cryptography.method.Aes
+@enduml

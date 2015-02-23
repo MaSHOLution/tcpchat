@@ -8,7 +8,7 @@ class java.io.IOException
 class java.io.OutputStreamWriter
 class java.util.EnumSet
 class java.util.Properties
-enum de.mash1t.chat.config.ServerConfigParam
+enum de.mash1t.chat.config.ConfigParam
 de.mash1t.chat.config.ConfigController ..> java.io.BufferedInputStream
 de.mash1t.chat.config.ConfigController ..> java.io.BufferedWriter
 de.mash1t.chat.config.ConfigController ..> java.io.FileInputStream

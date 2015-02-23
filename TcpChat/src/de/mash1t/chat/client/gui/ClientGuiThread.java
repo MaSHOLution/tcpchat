@@ -23,9 +23,9 @@
  */
 package de.mash1t.chat.client.gui;
 
+import de.mash1t.networklib.packets.*;
 import de.mash1t.chat.client.gui.tabs.TabController;
 import de.mash1t.chat.logging.Counters;
-import de.mash1t.chat.networking.packets.*;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 
@@ -82,7 +82,7 @@ public class ClientGuiThread implements Runnable {
         do {
 
             responsePacket = read();
-            ptype = responsePacket.getIdentifier();
+            ptype = responsePacket.getType();
 
             switch (ptype) {
                 case Disconnect:

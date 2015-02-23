@@ -42,7 +42,7 @@ import java.util.Properties;
 public final class ConfigController {
 
     private final Properties properties = new Properties();
-    private final EnumSet<ServerConfigParam> serverConfig = EnumSet.allOf(ServerConfigParam.class);
+    private final EnumSet<ConfigParam> serverConfig = EnumSet.allOf(ConfigParam.class);
     private final String fileName;
 
     /**
@@ -79,7 +79,7 @@ public final class ConfigController {
      * @param param the param to get the configuration from
      * @return configuration set in file
      */
-    public String getConfigValue(ServerConfigParam param) {
+    public String getConfigValue(ConfigParam param) {
         return properties.getProperty(param.getConfigString());
     }
 
@@ -90,7 +90,7 @@ public final class ConfigController {
      */
     public boolean validateConfig() {
         String temp;
-        for (ServerConfigParam param : serverConfig) {
+        for (ConfigParam param : serverConfig) {
             temp = getConfigValue(param);
             if (temp == null) {
                 return false;
@@ -110,7 +110,7 @@ public final class ConfigController {
      * @param temp the value of the config parameter
      * @return
      */
-    private boolean validateParam(ServerConfigParam param, String temp) {
+    private boolean validateParam(ConfigParam param, String temp) {
         switch (param) {
             case Port:
                 int port = Integer.parseInt(temp);
@@ -128,7 +128,7 @@ public final class ConfigController {
 
         try {
             writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(this.fileName), "utf-8"));
-            for (ServerConfigParam param : serverConfig) {
+            for (ConfigParam param : serverConfig) {
                 writer.write(param.getConfigString() + "=" + param.getDefaultValue());
                 writer.newLine();
             }

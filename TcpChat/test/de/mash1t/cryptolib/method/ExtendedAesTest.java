@@ -21,13 +21,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package security.cryptography;
+package de.mash1t.cryptolib.method;
 
 import de.mash1t.cryptolib.CryptoBasics;
+import static de.mash1t.cryptolib.CryptoBasics.encryptionBits;
+import static de.mash1t.cryptolib.CryptoBasics.encryptionBytes;
 import de.mash1t.cryptolib.EncryptionMethod;
 import de.mash1t.cryptolib.SessionIdGenerator;
-import de.mash1t.cryptolib.method.Aes;
-import de.mash1t.cryptolib.method.ExtendedAes;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
@@ -47,12 +47,12 @@ import static org.junit.Assert.*;
  *
  * @author Manuel Schmid
  */
-public class Text {
+public class ExtendedAesTest {
 
     private final String base = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut l";
 
     /**
-     * Test for Aes Cipher class
+     * Test for Aes Cipher class Code should always be the same as in the AesTest in teh CryptoLib
      *
      * @throws NoSuchAlgorithmException
      * @throws NoSuchPaddingException
@@ -70,7 +70,7 @@ public class Text {
         // Create secret key
         // TODO Change SecretKeySpec creation
         key = sha.digest(key);
-        key = Arrays.copyOf(key, CryptoBasics.encryption);
+        key = Arrays.copyOf(key, CryptoBasics.encryptionBytes);
         SecretKeySpec secretKeySpec = new SecretKeySpec(key, "AES");
 
         Cipher cipher = Cipher.getInstance("AES");
@@ -78,15 +78,21 @@ public class Text {
     }
 
     /**
-     * Test for encryption method aes
+     * Test for encryptionBytes method aes
      *
      * @throws NoSuchAlgorithmException
      * @throws NoSuchPaddingException
      * @throws InvalidKeyException
+     * @throws javax.crypto.IllegalBlockSizeException
+     * @throws javax.crypto.BadPaddingException
+     * @throws java.io.IOException
      */
     @Test
     public void aes() throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, IOException {
-        EncryptionMethod aes = new Aes();
+        System.out.println("Current EncryptionBytes: " + encryptionBytes);
+        System.out.println("Current EncryptionBits: " + encryptionBits);
+
+        EncryptionMethod aes = new ExtendedAes();
 
         String encrypted = aes.encrypt(base);
         assertFalse(base.equals(encrypted));
@@ -96,7 +102,14 @@ public class Text {
     }
 
     /**
-     * Test for no encryption method
+     * Test for no encryptionBytes method Code should always be the same as in the AesTest in teh CryptoLib
+     *
+     * @throws NoSuchAlgorithmException
+     * @throws NoSuchPaddingException
+     * @throws InvalidKeyException
+     * @throws javax.crypto.IllegalBlockSizeException
+     * @throws javax.crypto.BadPaddingException
+     * @throws java.io.IOException
      */
     @Test
     public void off() throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, IOException {
@@ -110,12 +123,18 @@ public class Text {
     }
 
     /**
-     * Test of current encryption method
+     * Test for current encryptionBytes method Code should always be the same as in the AesTest in teh CryptoLib
      *
      * @see CryptoBasics.encMethod
+     * @throws NoSuchAlgorithmException
+     * @throws NoSuchPaddingException
+     * @throws InvalidKeyException
+     * @throws javax.crypto.IllegalBlockSizeException
+     * @throws javax.crypto.BadPaddingException
+     * @throws java.io.IOException
      */
     @Test
-    public void current() throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, IOException  {
+    public void current() throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, IOException {
         EncryptionMethod encMethod = CryptoBasics.makeEncryptionObject();
 
         String encrypted = encMethod.encrypt(base);

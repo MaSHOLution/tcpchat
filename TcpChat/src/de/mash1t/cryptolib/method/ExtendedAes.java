@@ -75,7 +75,7 @@ public final class ExtendedAes extends Aes {
     @Override
     public boolean makeKey() {
         boolean result = super.makeKey();
-        if (result) {
+        if (!result) {
             de.mash1t.chat.logging.Counters.exception();
         }
         return result;

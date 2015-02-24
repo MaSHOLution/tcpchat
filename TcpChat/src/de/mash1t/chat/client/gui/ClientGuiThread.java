@@ -27,7 +27,6 @@ import de.mash1t.networklib.packets.*;
 import de.mash1t.chat.client.gui.tabs.TabController;
 import de.mash1t.chat.logging.Counters;
 import java.io.IOException;
-import java.io.ObjectInputStream;
 
 /**
  * This class serves as an outsourced thread, as the gui can only handle one thread (itself)
@@ -35,9 +34,6 @@ import java.io.ObjectInputStream;
  * @author Manuel Schmid
  */
 public class ClientGuiThread implements Runnable {
-
-    // Stream
-    protected ObjectInputStream objInStream = null;
 
     // Current gui thread
     protected ClientGui gui = null;
@@ -51,7 +47,6 @@ public class ClientGuiThread implements Runnable {
      */
     public ClientGuiThread(ClientGui gui) {
         this.gui = gui;
-        this.objInStream = gui.objInStream;
     }
 
     /*
@@ -80,8 +75,8 @@ public class ClientGuiThread implements Runnable {
 
         String message, sender, receiver;
         do {
-
-            responsePacket = read();
+            responsePacket = null;
+            responsePacket = gui.networkObj.read();
             ptype = responsePacket.getType();
 
             switch (ptype) {
@@ -116,7 +111,6 @@ public class ClientGuiThread implements Runnable {
                             gui.tabController.setFocusAt(receiver);
                         }
                     }
-
                     break;
 
                 case Userlist:
@@ -129,25 +123,5 @@ public class ClientGuiThread implements Runnable {
         } while (!exitListening);
         // Close the connection as it is no longer needed
         gui.closeConnection();
-    }
-
-    /**
-     * Reads a message from a specific objInStream
-     *
-     * @return read packet
-     */
-    protected synchronized Packet read() {
-        try {
-            Object temp = this.objInStream.readObject();
-            if (temp instanceof Packet) {
-                Packet readPacket = (Packet) temp;
-                return readPacket;
-            }
-        } catch (IOException | ClassNotFoundException ex) {
-            // TODO dialog?
-            gui.tabController.outputLineOnGui("*** SERVER IS GOING DOWN ***");
-            exitListening = true;
-        }
-        return new InvalidPacket();
     }
 }

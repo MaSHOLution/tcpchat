@@ -34,7 +34,6 @@ import de.mash1t.networklib.methods.NetworkProtocol;
 import java.awt.event.KeyEvent;
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
@@ -89,8 +88,8 @@ public final class ClientGui extends javax.swing.JFrame {
 
         // Set fields to default value
         tbPort.setText(ConfigParam.Port.getDefaultValue());
-        tbServer.setText("localhost");
-        //tbServer.setText("mash-it.org");
+        //tbServer.setText("localhost");
+        tbServer.setText("mash-it.org");
 
         // Initialize a new DialogHelper
         dialogHelper = new DialogHelper(this);

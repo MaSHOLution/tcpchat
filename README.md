@@ -49,7 +49,7 @@ $ java -jar TCPChat_Client.jar
 TCPChat is a netbeans project, which is developed with **JDK 1.7.0_71** with regards to an eventually **upcoming Android App**.
 
 Currently used libraries:
-- [CryptoLib] 0.1.0
+- [CryptoLib] 0.1.1
 - [NetworkLib] 0.1.0
 
 ### Support
@@ -74,5 +74,5 @@ This software is under MIT-License
 [homepage]:http://mash1t.de/
 [Twitter]:https://twitter.com/mash1t
 [jarfix.exe]:http://johann.loefflmann.net/en/software/jarfix/index.html
-[CryptoLib]:https://github.com/mash1t/java.lib.cryptography/tree/0.1.0
+[CryptoLib]:https://github.com/mash1t/java.lib.cryptography/tree/0.1.1
 [NetworkLib]:https://github.com/mash1t/java.lib.network/tree/0.1.0

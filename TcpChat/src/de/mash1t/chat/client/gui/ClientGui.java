@@ -88,8 +88,8 @@ public final class ClientGui extends javax.swing.JFrame {
 
         // Set fields to default value
         tbPort.setText(ConfigParam.Port.getDefaultValue());
-        //tbServer.setText("localhost");
-        tbServer.setText("mash-it.org");
+        tbServer.setText("localhost");
+        //tbServer.setText("mash-it.org");
 
         // Initialize a new DialogHelper
         dialogHelper = new DialogHelper(this);

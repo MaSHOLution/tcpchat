@@ -33,11 +33,14 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import de.mash1t.chat.logging.*;
-import de.mash1t.networklib.AbstractNetworkProtocol;
+import de.mash1t.networklib.methods.AbstractNetworkProtocol;
 import de.mash1t.networklib.methods.NetworkProtocolType;
 import de.mash1t.chat.config.ConfigController;
 import de.mash1t.chat.config.ConfigParam;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
+import org.bouncycastle.openpgp.PGPPublicKey;
 
 /**
  * Class ChatServer initializes threads and accepts new clients
@@ -48,13 +51,14 @@ public final class ChatServer {
     // maxClientsCount = 0 means infinite clients
     protected static final int maxClientsCount = 0;
     protected static final List<ClientThread> threads = new ArrayList<>();
-    protected static List<String> userList = new ArrayList<>();
+    protected static Map<String, PGPPublicKey> userList = new HashMap<>();
 
     // Logging
     protected static Logger logConnection;
     protected static Logger logException;
     protected static Logger logGeneral;
     protected static LoggingController logControl = null;
+    
     protected static NetworkProtocolType nwpType = NetworkProtocolType.TCP;
 
     // Config controller
@@ -155,7 +159,7 @@ public final class ChatServer {
      *
      * @return
      */
-    public static List<String> getUserList() {
+    public static Map<String, PGPPublicKey> getUserList() {
         return userList;
 
     }

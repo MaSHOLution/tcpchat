@@ -30,6 +30,9 @@ import java.util.List;
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
 import de.mash1t.networklib.packets.UserListPacket;
+import java.util.Map;
+import java.util.TreeMap;
+import org.bouncycastle.openpgp.PGPPublicKey;
 
 /**
  * Controller for the userlist
@@ -82,10 +85,9 @@ public final class UserListController {
             case Full:
                 clearList();
                 // TODO sort users
-                List<String> userlist = ulPacket.getUserList();
-                Collections.sort(userlist);
-                for (String user : userlist) {
-                    listModel.addElement(user);
+                Map<String, PGPPublicKey> userlist = new TreeMap<>(ulPacket.getUserList());
+                for (Map.Entry<String, PGPPublicKey> entry : userlist.entrySet()) {
+                    listModel.addElement(entry.getKey());
                 }
         }
     }

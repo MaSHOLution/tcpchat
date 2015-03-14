@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package de.mash1t.networklib;
+package de.mash1t.networklib.methods;
 
 import de.mash1t.chat.core.RoleType;
 import java.io.IOException;
@@ -33,7 +33,6 @@ import de.mash1t.chat.logging.Counters;
 import de.mash1t.chat.server.console.ClientThread;
 import de.mash1t.networklib.methods.NetworkProtocol;
 import de.mash1t.networklib.packets.Packet;
-import de.mash1t.networklib.packets.InfoPacket;
 import de.mash1t.networklib.packets.InvalidPacket;
 
 /**
@@ -94,7 +93,7 @@ public class ExtendedTCP extends AbstractNetworkProtocol implements NetworkProto
     public static boolean send(Packet packet, ClientThread thread) {
         try {
             Counters.connection();
-            return thread.conLib.send(packet);
+            return thread.networkObject.send(packet);
         } catch (Exception ex) {
             Counters.exception();
             return false;
@@ -119,11 +118,6 @@ public class ExtendedTCP extends AbstractNetworkProtocol implements NetworkProto
             Counters.exception();
         }
         return new InvalidPacket();
-    }
-
-    public boolean sendSessionId() {
-        // TODO implement SessionIdPacket
-        return send(new InfoPacket(encMethod.sessionId));
     }
 
     @Override

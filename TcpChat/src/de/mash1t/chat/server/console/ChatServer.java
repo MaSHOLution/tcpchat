@@ -104,8 +104,8 @@ public final class ChatServer {
         System.out.println("Server started on port " + portNumber);
         logControl.log(logGeneral, Level.INFO, "Server started on port " + portNumber);
 
-        // Open a server socket on the portNumber (default 8000)
         try {
+            // Open new server socket
             ServerSocket serverSocket = new ServerSocket(portNumber);
 
             // Adding shutdown handle
@@ -177,7 +177,7 @@ class ShutdownHandle extends Thread {
 
         // Send closing of server to all clients
         for (ClientThread thread : ChatServer.threads) {
-            if (thread.state == ConnectionState.Online) {
+            if (thread.connState == ConnectionState.Online) {
                 AbstractNetworkProtocol.send(new KickPacket("*** SERVER IS GOING DOWN ***"), thread, ChatServer.nwpType);
             }
         }

@@ -35,7 +35,7 @@ import de.mash1t.networklib.packets.ConnectPacket;
 import de.mash1t.networklib.packets.KickPacket;
 import static de.mash1t.chat.server.console.ChatServer.logConnection;
 import static de.mash1t.chat.server.console.ChatServer.logControl;
-import de.mash1t.networklib.ExtendedTCP;
+import de.mash1t.networklib.methods.ExtendedTCP;
 
 /**
  * Class for rejecting clients politely if server has already maxClients

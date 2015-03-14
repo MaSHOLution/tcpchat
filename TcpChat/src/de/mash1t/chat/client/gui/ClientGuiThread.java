@@ -26,7 +26,15 @@ package de.mash1t.chat.client.gui;
 import de.mash1t.networklib.packets.*;
 import de.mash1t.chat.client.gui.tabs.TabController;
 import de.mash1t.chat.logging.Counters;
+import de.mash1t.cryptolib.method.Rsa;
 import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import org.bouncycastle.openpgp.PGPException;
 
 /**
  * This class serves as an outsourced thread, as the gui can only handle one thread (itself)
@@ -36,9 +44,10 @@ import java.io.IOException;
 public class ClientGuiThread implements Runnable {
 
     // Current gui thread
-    protected ClientGui gui = null;
+    private final ClientGui gui;
+    private final Rsa rsa;
 
-    protected boolean exitListening = false;
+    private boolean exitListening = false;
 
     /**
      * Constructor
@@ -47,6 +56,18 @@ public class ClientGuiThread implements Runnable {
      */
     public ClientGuiThread(ClientGui gui) {
         this.gui = gui;
+        this.rsa = null;
+    }
+
+    /**
+     * Constructor
+     *
+     * @param gui
+     * @param rsa
+     */
+    public ClientGuiThread(ClientGui gui, Rsa rsa) {
+        this.gui = gui;
+        this.rsa = rsa;
     }
 
     /*
@@ -75,7 +96,6 @@ public class ClientGuiThread implements Runnable {
 
         String message, sender, receiver;
         do {
-            responsePacket = null;
             responsePacket = gui.networkObj.read();
             ptype = responsePacket.getType();
 
@@ -123,5 +143,41 @@ public class ClientGuiThread implements Runnable {
         } while (!exitListening);
         // Close the connection as it is no longer needed
         gui.closeConnection();
+    }
+
+    /**
+     * Encrypts a string with RSA
+     *
+     * @param message String to encrypt
+     * @return encrypted String
+     */
+    protected String encrypt(String message) {
+        if (rsa != null) {
+            try {
+                return rsa.encryptString(message);
+            } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException | IOException | NoSuchProviderException | PGPException ex) {
+                return null;
+            }
+        } else {
+            return message;
+        }
+    }
+
+    /**
+     * Decrypts a String with RSA
+     *
+     * @param encrypted encrypted String
+     * @return decrypted String
+     */
+    protected String decrypt(String encrypted) {
+        if (rsa != null) {
+            try {
+                return rsa.decryptString(encrypted);
+            } catch (IOException | NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException | NoSuchProviderException | PGPException ex) {
+                return null;
+            }
+        } else {
+            return encrypted;
+        }
     }
 }

@@ -29,29 +29,18 @@ import java.security.NoSuchAlgorithmException;
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
-import javax.crypto.spec.SecretKeySpec;
 
 /**
- * Encryption method AES
+ * Encryption method ExtendedAES
  *
- * @see http://blog.axxg.de/java-aes-verschluesselung-mit-beispiel/
  * @author Manuel Schmid
  */
 public final class ExtendedAes extends Aes {
 
-    private SecretKeySpec secretKeySpec;
-
-    /**
-     * Constructor, makes a new secretKeySpec from the SessionId
-     */
-    public ExtendedAes() {
-        this.makeKey();
-    }
-
     @Override
-    public String encrypt(String message) {
+    public String encryptString(String message) {
         try {
-            return super.encrypt(message);
+            return super.encryptString(message);
         } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException ex) {
             // TODO handle exceptions
         } finally {
@@ -61,23 +50,14 @@ public final class ExtendedAes extends Aes {
     }
 
     @Override
-    public String decrypt(String message) {
+    public String decryptString(String message) {
         try {
-            return super.decrypt(message);
+            return super.decryptString(message);
         } catch (IOException | NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException ex) {
             // TODO handle exceptions
         } finally {
             de.mash1t.chat.logging.Counters.exception();
         }
         return null;
-    }
-
-    @Override
-    public boolean makeKey() {
-        boolean result = super.makeKey();
-        if (!result) {
-            de.mash1t.chat.logging.Counters.exception();
-        }
-        return result;
     }
 }

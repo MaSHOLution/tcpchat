@@ -26,8 +26,8 @@ package de.mash1t.networklib;
 import de.mash1t.networklib.methods.NetworkProtocolType;
 import de.mash1t.networklib.packets.Packet;
 import de.mash1t.chat.server.console.ClientThread;
-import de.mash1t.cryptolib.CryptoBasics;
 import de.mash1t.cryptolib.EncryptionMethod;
+import de.mash1t.cryptolib.ExtendedCryptoBasics;
 import de.mash1t.networklib.methods.NetworkProtocol;
 
 /**
@@ -37,7 +37,7 @@ import de.mash1t.networklib.methods.NetworkProtocol;
  */
 public abstract class AbstractNetworkProtocol implements NetworkProtocol {
     
-    EncryptionMethod encMethod = CryptoBasics.makeEncryptionObject();
+    EncryptionMethod encMethod = ExtendedCryptoBasics.makeEncryptionObject();
     
     /**
      * Sends a message to a specific thread

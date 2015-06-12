@@ -29,10 +29,11 @@ import de.mash1t.chat.client.gui.tabs.ChatType;
 import de.mash1t.chat.client.gui.tabs.TabController;
 import de.mash1t.chat.client.gui.userlist.UserListController;
 import de.mash1t.chat.config.ConfigParam;
+import de.mash1t.networklib.methods.NetworkBasics;
+import de.mash1t.networklib.methods.NetworkProtocol;
 import java.awt.event.KeyEvent;
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
@@ -51,6 +52,7 @@ public final class ClientGui extends javax.swing.JFrame {
 
     // Socket
     protected Socket clientSocket = null;
+    protected NetworkProtocol networkObj = null;
 
     // Streams
     protected ObjectOutputStream objOutStream = null;
@@ -425,15 +427,13 @@ public final class ClientGui extends javax.swing.JFrame {
             try {
                 // Set up socket and streams
                 clientSocket = new Socket(host, port);
-                inputLine = new BufferedReader(new InputStreamReader(System.in));
-                objOutStream = new ObjectOutputStream(clientSocket.getOutputStream());
-                objInStream = new ObjectInputStream(clientSocket.getInputStream());
+                networkObj = NetworkBasics.makeNetworkProtocolObject(clientSocket);
 
                 // Create a thread to read from the server
                 new Thread(new ClientGuiThread(this)).start();
 
                 // Send clientName
-                if (this.send(new ConnectPacket(this.clientName))) {
+                if (networkObj.send(new ConnectPacket(this.clientName))) {
 
                     this.switchGui(true);
                     this.isConnected = true;
@@ -459,7 +459,7 @@ public final class ClientGui extends javax.swing.JFrame {
      * Disconnects the client to the server
      */
     protected void disconnect() {
-        this.send(new DisconnectPacket());
+        networkObj.send(new DisconnectPacket());
     }
 
     /**
@@ -493,27 +493,6 @@ public final class ClientGui extends javax.swing.JFrame {
     }
 
     /**
-     * Sends a packet through the objOutStream to the server
-     *
-     * @param packet packet to send
-     * @return
-     */
-    protected boolean send(Packet packet) {
-
-        try {
-            this.objOutStream.writeObject(packet);
-            this.tbMessage.setText("");
-            this.hasWrittenMessage = true;
-            return true;
-        } catch (IOException ex) {
-            // TODO exception handling
-        } finally {
-            de.mash1t.chat.logging.Counters.exception();
-        }
-        return false;
-    }
-
-    /**
      * Tries to send content of message box
      */
     protected void sendMessageBox() {
@@ -522,33 +501,28 @@ public final class ClientGui extends javax.swing.JFrame {
         if (!message.equals("")) {
             ChatTab currentChatTab = this.tabController.getCurrentChatTab();
             if (currentChatTab.getChatType() == ChatType.Private) {
-                // TODO Implement group messages
+                // TODO Implement group messages for private chatrooms
                 for (String person : currentChatTab.getPersons()) {
-                    this.send(new PrivateMessagePacket(message, this.clientName, person));
+                    networkObj.send(new PrivateMessagePacket(message, this.clientName, person));
                 }
             } else if (currentChatTab.getChatType() == ChatType.Group) {
-                this.send(new GroupMessagePacket(message, this.clientName));
+                networkObj.send(new GroupMessagePacket(message, this.clientName));
             }
         }
-        this.tbMessage.requestFocus();
+        tbMessage.setText("");
+        tbMessage.requestFocus();
     }
 
     /**
      * Closes the connection to the server
      */
     protected synchronized void closeConnection() {
-        try {
-            // Close streams and socket
-            this.objOutStream.close();
-            this.objInStream.close();
-            this.clientSocket.close();
-
-            this.switchGui(false);
-        } catch (IOException ex) {
-            System.err.println("IOException:  " + ex);
-        } finally {
+        // Close streams and socket
+        if (!networkObj.close()) {
             de.mash1t.chat.logging.Counters.exception();
+            //dialogHelper.showWarningDialog("Error while closing connection", "Error while closing connection");
         }
+        this.switchGui(false);
     }
 
     /**
@@ -612,10 +586,12 @@ public final class ClientGui extends javax.swing.JFrame {
                 if ("Windows".equals(info.getName())) {
                     javax.swing.UIManager.setLookAndFeel(info.getClassName());
                     break;
+
                 }
             }
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(ClientGui.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(ClientGui.class
+                    .getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } finally {
             de.mash1t.chat.logging.Counters.exception();
         }

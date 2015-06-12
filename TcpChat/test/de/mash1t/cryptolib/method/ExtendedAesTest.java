@@ -94,10 +94,10 @@ public class ExtendedAesTest {
 
         EncryptionMethod aes = new ExtendedAes();
 
-        String encrypted = aes.encrypt(base);
+        String encrypted = aes.encryptString(base);
         assertFalse(base.equals(encrypted));
 
-        String decrypted = aes.decrypt(encrypted);
+        String decrypted = aes.decryptString(encrypted);
         assertEquals(decrypted, base);
     }
 
@@ -115,10 +115,10 @@ public class ExtendedAesTest {
     public void off() throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, IOException {
         EncryptionMethod encMethod = new EncryptionMethod();
 
-        String encrypted = encMethod.encrypt(base);
+        String encrypted = encMethod.encryptString(base);
         assertEquals(base, encrypted);
 
-        String decrypted = encMethod.decrypt(encrypted);
+        String decrypted = encMethod.decryptString(encrypted);
         assertEquals(decrypted, base);
     }
 
@@ -137,8 +137,8 @@ public class ExtendedAesTest {
     public void current() throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, IOException {
         EncryptionMethod encMethod = CryptoBasics.makeEncryptionObject();
 
-        String encrypted = encMethod.encrypt(base);
-        String decrypted = encMethod.decrypt(encrypted);
+        String encrypted = encMethod.encryptString(base);
+        String decrypted = encMethod.decryptString(encrypted);
         assertEquals(decrypted, base);
     }
 }

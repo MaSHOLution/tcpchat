@@ -26,7 +26,6 @@ package de.mash1t.chat.client.gui;
 import de.mash1t.networklib.packets.*;
 import de.mash1t.chat.client.gui.tabs.TabController;
 import de.mash1t.chat.logging.Counters;
-import java.io.IOException;
 
 /**
  * This class serves as an outsourced thread, as the gui can only handle one thread (itself)
@@ -88,7 +87,7 @@ public class ClientGuiThread implements Runnable {
                     message = gm.getMessage();
                     sender = gm.getSender();
 
-                    // Always output groupmessage on first tab ("Group Chat")
+                    // Always output group message on first tab ("Group Chat")
                     gui.tabController.outputLineOnGui("<" + sender + "> " + message, 0);
                     break;
                 case Kick:

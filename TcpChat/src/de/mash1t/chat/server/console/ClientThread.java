@@ -262,14 +262,9 @@ public final class ClientThread extends Thread {
      * @param name name of the thread
      */
     protected void linkNameToThread(String name) {
-        for (ClientThread thread : threads) {
-            if (thread == this) {
-                this.clientName = name;
-                logControl.log(logConnection, Level.INFO, conLib.getIP() + ": is now " + name);
-                userList.add(name);
-                break;
-            }
-        }
+        clientName = name;
+        logControl.log(logConnection, Level.INFO, conLib.getIP() + ": is now " + name);
+        userList.add(name);
     }
 
     /**

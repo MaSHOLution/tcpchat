@@ -46,10 +46,13 @@ public final class ConfigController {
     private final String fileName;
 
     /**
-     * Constructor, directly loads configurations from file into internal variable
+     * Constructor, directly loads configurations from file into internal
+     * variable
+     *
+     * @param filename name of the ini-file
      */
-    public ConfigController() {
-        this.fileName = "ServerConfig.ini";
+    public ConfigController(String filename) {
+        this.fileName = filename;
     }
 
     /**
@@ -81,6 +84,26 @@ public final class ConfigController {
      */
     public String getConfigValue(ConfigParam param) {
         return properties.getProperty(param.getConfigString());
+    }
+
+    /**
+     * Getter for a specific parameter of type integer in the config file
+     *
+     * @param param
+     * @return
+     */
+    public int getConfigValueInt(ConfigParam param) {
+        return Integer.parseInt(properties.getProperty(param.getConfigString()));
+    }
+
+    /**
+     * Getter for a specific parameter of type integer in the config file
+     *
+     * @param param
+     * @return
+     */
+    public boolean getConfigValueBoolean(ConfigParam param) {
+        return Boolean.parseBoolean((properties.getProperty(param.getConfigString())));
     }
 
     /**
@@ -118,10 +141,30 @@ public final class ConfigController {
                     return false;
                 }
                 break;
+            case MaxClients:
+                int maxClients = Integer.parseInt(temp);
+                if (maxClients < 0) {
+                    return false;
+                }
+                break;
+
+            // Validate booleans
+            case LogFiles:
+            case LogConsole:
+            case CleanLogsOnStartup:
+                if (!temp.equals("true") && !temp.equals("false")) {
+                    return false;
+                }
+                break;
         }
         return true;
     }
 
+    /**
+     * Creates a file with default values
+     *
+     * @return true/false
+     */
     public boolean makeDefaultFile() {
 
         BufferedWriter writer = null;

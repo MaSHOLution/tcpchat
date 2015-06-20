@@ -31,6 +31,7 @@ package de.mash1t.chat.config;
 public enum ConfigParam {
 
     Port("port", "8000"),
+    MaxClients("maxclients", "0"),
     LogFiles("log_to_files", "true"),
     LogConsole("log_to_console", "false"),
     CleanLogsOnStartup("clean_logs_on_start", "false");

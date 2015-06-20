@@ -58,7 +58,7 @@ public final class ChatServer {
     protected static NetworkProtocolType nwpType = NetworkProtocolType.TCP;
 
     // Config controller
-    private static final ConfigController conf = new ConfigController();
+    private static final ConfigController conf = new ConfigController("ServerConfig.ini");
 
     /**
      * Main method for server
@@ -89,10 +89,12 @@ public final class ChatServer {
 
     private static void runServer() {
 
-        int portNumber = Integer.parseInt(conf.getConfigValue(ConfigParam.Port));
-        boolean loggingEnabled = Boolean.parseBoolean(conf.getConfigValue(ConfigParam.LogFiles));
-        boolean showOnConsole = Boolean.parseBoolean(conf.getConfigValue(ConfigParam.LogConsole));
-        boolean cleanLogsOnStartup = Boolean.parseBoolean(conf.getConfigValue(ConfigParam.CleanLogsOnStartup));
+        int portNumber = conf.getConfigValueInt(ConfigParam.Port);
+        int maxClientsCount = conf.getConfigValueInt(ConfigParam.MaxClients);
+        boolean loggingEnabled = conf.getConfigValueBoolean(ConfigParam.LogFiles);
+        boolean showOnConsole = conf.getConfigValueBoolean(ConfigParam.LogConsole);
+        boolean cleanLogsOnStartup = conf.getConfigValueBoolean(ConfigParam.CleanLogsOnStartup);
+        // maxClientsCount = 0 means infinite clients
 
         // Setting up LoggingController
         logControl = new LoggingController(loggingEnabled, showOnConsole, cleanLogsOnStartup);

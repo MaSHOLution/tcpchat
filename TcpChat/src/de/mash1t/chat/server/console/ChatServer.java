@@ -46,7 +46,7 @@ public final class ChatServer {
 
     // Setting up client
     // maxClientsCount = 0 means infinite clients
-    protected static final int maxClientsCount = 0;
+    protected static int maxClientsCount;
     protected static final List<ClientThread> threads = new ArrayList<>();
     protected static List<String> userList = new ArrayList<>();
 
@@ -90,11 +90,11 @@ public final class ChatServer {
     private static void runServer() {
 
         int portNumber = conf.getConfigValueInt(ConfigParam.Port);
-        int maxClientsCount = conf.getConfigValueInt(ConfigParam.MaxClients);
+        // maxClientsCount = 0 means infinite clients
+        maxClientsCount = conf.getConfigValueInt(ConfigParam.MaxClients);
         boolean loggingEnabled = conf.getConfigValueBoolean(ConfigParam.LogFiles);
         boolean showOnConsole = conf.getConfigValueBoolean(ConfigParam.LogConsole);
         boolean cleanLogsOnStartup = conf.getConfigValueBoolean(ConfigParam.CleanLogsOnStartup);
-        // maxClientsCount = 0 means infinite clients
 
         // Setting up LoggingController
         logControl = new LoggingController(loggingEnabled, showOnConsole, cleanLogsOnStartup);
